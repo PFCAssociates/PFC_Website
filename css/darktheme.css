@@ -1,0 +1,45 @@
+@charset "utf-8";
+/* CSS Document */
+/*Sizing & Transition*/
+*, *:after, *:before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-transition: all 1s ease;
+  -moz-transition: all 1s ease;
+  -o-transition: all 1s ease;
+  -ms-transition: all 1s ease;
+  transition: all 1s ease;
+}
+
+html, body {
+  height: 100%;
+}
+
+/*Wrapper*/
+.main {
+	background:;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+}
+
+
+/*Light Switch*/
+
+
+input#lightswitch {
+   position: absolute;
+	margin-top: 500px;
+}
+
+
+/*Switched Off*/
+input#lightswitch:checked + .main {
+  background:#AB2E31;
+}

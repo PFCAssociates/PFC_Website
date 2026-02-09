@@ -1,0 +1,157 @@
+/*Top*/
+@charset "utf-8";
+/* CSS Document */
+
+*{
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+font-size: clamp(5px, 1vw, 10px);
+}
+
+.grid-container
+{
+
+display: grid;
+margin: auto;
+grid-template-columns: repeat(6,1fr);
+max-width: 1145px;
+
+
+grid-template-areas:
+       /*Grid item placement*/
+       /*|   01   |   02   |   03   |   04   |   05   |   06   |   07   |   08   |   09   |   10   |   11   |   12   |   13   |   14   |   15   |   16   |   17   |   18   |   19   |   20   |   21   |   22   |   23   |   24   |*/
+/*Row01*/"........ ........ ........ ........ ........ ........"/*          Space*/
+/*Row02*/"........ ........ ........ ........ ........ ........"/*          Space*/
+/*Row03*/"thxDsc01 thxDsc01 thxDsc01 thxDsc01 thxDsc01 thxDsc01"/*thxDsc*/
+/*Row04*/"........ ........ ........ ........ ........ ........"/*          Space*/
+/*Row05*/"redDsc01 redDsc01 redDsc01 redDsc01 redDsc01 redDsc01"/*redDsc*/
+/*Row06*/"........ ........ ........ ........ ........ ........"/*          Space*/
+/*Row07*/"........ pfcLog01 pfcLog01 pfcLog01 pfcLog01 ........"/*pfcLog*/
+/*Row08*/"........ ........ ........ ........ ........ ........"/*          Space*/
+/*Row09*/"........ ........ ........ ........ ........ ........"/*          Space*/
+/*Row10*/"slgQuo01 slgQuo01 slgQuo01 slgQuo01 slgQuo01 slgQuo01"/*slgQuo*/
+/*Row11*/"........ ........ ........ ........ ........ ........"/*          Space*/
+/*Row12*/"coprit01 coprit01 coprit01 coprit01 coprit01 coprit01"/*coprit*/
+/*Row13*/"........ ........ ........ ........ ........ ........"/*          Space*/
+;
+
+grid-template-rows:
+       /*Row Heights*/
+/*Row01*/00px/*          Space*/
+/*Row02*/500px/*          Space*/
+/*Row03*/auto/*thxDsc*/
+/*Row04*/40px/*          Space*/
+/*Row05*/auto/*redDsc*/
+/*Row06*/200px/*          Space*/
+/*Row07*/200px/*pfcLog*/
+/*Row08*/15px/*          Space*/
+/*Row09*/150px/*          Space*/
+/*Row10*/auto/*slgQuo*/
+/*Row11*/15px/*          Space*/
+/*Row12*/auto/*coprit*/
+/*Row13*/15px/*          Space*/
+;
+
+}/*End of .grid-container*/
+
+.giAll
+{
+
+min-width: 0;
+max-width: 100%;
+align-self: center;
+text-align: center;
+overflow: hidden;
+background-color: transparent;
+border: 0px;
+padding: 0px;
+font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "DejaVu Sans", "sans-serif";
+
+}
+
+a/*Remove the gray background color from active links in IE 10.*/
+{
+
+background-color: transparent;
+
+}
+
+a:focus, a:active, a:hover/*focus = tabbing, active=clicking, hover on all hyperlinks*/
+{
+
+background-color: #E2E2E2;
+outline: 0;
+
+}
+
+/*Start Grid Category Section*/
+
+.thxDsc/*thxDsc01*/
+{
+align-self: baseline;
+margin-left: 20px;
+margin-right: 20px;
+font-size: clamp(10px, 2vw, 15px);
+}
+.redDsc/*redDsc01*/
+{
+align-self: baseline;
+text-align: justify;
+text-justify: inter-word;
+margin-left: 20px;
+margin-right: 20px;
+font-size: clamp(10px, 2vw, 15px);
+}
+.pfcLog/*pfcLog01*/
+{
+min-width: 100%;
+min-height: 100%;
+}
+.slgQuo/*slgQuo01*/
+{
+color: #3E678B;
+font-size: clamp(10px, 2.7vw, 28px);
+font-weight: bold;
+}
+.coprit/*coprit01*/
+{
+font-size: clamp(8px, 1vw, 10px);
+}
+
+/*End Grid Category Section*/
+
+/*Start Div Class Section*/
+
+.thxDsc01
+{
+grid-area: thxDsc01;
+
+
+}
+.redDsc01
+{
+grid-area: redDsc01;
+
+
+}
+.pfcLog01
+{
+grid-area: pfcLog01;
+
+
+}
+.slgQuo01
+{
+grid-area: slgQuo01;
+
+
+}
+.coprit01
+{
+grid-area: coprit01;
+
+
+}
+
+/*End Div Class Section*/
