@@ -1,3 +1,5 @@
+# When Claude Code pushes to a claude/* branch, this workflow automatically
+# merges it into main, deletes the branch, and deploys to GitHub Pages.
 name: Auto-merge Claude branches
 
 on:
