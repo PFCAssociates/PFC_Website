@@ -1,0 +1,8 @@
+{
+  "description": "Pre-allows Claude Code to run git commands without prompting for permission",
+  "permissions": {
+    "allow": [
+      "Bash(git *)"
+    ]
+  }
+}
