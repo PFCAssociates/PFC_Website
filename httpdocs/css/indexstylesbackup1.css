@@ -1,0 +1,520 @@
+@charset "utf-8";
+/* CSS Document */
+
+.preload * 
+{
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -ms-transition: none !important;
+  -o-transition: none !important;
+}
+
+body.preload *
+{
+animation-duration: 0s !important;
+-webkit-animation-duration: 0s !important;
+transition:background-color 0s, opacity 0s, color 0s, width 0s, height 0s, padding 0s, margin 0s !important;
+}
+
+
+
+:root 
+{
+  width: 100%;
+  height: 100%;
+}
+
+Body
+{
+	min-width: 400px;
+	font-family: "Gill Sans", "Gill Sans MT", "Myriad Pro", "DejaVu Sans Condensed", Helvetica, Arial, "sans-serif";
+	color: #000000;
+	margin: 0px;
+	font-style: normal;
+	font-weight: 300;
+	transition: all 0.15s ease-out;
+}
+
+
+/*The following sets up the slider*/
+
+
+
+
+
+/*sets body transition without interfering with body css*/
+body 
+{
+    transition: all 0.5s ease-out;
+}
+
+/*sets the color of background and text when light theme is selected*/
+body 
+{
+  background-color: #fff;
+  color: #333;
+}
+
+/*sets the color of background and text when dark theme is selected*/
+body.dark-theme 
+{
+  background-color: #333;
+  color: #fff;
+}
+
+/*the following makes the oval checkbox thing*/
+input[type="checkbox"]
+{
+	float: right;
+	margin-right: 10px;
+	/*grey #c6c6c6*/
+	background:#E2E2E2;
+	position: relative;
+	width: 80px;
+	height: 40px;
+	-webkit-appearance: none;
+	/*required to make appear correctly on firefox*/
+	-moz-appearance: none;
+	outline: none;
+	border-radius: 20px;
+	box-shadow: inset 0 0 5px rgba(0,0,0,.2);
+	transition: all 0.5s ease-out;
+}
+
+/*changes background color of oval if it is checked*/
+input:checked[type="checkbox"]
+{
+	background:#027FB8;
+}
+
+/*the following makes the moving Circle*/
+input[type="checkbox"]:before
+{
+	content: '';
+	position: absolute;
+	width: 40px;
+	height: 40px;
+	border-radius: 20px;
+	top: 0;
+	Left: 0;
+	background: #fff;
+	transform: scale(1.1);
+	box-shadow: 0 2px 5px rgba(0,0,0,.2);
+	transition: all 0.5s ease-out;
+}
+
+/*changes color of the moving Circle on light theme*/
+#lightswitch::before
+{
+   background-color:#FFFFFF;
+}
+
+/*changes color of the moving Circle on dark theme and moves it to the right*/
+.dark-theme #lightswitch::before 
+{
+	left: 40px;
+	background-color: #FFFFFF;
+		
+}
+
+
+
+
+/*End of Slider Creation*/
+
+
+/*Here Starts the Dark Effect of the slider*/
+
+
+/*TO DO: Disable css animations or transitions when the page first loads, then reenable them with JavaScript*/
+
+
+
+
+
+/*End of Dark Effect of the slider*/
+
+
+
+
+p
+{
+	/*background-color: #F5F5F5;*/
+	
+}
+
+/*p2 is footer*/
+p2
+{
+	font-size: 12px;
+}
+
+/*.clearfix makes it so that images of larger sizes than the text box modify the overall box to fit both*/
+.clearfix::after
+{
+	content: "";
+	clear: none;
+	display: table;
+}
+.clearfix
+{
+	overflow:auto;
+}
+
+.page-wrapper
+{
+	/*max width of the entire website*/
+	max-width: 1300px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.top-banner
+{
+	width: 100%;
+	height: 240px;
+	background-image: url(../PFC_images/PFC_Building.png);
+	background-position: center center;
+	background-size: cover;
+	padding-top: 20px;
+}
+
+#logo
+{
+	width: 25%;
+	float: left;
+	margin-left: 20px;
+	max-width: 200px;
+	min-width: 150px;
+}
+
+
+.top-banner img
+{
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/*not currently in main page*/
+.top-banner h1
+{
+	font-size: 24px;
+	text-align: center;
+	color: #FFFFFF;
+	font-family: Cambria, "Hoefler Text", "Liberation Serif", Times, "Times New Roman", "serif";
+	font-style: normal;
+	font-weight: 300;
+}
+
+.nav-bar
+{
+	margin-bottom: -10px;
+}
+
+.nav-bar ul
+{
+	text-align:center;
+	list-style-type: none;
+	padding-left: 0px;
+}
+
+.nav-bar a
+{
+	text-decoration: none;
+	/*#2D5DBF is a blue color */
+	color: #2D5DBF;
+	display: block;
+	margin-bottom: 0px;
+	border-style: solid;
+	border-width: .5px;
+	border-color: #E2E2E2;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	font-family:"Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "DejaVu Sans", Verdana, "sans-serif";
+	font-style: normal;
+	font-weight: 400;
+	font-size: .7cm;
+}
+
+.nav-bar a:hover
+{
+	/*#3E678B is a darker bluish color*/
+	background-color:#E2E2E2;
+}
+
+h2
+{
+	color: #3E678B
+}
+
+h3
+{
+	color: #CE3334
+}
+
+.main
+{
+	width: 96%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.container-featured
+{
+	
+	margin: 2%;
+}
+
+.featured-images
+{
+	display: block;
+	width: 100%;
+}
+/*Pics used
+
+Patch_of_the_Metropolitan_Police_Department_of_the_District_of_Columbia.png
+Fire_and_EMS_Badge.png
+park_police_badge_2.png
+Logo_of_the_United_States_Secret_Service.png
+
+*/
+#pic1
+{
+	/*type in .. before the url if the css is in a different folder from the index*/
+	/*make sure all the images have no spaces but rather _ */
+	background-image: 				url(../PFC_images/Patch_of_the_Metropolitan_Police_Department_of_the_District_of_Columbia.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	
+}
+
+#pic2
+{
+	background-image:
+url(../PFC_images/Fire_and_EMS_Badge.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+}
+
+#pic3
+{
+	background-image:
+url(../PFC_images/park_police_badge_2.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+}
+
+#pic4
+{
+	background-image:
+url(../PFC_images/Logo_of_the_United_States_Secret_Service.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+}
+
+.featured-img
+{
+	width: 150px;
+	height: 150px;
+	/*border-radius: 100%;*/
+	
+	background-size:cover;
+	margin-left: auto;
+	margin-right: auto;
+	border-style: solid;
+	border-color: transparent;
+	/*border-color: #E2E2E2;*/
+	border-width: medium;
+}
+
+.featured-images
+{
+	text-align: center;
+}
+
+.featured
+{
+	width: 48%;
+	margin-left: 1%;
+	margin-right: 1%;
+	float: left;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+#topic-1-img
+{
+	width: 100%;
+	background-image: url(../PFC_images/drpatient1.jpg);
+	background-size: cover;
+	height: 300px;
+}
+
+#topic-2-img
+{
+	width: 100%;
+	background-image: url(../PFC_images/fire-ems.jpg);
+	background-size: cover;
+	height: 300px;
+}
+
+.footer
+{
+	width: 100%;
+	/*background: #5A6773;*/
+	text-align: center;
+	padding: 20px;
+	/*the border box eliminates the 100% plus the 20 pixels on left and right which removes the scroll bar from the footer */
+	box-sizing: border-box;
+	/*saw an option for box shadow*/
+	
+}
+
+.footer h3
+{
+	font-size: 28px;
+	/*background-color: #F5F5F5;*/
+	color: #3E678B;
+	
+}
+
+.footer p2
+{
+	font-size: 10px;
+}
+
+.topic-1 h3
+{
+	font-size: 24px;
+	
+	text-align: center;
+}
+
+.topic-1 p
+{
+	text-align: justify;
+}
+
+.topic-2 h3
+{
+	font-size: 24px;
+	text-align: center;
+}
+
+.topic-2 p
+{
+	text-align: justify;
+}
+
+
+.scrollToTop
+{
+	position:fixed;
+	bottom: 30px;
+	right: 20px;
+	width: 60px;
+	height: 60px;
+	line-height: 60px;
+	text-align: center;
+	background: #0063e8;
+	color: #fff;
+	display: none;
+	border-radius: 50%;
+}
+
+.scrollToTop:hover
+{
+	background: #e8008a;
+}
+
+@media screen and (min-width:768px)
+{
+	.nav-bar a
+	{
+		/*16.4% makes 6 buttons align*/
+		width: 16.4%;
+		float:left;
+		margin-bottom: 5px;
+	}
+	
+	#topic-2-img
+	{
+		width: 48%;
+		float: left;
+		margin-right: 2%;
+		margin-bottom: 20px;
+	}
+	
+	.footer h3
+	{
+		/*not currently working font-size: 24px;*/
+		font-size: 28px;
+		
+	}
+	
+	.topic-1
+	{
+		margin-bottom: 20px;
+		width: 80%;
+		margin-right: auto;
+		margin-left: auto;
+	}
+}
+
+
+
+
+@media screen and (min-width:960px)
+{
+	
+	.slidercheckbox
+{
+	margin-top: 0px;
+	margin-bottom: 0px;
+
+}
+	
+	
+	.container-featured
+	{
+		float: left;
+		margin-left: 1%;
+		margin-right: 1%;
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		width: 48%;
+	}
+	
+	.topic-1
+	{
+		width: 48%;
+		margin-left: 1%;
+		margin-right: 1%;
+		float: left;
+	}
+	
+	.topic-2
+	{
+		width: 48%;
+		margin-left: 1%;
+		margin-right: 1%;
+		float: left;
+	}
+	
+	#topic-1-img
+	{
+		width: 100%;
+	}
+	
+	#topic-2-img
+	{
+		width: 100%;
+	}
+}
