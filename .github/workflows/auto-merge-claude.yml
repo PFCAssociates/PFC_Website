@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge into main
         run: |
@@ -24,3 +25,7 @@ jobs:
           git checkout main
           git merge --ff-only ${{ github.ref_name }} || git merge --no-edit ${{ github.ref_name }}
           git push origin main
+
+      - name: Delete branch
+        run: |
+          git push origin --delete ${{ github.ref_name }}
