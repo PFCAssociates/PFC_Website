@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!-- https://community.unbounce.com/t/url-parameter-dynamic-text-replacement-within-html-elements/26754/2 -->
+
+<!--Upload this file to your server-->
+
+<html>
+<head>
+  <!--Add the title of your typeform below-->
+  <title>COVID RTW Form</title>
+
+  <!--CSS styles that ensure your typeform takes up all the available screen space (DO NOT EDIT!)-->
+<style type="text/css">
+    html{
+      margin: 0;
+      height: 100%;
+      overflow: visible;
+    }
+    iframe{
+	/*	
+      position: absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      top:0;
+      border:0;
+	*/
+		width:850px;
+		height:722px;
+		border:0;
+		display: block;
+  margin-left: auto;
+  margin-right: auto;
+		
+    }
+  </style>
+</head>
+<body>
+
+	<script type='text/javascript'>
+window.onload = function() {
+	//https://stackoverflow.com/questions/3069915/javascript-add-iframe-element-after-page-has-loaded
+	var source = window.location.toString().split('?')[1]
+	
+	
+    var iframe = document.createElement('iframe');
+	//css styling of the iframe
+	//iframe.style.cssText = 'padding-top:25px;margin-left:auto;margin-right:auto;width:850px;min-height: 800px;';
+	//iframe.style.cssText = 'width:100%;display: flex;justify-content: center;';
+	//iframe.style.cssText = 'padding:500px;width:500px;height:500px;display:inline-block;';
+	
+	
+	//hides the iframe
+	//iframe.style.display = "none";
+     iframe.src = "https://formfacade.com/headless/112964348896262839040/home/form/1FAIpQLSe-ygt-1InccoozRRyWTbyGqfqckNXzMZgnphXFyxfml5STyQ?" + source;
+	
+	//entry1483440734
+	
+	//multiple choice separate with semicolon (ie. ?usp=pp_url&entry.1483440734=Virtual;Virtual2;Virtual3
+	
+	//?usp=pp_url&entry.1483440734=Virtual
+	
+	//?usp=pp_url&entry.1483440734=In+person
+	
+	//iframe.width = "100%;
+	
+    document.body.appendChild(iframe);
+
+};
+</script>
+		
+
+<p>Date/Time Page Loaded: <span id="datetime"></span></p>
+
+<script>
+var dt = new Date();
+document.getElementById("datetime").innerHTML = dt.toLocaleString();
+</script>
+	
+	
+</body>
+	
+
+		
+</html>
+
