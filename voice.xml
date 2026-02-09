@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response><Say voice="alice">Thank you for your call.</Say><Pause length="1"/><Say voice="alice">This is an automated message. Please contact PFC at 202 854 7400 with any questions</Say></Response>
