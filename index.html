@@ -1,0 +1,504 @@
+<!doctype html>
+
+
+<html class="no-js" lang=""><!--------------------------------------------------->
+<!--******************************************************************************
+  ____   _                _      ___    __   _   _  _____  __  __  _     
+ / ___| | |_  __ _  _ __ | |_   / _ \  / _| | | | ||_   _||  \/  || |    
+ \___ \ | __|/ _` || '__|| __| | | | || |_  | |_| |  | |  | |\/| || |    
+  ___) || |_| (_| || |   | |_  | |_| ||  _| |  _  |  | |  | |  | || |___ 
+ |____/  \__|\__,_||_|    \__|  \___/ |_|   |_| |_|  |_|  |_|  |_||_____|                                        
+
+*******************************************************************************-->
+<head><!------------------------------------------------------------------------->
+
+
+
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+
+
+<!--
+The following ascii art was made at 
+http://patorjk.com/software/taag/#p=display&h=1&v=0&f=Ivrit&t=Change%20Title
+-->
+
+
+<!--*****************************************************************************
+   ____  _                                   _____  _  _    _       
+  / ___|| |__    __ _  _ __    __ _   ___   |_   _|(_)| |_ | |  ___ 
+ | |    | '_ \  / _` || '_ \  / _` | / _ \    | |  | || __|| | / _ \
+ | |___ | | | || (_| || | | || (_| ||  __/    | |  | || |_ | ||  __/
+  \____||_| |_| \__,_||_| |_| \__, | \___|    |_|  |_| \__||_| \___|
+                              |___/                                 
+***********************Change Title Of Document Below************************-->
+<title>
+	PFC Associates
+</title>
+
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="manifest" href="site.webmanifest">
+<link rel="apple-touch-icon" href="icon.png">
+<!--
+Place favicon.ico in the root directory
+-->
+
+<link rel="stylesheet" href="css/normalize.css">
+<link rel="stylesheet" href="css/main.css">
+
+<!--******************************************************************************
+   ____  _                                    ____  ____  ____  
+  / ___|| |__    __ _  _ __    __ _   ___    / ___|/ ___|/ ___| 
+ | |    | '_ \  / _` || '_ \  / _` | / _ \  | |    \___ \\___ \ 
+ | |___ | | | || (_| || | | || (_| ||  __/  | |___  ___) |___) |
+  \____||_| |_| \__,_||_| |_| \__, | \___|   \____||____/|____/ 
+                              |___/                             
+***********************Change CSS Reference Below******************************-->
+<link rel="stylesheet" type="text/css" href="css/indexstyles.css">
+
+<!--
+The following script tag downloads a font from the Adobe Edge Web Fonts server for use within the web page. Do not modify this script.
+-->
+<script>
+	var __adobewebfontsappname__="dreamweaver"
+</script>
+
+<!--
+Place any script relating to downloading fonts here
+-->
+
+	<!--The following adds the up arrow, which is downloaded from a website-->
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+<script src="https://use.edgefonts.net/lato:n1,n3,n4:default;bad-script:n4:default;maven-pro:n4:default;six-caps:n4:default;open-sans-condensed:n3:default.js" type="text/javascript"></script>
+
+</head><!------------------------------------------------------------------------>
+
+
+
+<body><!------------------------------------------------------------------------->
+<!--
+[if lte IE 9]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+<![endif]
+-->
+<!--
+Start of Page Wrapper
+-->
+<div class="page-wrapper"><!----------------------------------------------------->
+<!--******************************************************************************
+  ____    _                    _       ___     __    ____                         
+ / ___|  | |_    __ _   _ __  | |_    / _ \   / _|  |  _ \    __ _    __ _    ___ 
+ \___ \  | __|  / _` | | '__| | __|  | | | | | |_   | |_) |  / _` |  / _` |  / _ \
+  ___) | | |_  | (_| | | |    | |_   | |_| | |  _|  |  __/  | (_| | | (_| | |  __/
+ |____/   \__|  \__,_| |_|     \__|   \___/  |_|    |_|      \__,_|  \__, |  \___|
+                                                                     |___/        
+*******************Add your site or application content below******************-->
+
+
+
+		<header class="top-header">
+		  <div class="top-banner">
+				<div id="logo">
+					<img src="PFC_images/PFC_LOGO_4.png" alt="PFC Logo">
+						<h1>
+						<!--Insert text if desired to header-->
+							
+						</h1>
+				</div>
+			</div>
+</header>
+		<!--added multiple clearfix's to correct float left problems in css-->
+	  <main class="main clearfix">
+<div class="nav-bar">
+      <!--type ul>li*6>a and press tab for fast writing-->
+      <!--the a represents an anchor-->
+      <ul>
+	        <li><a href="index.html">Home</a></li>
+	        <li><a href="services.html">Services</a></li>
+	        <li><a href="staff.html">Staff</a></li>
+	        <li><a href="faq.html">FAQ</a></li>
+	        <li><a href="links.html">Links</a></li>
+	        <li><a href="bulletin.html">Bulletin</a></li>
+          </ul>
+        </div>
+	    
+			
+			<!--lightswitch checkbox input went here-->
+			<input type="checkbox" id="lightswitch">
+		  
+			<script src="js/vendor/jquery-3.3.1.min.js"></script>
+		  
+	    	<script>
+			function onClickBox() 
+				{
+				let checked=$("#lightswitch").is(":checked");
+				localStorage.setItem("checked", checked);
+				}
+
+			function onReady() 
+				{
+				let checked="true"==localStorage.getItem("checked");
+				$("#lightswitch").prop('checked', checked);
+				$("#lightswitch").click(onClickBox);
+				}
+			$(document).ready(onReady);
+		</script>
+			
+        
+	    <section class="featured-images clearfix">
+   		  <div class="container-featured">
+					<div class="featured">
+						<div id="pic1" class="featured-img">
+						</div>
+						<h2>
+							Welcome to PFC
+						</h2>
+						<!--type p>lipsum and press tab to auto populate generic text-->
+						<p>
+							PFC Associates, a joint venture of Providence Hospital and the Washington Hospital Center, initiated a unique privatization project with the government of the District of Columbia. 
+						</p>
+					</div>
+			<div class="featured">
+						<div id="pic2" class="featured-img">
+						</div>
+						<h2>
+							Who We Serve
+						</h2>
+					  	<!--type p>lipsum and press tab to auto populate generic text-->
+						<p>
+							The Police &amp; Fire Clinic provides occupational and preventive medical services to the District's more than 6,000 police officers and fire fighters.
+						</p>
+	 		</div>
+		  </div>
+		  <div class="container-featured">
+		    <div class="featured">
+				      	<div id="pic1" class="featured-img">
+						</div>
+			   	   		<h2>
+							Our Partnership
+						</h2>
+			   	   		<!--type p>lipsum and press tab to auto populate generic text-->
+			   	   		<p>
+							Our partnership with the District not only improves the quality of medical services and increase productivity of the public safety force, but also results in significant efficiencies and savings for the city.
+						</p>
+		       	 	</div>
+	   		<div class="featured">
+			   	   		<div id="pic2" class="featured-img">
+						</div>
+			      		<h2> 
+							Our Mission 
+						</h2>
+			      		<!--type p>lipsum and press tab to auto populate generic text-->
+			      		<p>
+							PFC Associates, LLC, will develop and practice innovative approaches to appraising, initiating, maintaining, and restoring the physical, psychological and emotional health of Police Officers, Firefighters and other members covered in the District of Columbia whom we serve.
+
+
+						</p>
+       		</div>
+   		  </div>
+		</section>
+			
+		<article class="topic-1 clearfix">
+				<div id="topic-1-img">
+				</div>
+				<h3>
+					PFC's Confidentiality Policy
+				</h3>
+				<p>
+					PFC's health care providers and staff are committed to maintaining confidentiality at the Police and Fire Clinic. Records are maintained in accordance with the statutory provisions of the Comprehensive Merit Personnel Act and the implementing regulations found in the District Personnel Manual. Clinical staff adhere to the American College of Occupational and Environmental Medicine's Code of Ethical Conduct, which is aimed at protecting the privacy of employee medical information.
+				</p>
+				
+		</article>
+		<article class="topic-2 clearfix">
+			 	<div id="topic-2-img">
+			    </div>
+			    <h3>
+					Ethical Guidelines
+			    </h3>
+			    <p>
+				 In addition, the Behavioral Health Service follow the ethical guidelines put forth by the American Psychological Association Ethical Principles of Psychologists and Code of Conduct, Title IV District of Columbia Code-Mental Health Information Act, Psychological Guidelines for Issues in Law Enforcement, Police Psychological Services Section, International Association of Chiefs of Police.
+			    </p>
+	    </article>
+			
+		</main>
+		<footer class="footer">
+			<h3>
+				"PROTECTING AND SERVING THOSE WHO PROTECT AND SERVE US"
+			</h3>
+			<p2>
+				Copyright © PFC Associates, LLC/D.C. Police &amp; Fire Clinic. All rights reserved.
+			</p2>
+			
+		</footer>
+		
+		
+
+
+
+<!--******************************************************************************
+  _____               _     ___     __    ____                         
+ | ____|  _ __     __| |   / _ \   / _|  |  _ \    __ _    __ _    ___ 
+ |  _|   | '_ \   / _` |  | | | | | |_   | |_) |  / _` |  / _` |  / _ \
+ | |___  | | | | | (_| |  | |_| | |  _|  |  __/  | (_| | | (_| | |  __/
+ |_____| |_| |_|  \__,_|   \___/  |_|    |_|      \__,_|  \__, |  \___|
+                                                           |___/        
+*******************************************************************************-->
+<!--
+End of Page Wrapper
+<div class="page-wrapper">
+-->
+</div><!------------------------------------------------------------------------->
+<!--
+The following are scripts, add most of the website content above "End of Page" message, not below
+-->
+
+<script src="js/vendor/modernizr-3.6.0.min.js">
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous">
+</script>
+
+<script>
+	window.jQuery || document.write('<script src="js/vendor/jquery-3.3.1.min.js"><\/script>')
+</script>
+
+<script src="js/plugins.js">
+</script>
+
+<script src="js/main.js">
+</script>
+	<!--The Following adds the Scroll To Top button-->
+	<a href="#" class="scrollToTop"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>
+			<script type="text/javascript">
+			$(document).ready(function(){
+				
+						
+				//show hide button on scroll
+				$(window).scroll(function(){
+					if($(this).scrollTop() > 200){
+						$('.scrollToTop').fadeIn();
+					} else {
+						$('.scrollToTop').fadeOut();
+					}
+				});
+				
+				//smooth scrolling to top
+					$('.scrollToTop').click(function(){
+						$('html,body').animate({scrollTop: 0}, 1000) // set Animation time
+					});
+				
+				
+			});
+		</script>
+	<!--End of Scroll To Top button-->
+<!--
+Google Analytics: change UA-XXXXX-Y to be your site's ID.
+-->
+<script>
+window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+ga('create', 'UA-XXXXX-Y', 'auto'); ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async defer>
+</script>
+	
+<!--
+Shadow Custom ChangeTheme Script
+-->
+<script src="js/ChangeTheme.js">
+</script>
+
+</body><!------------------------------------------------------------------------>
+
+<!--******************************************************************************
+  _____             _     ___    __    _   _  _____  __  __  _     
+ | ____| _ __    __| |   / _ \  / _|  | | | ||_   _||  \/  || |    
+ |  _|  | '_ \  / _` |  | | | || |_   | |_| |  | |  | |\/| || |    
+ | |___ | | | || (_| |  | |_| ||  _|  |  _  |  | |  | |  | || |___ 
+ |_____||_| |_| \__,_|   \___/ |_|    |_| |_|  |_|  |_|  |_||_____|
+                                                                 
+*******************************************************************************-->
+</html><!------------------------------------------------------------------------>
+<!--******************************************************************************
+     __     __     __     __     __     __     __     __     __     __     __
+    / /    / /    / /    / /    / /    / /    / /    / /    / /    / /    / /
+   / /    / /    / /    / /    / /    / /    / /    / /    / /    / /    / / 
+  / /    / /    / /    / /    / /    / /    / /    / /    / /    / /    / /  
+ /_/    /_/    /_/    /_/    /_/    /_/    /_/    /_/    /_/    /_/    /_/   
+     __     __     __     __     __     __     __     __     __     __     __
+    / /    / /    / /    / /    / /    / /    / /    / /    / /    / /    / /
+   / /    / /    / /    / /    / /    / /    / /    / /    / /    / /    / / 
+  / /    / /    / /    / /    / /    / /    / /    / /    / /    / /    / /  
+ /_/    /_/    /_/    /_/    /_/    /_/    /_/    /_/    /_/    /_/    /_/   
+             _                   _   _        _             _   
+            / \     ___    ___  (_) (_)      / \     _ __  | |_ 
+           / _ \   / __|  / __| | | | |     / _ \   | '__| | __|
+          / ___ \  \__ \ | (__  | | | |    / ___ \  | |    | |_ 
+         /_/   \_\ |___/  \___| |_| |_|   /_/   \_\ |_|     \__|
+                                                        
+*******************************************************************************-->
+
+<!--
+site used to convert image to ascii art
+https://manytools.org/hacker-tools/convert-images-to-ascii-art/
+-->
+
+<!--
+                         .%            
+                     .%%&              
+                   %&%%                
+           @    %%&%%                  
+         %&    %%%&%                   
+        %%   %%%%%*                    
+      &&%&  %%%                      
+     @&%%  %&%%                      
+    &%@@@ %%%%&&      &%&&%&%#%*       
+   @@&@& %%%%%%.  .%%%%%&&%&&%%@%%&@   
+   %@%@%&%%%%%&&%%%&%%&%&           ,
+  &%&%&&%%%%%%%%%%%%@%%#               
+  %%@%%%        &%&%@#                 
+ %%&&%      %%&&@ @%&%                 
+ %%@%%        &%&@ %%&%&&%%&           
+&@%&%%        %&&@&&%&                 
+&@&%%&&@     &%&&%&(%                  
+@& %%&%%%%%%%&%&&% @                   
+ &  @&&%&%%%%%&&                       
+  @   %%&&%%&@%@                       
+        &@%&&&%%%                      
+           @&&%%&%%@                   
+               &&%%%%&&*               
+                      @%&%%&           
+-->
+
+<!--
+                                        @                  
+                                   &%%%                    
+                                %%%%@                      
+                             &%%%#%                        
+                   *      .%%%&%%                          
+                 %      %%%&@%&@                           
+               %#      %%%%&&%                             
+             @%%     &%%&%%%&                              
+            %&%&    %&&%%%%@                               
+          @&%@%   @%%&&@&&@                                
+         %%&%&   @&%%%%&&@                                 
+        %&%%%@  @%&%%%%&@                                  
+       %%&&@%  @%%&%%%%%           *@&&%%@&&&(             
+      &%%%@&% /%%%&%%%%@      /@%%%%%%%%%&&@%%%&%&@        
+     @&%&%&&*%&&%%&%%%%    *#%@@%%%%%%%%%&&&%%&&%&%%%    
+    #&@%%%&&%%%%%%%%%%%&&%%%%&&@%%%%&%%&%#              @, 
+    %%@%%&&&%%%%&%%&%%%&%&&&%%&&%%%%%&                     
+   /%&%@&&%%&%%&%@%%%%%@%%&&%%%@                       
+   @&&@%%%@&@          @%%%%%%&%%%                         
+   &%&&%#%@          ,   .&%&%@%&                          
+  @@%&%&%@        @@%%%&%@ @%%&%%&&                        
+ @&@%@@@%            &%&&&& &%&&&%%%%&%%@                  
+ %@&&&&@%%           @%&%&&& %&%%@                         
+%%@&%&&&%%           @%&%%@@ &&&%                          
+@%@&%%&@&%%         &&%&%%&% @&%%                          
+%%@@@%@@@%%%@%@@@&%&&&%@&%%% @%                            
+ %&% @@&&%%%@%%%&%%@&&%&&%%  (                             
+ .&&  @&&%&%%%%%%%%@%@%&&(                                 
+   @    %%%%%%&%&%%@&@&                                    
+    .     &%%%%%&%&&@@%&                                   
+            &&@%%%&%&&%%@.                                 
+              *%%@%%&@&%&%%@                               
+                  @%@@&%&%%%%%%                            
+                      @&&%%%&%&&&&.                        
+                           #@%%%&@%%&%@                    
+                                   *@&%&%%%@               
+-->
+
+<!--
+                                                                     .                             
+                                                               /&%&.                               
+                                                           &%%%%%                                  
+                                                       &%%%%%&&                                    
+                                                    %%%%%%&                                      
+                                                 %&%%&%&%%%.                                       
+                                               @&%&%%%%&%%                                         
+                                @           .&&%%%%&%%%@                                           
+                             ,%/          /%%&&&%%&@%&                                             
+                           /%%,         #%&%%&%@%%&&@                                              
+                         .&%%,        .%%%&%%&%@%#@                                                
+                        @%%%(        @%&%&&%%%&&%@                                                 
+                      @%%%%#       (%%%%&&%%%%%%*                                                  
+                    .&&%%%@       @%&%&%@%%%%%%                                                    
+                   @%%@%%&      .%%%&&%%&%%%%&                                                     
+                  &&%%&%#.     &%%%%%%%@&%%%&                                                      
+                /&%&%#&%&     @&%%%%%&%&@%%&                                                       
+               @&&%&%%&&     @%%%%%&%%%&&%%                                                        
+              @&%&%%%%&&    %%%%%%%&%%&@&%                                                         
+             %%@%&%&%%@    @%%&&%%%@%%%&@/                                                         
+            @%%&%@&@%%&   @%%%&&%%%&%%%%@                     *&@@@@@@@@%,                         
+           @%%%&@&&@%%   &%%#%%%%%%%%%%&               /@&%%%&%&&&%%%&@%%@%&%%&@(                  
+          @%%%%%&@%&%@  /%%%%%%&%#%%%%&@           &@%%%%%%%&&%%%&%%%&@%%@%&%%%&%%%&@/             
+         %@&%%%%%@&&%,  %%%%%%%&%%%%%%&*        @%%@@%%%%%%%&%&%&&%%%&@%&&%@%%@@%%%@%%%&@          
+         @@&&%&%&@@&%@%%%%%%%%%%%%%%%@/    @%%%%&&@%%%%%%%%&&%%&%%%&@&%@%&%%@&%%@&%%%&&@%@/      
+        @&@@%%%%&&@%%%%%&%%%%%%%%%%%&&%&%&%&%%%%%&&%@%%%%%%%%@%%&&%%#&@%                  .@@%@    
+       (%%%@#%%%&&&%%%%&%%%&%%%%%%%%%&%&%&%%%%%&%%&%@&%%%%%%%&%%%&@                             ./ 
+       &%%%@%%%#@&&&%%%&%%%&%%%%%%%%&%%&%%%%&@%&&%%%@&%%%%%%%%%%                                   
+      &%%%&@%%%%%&@&%&%%%%%&%%%%%%%%&&%&&%&%%@%&%%%&@&%%%%%%@                                      
+      @%%&%&&&%%&@@%%&%&%%%&%%%%@%%%&&%%&%&%%&%&%%%@@&%%%%&.                                       
+      &%%%%&%%%%%@@&%%&*            .@%&%&@%%&%%%%%&@&%%%%                                         
+     #%%%&%&@%%%&@@@                    *@&%&&%&%%%@&&%@                                           
+     @&%%&%@&&&@                 ,,.     @&%&@%%&@%&&                                            
+     %&%%@%&%&%%@             (&@%%%&%%&%@   &&%%%&&%%%@                                           
+    @%&%%&%%%&%%                @&%%&%%&%&&@  @%%%@@%%%%%%&&@(                                     
+   &&%&%%@%%%&%&                  @&&%%&%%%@@  @%%@@%%%%%%%%&%&%%&@%                               
+  @%&%%%%&%%%&%@                   #@%%&&&&@&@  &%&&%%&&%%%&%%@%%&&&&%&@                           
+  %%@%%%%&&%%@%%                    &%%&%&%@&@& *%&%%%%@/                                          
+ @&%&&%&%&%%%&%&&                   @%%&%&%&@&%  &&@%%&@                                           
+ @%%&&&%%%%%%@%%%,                 &@%%@%%&&%# @&@%%%/                                           
+ @%%@&&&%%%%%@&%%%@               @@&%%&%&%%&@%# @&&%%@                                            
+ @%%@@&&&%%%&@&&%%%&@           @&@&%&%&@&%%%%%. &%&&@                                             
+ @%%@@&/&%%%&&@%%%&%&&%%@&@@@&%%&&&&%&%@&%%%%%&  @%                                              
+ (&%@&  @%%&%&&&%%%%@&%%%%%%@%%%@@&@&%%&&&%%%%   @@                                                
+  @%%@   &%&&&&%%@%%@%%%%%@%%%%@%%@%&&&@%#&                                                      
+   %&&    *&%@&%%@%%&&%%%%%%@%%%&@&%@%&&@&%#                                                       
+   .&%      &@%%%&%%@%%%&%%%%%%%%@%%&%%&@                                                          
+     &@      @%%%&&%&&%&&%%%&%%%&&&%@%&                                                            
+      @        @&%&%&&%&%%%&@%&%&@&&&%%#                                                           
+                 @@%@&&%%%&%&%%@@&@%%##                                                          
+                   @&%%&@%%%@%&&%&%%@&%%@@                                                         
+                      @@@#%%@&%&%@&&@&&%&&%&                                                       
+                        *&%&@@%&%&&&&&@%&&%%%@*                                                    
+                           .@@&%#@@%@@%%@&%%%&%%@.                                                 
+                               &&&@&&&@&@%%%%%%%%%#@/                                              
+                                   *@&@&@%&%%%%%&%%&@&&@.                                          
+                                        #@%&%%%%&%%&@%%%%%%@/                                      
+                                              @@@%%&&%&&%%%%&%@@@                                  
+                                                     #@@&%%%%%%%%%&%@@                             
+                                                              .%@@@&&%&%%%@%                       
+                                                                                .,
+-->
+
+<!--
+                       :PB@Bk:                         
+                   ,jB@@B@B@B@BBL.                     
+                7G@B@B@BMMMMMB@B@B@Nr                  
+            :kB@B@@@MMOMOMOMOMMMM@B@B@B1,              
+        :5@B@B@B@BBMMOMOMOMOMOMOMM@@@B@B@BBu.          
+     70@@@B@B@B@BXBBOMOMOMOMOMOMMBMPB@B@B@B@B@Nr       
+   G@@@BJ iB@B@@  OBMOMOMOMOMOMOM@2  B@B@B. EB@B@S     
+   @@BM@GJBU.  iSuB@OMOMOMOMOMOMM@OU1:  .kBLM@M@B@     
+   B@MMB@B       7@BBMMOMOMOMOMOBB@:       B@BMM@B     
+   @@@B@B         7@@@MMOMOMOMM@B@:         @@B@B@     
+   @@OLB.          BNB@MMOMOMM@BEB          rBjM@B     
+   @@  @           M  OBOMOMM@q  M          .@  @@     
+   @@OvB           B:u@MMOMOMMBJiB          .BvM@B     
+   @B@B@J         0@B@MMOMOMOMB@B@u         q@@@B@     
+   B@MBB@v       G@@BMMMMMMMMMMMBB@5       F@BMM@B     
+   @BBM@BPNi   LMEB@OMMMM@B@MMOMM@BZM7   rEqB@MBB@     
+   B@@@BM  B@B@B  qBMOMB@B@B@BMOMBL  B@B@B  @B@B@M     
+    J@@@@PB@B@B@B7G@OMBB.   ,@MMM@qLB@B@@@BqB@BBv      
+       iGB@,i0@M@B@MMO@E  :  M@OMM@@@B@Pii@@N:         
+          .   B@M@B@MMM@B@B@B@MMM@@@M@B                
+              @B@B.i@MBB@B@B@@BM@::B@B@                
+              B@@@ .B@B.:@B@ :B@B  @B@O                
+                :0 r@B@  B@@ .@B@: P:                  
+                    vMB :@B@ :BO7                      
+                        ,B@B       
+-->
