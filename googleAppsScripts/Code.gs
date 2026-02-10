@@ -866,8 +866,34 @@
 //
 // =============================================
 
+// =============================================
+// PROJECT CONFIG — Change these when reusing for a different project
+// =============================================
 var VERSION = "01.03";
 var TITLE = "Attempt 40";
+
+// Google Sheets
+var SPREADSHEET_ID   = "13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk";
+var SHEET_NAME       = "Live_Sheet";
+
+// GitHub
+var GITHUB_OWNER     = "PFCAssociates";
+var GITHUB_REPO      = "PFC_Website";
+var GITHUB_BRANCH    = "main";
+var FILE_PATH        = "googleAppsScripts/Code.gs";
+
+// Apps Script Deployment
+var DEPLOYMENT_ID    = "AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg";
+
+// Google Drive sound file
+var SOUND_FILE_ID    = "1bzVp6wpTHdJ4BRX8gbtDN73soWpmq1kN";
+
+// Embedding page URL (where the GAS app is iframed)
+var EMBED_PAGE_URL   = "https://pfcassociates.github.io/PFC_Website/test.html";
+
+// Splash screen logo
+var SPLASH_LOGO_URL  = "https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png";
+// =============================================
 
 function doGet() {
   var html = `
@@ -894,11 +920,11 @@ function doGet() {
       </style>
     </head>
     <body>
-      <div id="splash"><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
+      <div id="splash"><img src="${SPLASH_LOGO_URL}" alt=""></div>
       <h1 id="title" style="font-size: 28px; margin: 0 0 4px 0;">...</h1>
       <div id="version">...</div>
       <button onclick="checkForUpdates()">🔄 Pull Latest from GitHub</button>
-      <form id="redirect-form" method="GET" action="https://pfcassociates.github.io/PFC_Website/test.html" target="_top" style="display:inline;">
+      <form id="redirect-form" method="GET" action="${EMBED_PAGE_URL}" target="_top" style="display:inline;">
         <button id="reload-btn" type="submit" style="background:#2e7d32;color:white;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:14px;margin-top:10px;">🔄 Reload Page</button>
       </form>
       <div id="result"></div>
@@ -908,7 +934,7 @@ function doGet() {
         <h3>Live_Sheet</h3>
         <div id="token-info">...</div>
         <div id="live-b1" style="font-size: 20px; font-weight: bold; color: #333; margin-bottom: 4px; text-align: center;">...</div>
-        <iframe src="https://docs.google.com/spreadsheets/d/13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk/edit?rm=minimal"></iframe>
+        <iframe src="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?rm=minimal"></iframe>
       </div>
 
       <div style="margin-top: 10px; font-size: 14px; color: #333;">
@@ -1139,9 +1165,9 @@ function doPost(e) {
   var action = (e && e.parameter && e.parameter.action) || "";
   if (action === "writeC1") {
     var value = (e.parameter.value) || "";
-    var ss = SpreadsheetApp.openById("13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk");
-    var sheet = ss.getSheetByName("Live_Sheet");
-    if (!sheet) sheet = ss.insertSheet("Live_Sheet");
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
     sheet.getRange("C1").setValue(value + " — " + new Date().toLocaleString());
     // Signal to the web app client that a new version is available
     CacheService.getScriptCache().put("pushed_version", value, 3600);
@@ -1182,7 +1208,7 @@ function getAppData() {
 }
 
 function getSoundBase64() {
-  var url = "https://drive.google.com/uc?export=download&id=1bzVp6wpTHdJ4BRX8gbtDN73soWpmq1kN";
+  var url = "https://drive.google.com/uc?export=download&id=" + SOUND_FILE_ID;
   var response = UrlFetchApp.fetch(url, { followRedirects: true });
   var blob = response.getBlob();
   var base64 = Utilities.base64Encode(blob.getBytes());
@@ -1237,8 +1263,8 @@ function readB1FromCacheOrSheet() {
   var cached = cache.get("live_b1");
   if (cached !== null) return cached;
 
-  var ss = SpreadsheetApp.openById("13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk");
-  var sheet = ss.getSheetByName("Live_Sheet");
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) return "";
   var val = sheet.getRange("B1").getValue();
   var result = val !== null && val !== undefined ? String(val) : "";
@@ -1252,7 +1278,7 @@ function readB1FromCacheOrSheet() {
 function onEditWriteB1ToCache(e) {
   if (!e || !e.range) return;
   var sheet = e.range.getSheet();
-  if (sheet.getName() !== "Live_Sheet") return;
+  if (sheet.getName() !== SHEET_NAME) return;
   if (e.range.getRow() !== 1 || e.range.getColumn() !== 2) return;
   var val = e.range.getValue();
   var result = val !== null && val !== undefined ? String(val) : "";
@@ -1260,29 +1286,25 @@ function onEditWriteB1ToCache(e) {
 }
 
 function writeVersionToSheetA1() {
-  var ss = SpreadsheetApp.openById("13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk");
-  var sheet = ss.getSheetByName("Live_Sheet");
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
-    sheet = ss.insertSheet("Live_Sheet");
+    sheet = ss.insertSheet(SHEET_NAME);
   }
   sheet.getRange("A1").setValue("v" + VERSION + " — " + new Date().toLocaleString());
 }
 
 function writeVersionToSheetC1() {
-  var ss = SpreadsheetApp.openById("13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk");
-  var sheet = ss.getSheetByName("Live_Sheet");
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
-    sheet = ss.insertSheet("Live_Sheet");
+    sheet = ss.insertSheet(SHEET_NAME);
   }
   sheet.getRange("C1").setValue("v" + VERSION + " — " + new Date().toLocaleString());
 }
 
 function pullAndDeployFromGitHub() {
-  var GITHUB_OWNER = "PFCAssociates";
-  var GITHUB_REPO  = "PFC_Website";
-  var GITHUB_BRANCH = "main";
-  var FILE_PATH    = "googleAppsScripts/Code.gs";
-  var DEPLOYMENT_ID = "AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg";
+  // Config values are now defined at the top of the file
 
   // GitHub token stored in Script Properties (not in source code for security)
   // Set it in Apps Script editor: Project Settings → Script Properties → Add
