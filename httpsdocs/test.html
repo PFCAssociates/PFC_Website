@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.03">
+  <meta name="build-version" content="01.04">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -96,10 +96,13 @@
     if (sessionStorage.getItem('gas-pending-sound')) {
       sessionStorage.removeItem('gas-pending-sound');
       if (navigator.vibrate) navigator.vibrate(200);
-      var soundData = sessionStorage.getItem('gas-sound-data');
-      if (soundData) {
-        sessionStorage.removeItem('gas-sound-data');
-        playSoundFromDataUrl(soundData);
+      // Prefer the embed-specific sound, fall back to GAS sound, then beep
+      var embedSound = sessionStorage.getItem('gas-embed-sound-data');
+      var gasSound = sessionStorage.getItem('gas-sound-data');
+      if (embedSound) {
+        playSoundFromDataUrl(embedSound);
+      } else if (gasSound) {
+        playSoundFromDataUrl(gasSound);
       } else {
         playBeep();
       }
@@ -107,7 +110,11 @@
 
     window.addEventListener('message', function(e) {
       if (!e.data) return;
-      // Cache sound data from GAS iframe as soon as it's loaded
+      // Cache embed-specific sound from GAS iframe for test.html auto-refresh
+      if (e.data.type === 'gas-embed-sound' && e.data.soundDataUrl) {
+        sessionStorage.setItem('gas-embed-sound-data', e.data.soundDataUrl);
+      }
+      // Cache GAS sound as fallback
       if (e.data.type === 'gas-sound' && e.data.soundDataUrl) {
         sessionStorage.setItem('gas-sound-data', e.data.soundDataUrl);
       }
