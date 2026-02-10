@@ -869,7 +869,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.15g";
+var VERSION = "01.16g";
 var TITLE = "Attempt 42";
 
 // Google Sheets
@@ -923,7 +923,7 @@ function doGet() {
       <div id="splash"><img src="https://www.PFCAssociates.com/SAIS%20Logo.png" alt=""></div>
       <h1 id="title" style="font-size: 28px; margin: 0 0 4px 0;">...</h1>
       <div id="version">...</div>
-      <button onclick="checkForUpdates()">🔄 Pull Latest from GitHub</button>
+      <button onclick="checkForUpdates()">🔧 Manual Deploy from GitHub</button>
       <button id="reload-btn" onclick="try{window.top.location.reload();}catch(e){window.parent.location.reload();}" style="background:#2e7d32;color:white;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:14px;margin-top:10px;">🔄 Reload Page</button>
       <div id="result"></div>
       <div id="versionCount" style="margin-top: 6px; font-size: 12px; color: #888;"></div>
@@ -1071,8 +1071,8 @@ function doGet() {
         pollB1FromCache();
         setInterval(pollB1FromCache, 15000);
 
-        // Poll for new pushed version every 15s (set by doPost via GitHub Action)
-        // If a new version was pushed, auto-pull without user intervention
+        // Poll for new deployed version every 15s (set by doPost after deploy)
+        // Deploy already happened server-side — just reload when new version detected
         var _autoPulling = false;
         function pollPushedVersionFromCache() {
           if (_autoPulling) return;
@@ -1082,16 +1082,22 @@ function doGet() {
               var current = (document.getElementById('version').textContent || '').trim();
               if (pushed !== current && pushed !== '') {
                 _autoPulling = true;
-                checkForUpdates();
+                // Deploy already happened in doPost(). Just signal parent to reload.
+                var reloadMsg = {type: 'gas-reload', version: pushed};
+                if (_soundDataUrl) reloadMsg.soundDataUrl = _soundDataUrl;
+                try { window.top.postMessage(reloadMsg, '*'); } catch(e) {}
+                try { window.parent.postMessage(reloadMsg, '*'); } catch(e) {}
+                var btn = document.getElementById('reload-btn');
+                if (btn) {
+                  btn.style.background = '#d32f2f';
+                  btn.textContent = '⚠️ Update Available — Reload Page';
+                }
                 setTimeout(function() { _autoPulling = false; }, 30000);
               }
             })
             .readPushedVersionFromCache();
         }
         setInterval(pollPushedVersionFromCache, 15000);
-
-        // Auto-pull from GitHub on every page load (5s delay for deployment propagation)
-        setTimeout(checkForUpdates, 5000);
 
         // Poll token/quota usage (on load + every 60s)
         function pollQuotaAndLimits() {
@@ -1165,19 +1171,37 @@ function doGet() {
 }
 
 // POST endpoint — called by GitHub Action after merging to main.
-// Writes a value to cell C1 of Live_Sheet.
-// Usage: curl -L -X POST "WEB_APP_URL" -d "action=writeC1&value=v1.09"
+// Pulls latest code from GitHub, deploys it to Apps Script, and signals clients.
+// Usage: curl -L -X POST "WEB_APP_URL" -d "action=deploy"
 function doPost(e) {
   var action = (e && e.parameter && e.parameter.action) || "";
-  if (action === "writeC1") {
-    var value = (e.parameter.value) || "";
-    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    var sheet = ss.getSheetByName(SHEET_NAME);
-    if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
-    sheet.getRange("C1").setValue(value + " — " + new Date().toLocaleString());
-    // Signal to the web app client that a new version is available
-    CacheService.getScriptCache().put("pushed_version", value, 3600);
-    return ContentService.createTextOutput("OK");
+  if (action === "deploy") {
+    try {
+      var result = pullAndDeployFromGitHub();
+      var wasUpdated = result.indexOf("Updated to") === 0;
+
+      if (wasUpdated) {
+        // Extract new version from result (e.g. "Updated to v01.16g (deployment 42) | ...")
+        var vMatch = result.match(/v([\d.]+\w*)/);
+        var deployedVersion = vMatch ? "v" + vMatch[1] : "";
+
+        // Write deploy confirmation to sheet (use extracted version, not VERSION variable
+        // which still holds the OLD value since doPost runs the previously deployed code)
+        var timestamp = new Date().toLocaleString();
+        var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        var sheet = ss.getSheetByName(SHEET_NAME);
+        if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
+        sheet.getRange("A1").setValue(deployedVersion + " — " + timestamp);
+        sheet.getRange("C1").setValue(deployedVersion + " — " + timestamp);
+
+        // Signal clients that a new version is deployed
+        CacheService.getScriptCache().put("pushed_version", deployedVersion, 3600);
+      }
+
+      return ContentService.createTextOutput("OK: " + result);
+    } catch(err) {
+      return ContentService.createTextOutput("ERROR: " + err.message);
+    }
   }
   return ContentService.createTextOutput("Unknown action");
 }
