@@ -867,7 +867,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.18g";
+var VERSION = "01.19g";
 var TITLE = "Attempt 42";
 
 // Google Sheets
@@ -883,9 +883,8 @@ var FILE_PATH        = "googleAppsScripts/Code.gs";
 // Apps Script Deployment
 var DEPLOYMENT_ID    = "AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg";
 
-// Google Drive sound files
+// Google Drive sound file (for GAS "Test Sound" button only)
 var SOUND_FILE_ID    = "1bzVp6wpTHdJ4BRX8gbtDN73soWpmq1kN";
-var EMBED_SOUND_FILE_ID = "1XN9WWYa82F3FtYt7O_lFyQst9P5YkPov";
 
 // Embedding page URL (where the GAS app is iframed)
 var EMBED_PAGE_URL   = "https://pfcassociates.github.io/PFC_Website/test.html";
@@ -968,22 +967,9 @@ function doGet() {
         var _soundDataUrl = null;
         var _soundError = null;
         google.script.run
-          .withSuccessHandler(function(dataUrl) {
-            _soundDataUrl = dataUrl;
-            // Send sound to parent page so it can cache it for its own reloads
-            try { window.top.postMessage({type: 'gas-sound', soundDataUrl: dataUrl}, '*'); } catch(e) {}
-            try { window.parent.postMessage({type: 'gas-sound', soundDataUrl: dataUrl}, '*'); } catch(e) {}
-          })
+          .withSuccessHandler(function(dataUrl) { _soundDataUrl = dataUrl; })
           .withFailureHandler(function(err) { _soundError = err.message; })
           .getSoundBase64();
-
-        // Pre-load embed page sound and send to parent
-        google.script.run
-          .withSuccessHandler(function(dataUrl) {
-            try { window.top.postMessage({type: 'gas-embed-sound', soundDataUrl: dataUrl}, '*'); } catch(e) {}
-            try { window.parent.postMessage({type: 'gas-embed-sound', soundDataUrl: dataUrl}, '*'); } catch(e) {}
-          })
-          .getEmbedSoundBase64();
 
         function playReadySound() {
           var status = document.getElementById('result');
@@ -1237,15 +1223,6 @@ function getAppData() {
 
 function getSoundBase64() {
   var url = "https://drive.google.com/uc?export=download&id=" + SOUND_FILE_ID;
-  var response = UrlFetchApp.fetch(url, { followRedirects: true });
-  var blob = response.getBlob();
-  var base64 = Utilities.base64Encode(blob.getBytes());
-  var contentType = blob.getContentType() || "audio/mpeg";
-  return "data:" + contentType + ";base64," + base64;
-}
-
-function getEmbedSoundBase64() {
-  var url = "https://drive.google.com/uc?export=download&id=" + EMBED_SOUND_FILE_ID;
   var response = UrlFetchApp.fetch(url, { followRedirects: true });
   var blob = response.getBlob();
   var base64 = Utilities.base64Encode(blob.getBytes());

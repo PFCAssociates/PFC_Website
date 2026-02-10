@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.17w">
+  <meta name="build-version" content="01.18w">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -56,20 +56,6 @@
     document.addEventListener('click', unlockAudio, { once: false });
     document.addEventListener('touchstart', unlockAudio, { once: false });
 
-    function playBeep() {
-      try {
-        var ctx = _audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-        var osc = ctx.createOscillator();
-        var gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = 880;
-        gain.gain.value = 0.3;
-        osc.start();
-        osc.stop(ctx.currentTime + 0.15);
-      } catch(e) {}
-    }
-
     function playSoundFromDataUrl(dataUrl) {
       try {
         var ctx = _audioCtx || new (window.AudioContext || window.webkitAudioContext)();
@@ -83,22 +69,19 @@
           source.buffer = audioBuffer;
           source.connect(ctx.destination);
           source.start(0);
-        }, function() { playBeep(); });
-      } catch(e) { playBeep(); }
+        });
+      } catch(e) {}
     }
 
-    // Pre-load sound files from same-origin (no GAS dependency)
-    // Files are in /sounds/ relative to this page
-    function cacheSoundFile(url, storageKey) {
-      if (localStorage.getItem(storageKey)) return; // already cached
-      fetch(url).then(function(res) { return res.blob(); }).then(function(blob) {
+    // Pre-load sound file from same-origin (no GAS dependency)
+    (function() {
+      if (localStorage.getItem('update-sound-data')) return;
+      fetch('sounds/embed-update.mp3').then(function(res) { return res.blob(); }).then(function(blob) {
         var reader = new FileReader();
-        reader.onloadend = function() { localStorage.setItem(storageKey, reader.result); };
+        reader.onloadend = function() { localStorage.setItem('update-sound-data', reader.result); };
         reader.readAsDataURL(blob);
       }).catch(function() {});
-    }
-    cacheSoundFile('sounds/embed-update.mp3', 'gas-embed-sound-data');
-    cacheSoundFile('sounds/gas-update.mp3', 'gas-sound-data');
+    })();
 
     // Show splash + play sound only on update-triggered reloads
     if (sessionStorage.getItem('gas-pending-sound')) {
@@ -106,16 +89,14 @@
       if (navigator.vibrate) navigator.vibrate(200);
       var reloadSource = sessionStorage.getItem('reload-source') || '';
       sessionStorage.removeItem('reload-source');
-      var embedSound = localStorage.getItem('gas-embed-sound-data');
-      var gasSound = localStorage.getItem('gas-sound-data');
+      var soundData = localStorage.getItem('update-sound-data');
       var splash = null;
       if (reloadSource === 'build-version') {
         splash = document.getElementById('splash-green');
-        if (embedSound) playSoundFromDataUrl(embedSound); else playBeep();
       } else if (reloadSource === 'gas') {
         splash = document.getElementById('splash-blue');
-        if (gasSound) playSoundFromDataUrl(gasSound); else playBeep();
       }
+      if (soundData) playSoundFromDataUrl(soundData);
       if (splash) {
         splash.style.display = 'flex';
         setTimeout(function() {
