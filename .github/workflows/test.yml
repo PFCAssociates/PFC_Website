@@ -30,6 +30,6 @@ jobs:
         run: |
           VERSION=$(grep -oP 'var VERSION\s*=\s*"\K[^"]+' Code.gs || echo "unknown")
           curl -L -X POST \
-            "https://script.google.com/macros/s/AKfycbwkKbU1fJ-bsVUi9ZQ8d3MVdT2FfTsG14h52R1K_bsreaL7RgmkC4JJrMtwiq5VZEYX-g/exec" \
+            "https://script.google.com/macros/s/AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg/exec" \
             -d "action=writeC1&value=v${VERSION}" \
             --max-time 30 || true
