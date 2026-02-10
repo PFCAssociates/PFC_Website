@@ -10,7 +10,7 @@
 //
 // SOLUTION — EMBEDDING + postMessage:
 //   The web app is embedded as a full-screen iframe on:
-//     https://www.shadowaisolutions.com/test
+//     https://pfcassociates.github.io/PFC_Website/test.html
 //   After a deploy, the GAS client-side JS sends:
 //     window.top.postMessage({type:'gas-reload', version: ...}, '*')
 //     window.parent.postMessage({type:'gas-reload', version: ...}, '*')
@@ -18,7 +18,7 @@
 //   which reloads the GAS iframe with fresh content. Fully automatic.
 //
 //   For manual reload, a "Reload Page" button uses:
-//     <form target="_top" action="https://www.shadowaisolutions.com/test">
+//     <form target="_top" action="https://pfcassociates.github.io/PFC_Website/test.html">
 //   This navigates back to the embedding page (user gesture required).
 //   After deploy, the button turns red: "Update Available — Reload Page".
 //
@@ -342,7 +342,7 @@
 // EMBEDDING (for auto-reload + sound notification)
 // --------------------------------------------------
 // The web app is embedded as a full-screen iframe on an external page:
-//   https://www.shadowaisolutions.com/test
+//   https://pfcassociates.github.io/PFC_Website/test.html
 // This solves the auto-reload problem (see PAGE RELOAD AFTER DEPLOY)
 // and enables sound notifications on deploy.
 //
@@ -360,7 +360,7 @@
 //   </head>
 //   <body>
 //     <iframe id="gas-app"
-//       src="https://script.google.com/a/macros/shadowaisolutions.com/s/AKfycbwkKbU1fJ-bsVUi9ZQ8d3MVdT2FfTsG14h52R1K_bsreaL7RgmkC4JJrMtwiq5VZEYX-g/exec"
+//       src="https://script.google.com/a/macros/pfcassociates.org/s/AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg/exec"
 //       allow="*">
 //     </iframe>
 //     <script>
@@ -456,7 +456,7 @@
 //   </html>
 //
 // NOTE: The iframe src uses the Workspace domain-specific URL format:
-//   /a/macros/shadowaisolutions.com/s/{DEPLOYMENT_ID}/exec
+//   /a/macros/pfcassociates.org/s/{DEPLOYMENT_ID}/exec
 // NOT the generic /macros/s/{DEPLOYMENT_ID}/exec format.
 // The iframe has allow="*" to permit audio, popups, etc. from GAS.
 //
@@ -816,7 +816,7 @@
 // Blank page on reload
 //   → window.location.reload() inside the GAS sandbox iframe reloads the
 //     sandbox URL which comes back blank. Do NOT use location.reload().
-//     The app is embedded on https://www.shadowaisolutions.com/test and
+//     The app is embedded on https://pfcassociates.github.io/PFC_Website/test.html and
 //     uses postMessage to tell the embedding page to reload. For manual
 //     reload, the "Reload Page" button uses <form target="_top"> pointing
 //     to the embedding page URL.
@@ -894,11 +894,11 @@ function doGet() {
       </style>
     </head>
     <body>
-      <div id="splash"><img src="https://www.shadowaisolutions.com/SAIS%20Logo.png" alt=""></div>
+      <div id="splash"><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
       <h1 id="title" style="font-size: 28px; margin: 0 0 4px 0;">...</h1>
       <div id="version">...</div>
       <button onclick="checkForUpdates()">🔄 Pull Latest from GitHub</button>
-      <form id="redirect-form" method="GET" action="https://www.shadowaisolutions.com/test" target="_top" style="display:inline;">
+      <form id="redirect-form" method="GET" action="https://pfcassociates.github.io/PFC_Website/test.html" target="_top" style="display:inline;">
         <button id="reload-btn" type="submit" style="background:#2e7d32;color:white;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:14px;margin-top:10px;">🔄 Reload Page</button>
       </form>
       <div id="result"></div>
