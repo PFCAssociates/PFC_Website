@@ -867,7 +867,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.19g";
+var VERSION = "01.20g";
 var TITLE = "Attempt 42";
 
 // Google Sheets
@@ -921,7 +921,7 @@ function doGet() {
       <h1 id="title" style="font-size: 28px; margin: 0 0 4px 0;">...</h1>
       <div id="version">...</div>
       <button onclick="checkForUpdates()">🔧 Manual Deploy from GitHub</button>
-      <button id="reload-btn" onclick="try{window.top.location.reload();}catch(e){window.parent.location.reload();}" style="background:#2e7d32;color:white;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:14px;margin-top:10px;">🔄 Reload Page</button>
+      <button id="reload-btn" onclick="try{window.top.postMessage({type:'manual-reload'},'*')}catch(e){try{window.parent.postMessage({type:'manual-reload'},'*')}catch(e2){}}" style="background:#2e7d32;color:white;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:14px;margin-top:10px;">🔄 Reload Page</button>
       <div id="result"></div>
       <div id="versionCount" style="margin-top: 6px; font-size: 12px; color: #888;"></div>
 
