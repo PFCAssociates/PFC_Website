@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.02">
+  <meta name="build-version" content="01.03">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -106,7 +106,12 @@
     }
 
     window.addEventListener('message', function(e) {
-      if (e.data && e.data.type === 'gas-reload') {
+      if (!e.data) return;
+      // Cache sound data from GAS iframe as soon as it's loaded
+      if (e.data.type === 'gas-sound' && e.data.soundDataUrl) {
+        sessionStorage.setItem('gas-sound-data', e.data.soundDataUrl);
+      }
+      if (e.data.type === 'gas-reload') {
         sessionStorage.setItem('gas-pending-sound', '1');
         if (e.data.soundDataUrl) {
           sessionStorage.setItem('gas-sound-data', e.data.soundDataUrl);
