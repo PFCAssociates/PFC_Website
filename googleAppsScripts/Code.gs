@@ -1174,7 +1174,7 @@ function getAppData() {
       if (totalVersions >= 180) vStatus += " — APPROACHING LIMIT! Manually delete old versions in Apps Script editor: Project History > Bulk delete versions";
       cache.put("version_count_status", vStatus, 21600);
     } catch(e) {
-      vStatus = "Unable to check version count";
+      vStatus = "Unable to check version count: " + e.message;
     }
   }
   data.versionCount = vStatus;
