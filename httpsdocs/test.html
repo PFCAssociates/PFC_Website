@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.08">
+  <meta name="build-version" content="01.09">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -104,22 +104,9 @@
         playSoundFromDataUrl(gasSound);
       } else if (reloadSource === 'build-version' && embedSound) {
         playSoundFromDataUrl(embedSound);
-      } else if (gasSound || embedSound) {
-        playSoundFromDataUrl(gasSound || embedSound);
       } else {
         playBeep();
       }
-    }
-
-    // Play sound + vibrate, then reload after a short delay
-    function playSoundAndReload(soundDataUrl) {
-      if (navigator.vibrate) navigator.vibrate(200);
-      if (soundDataUrl) {
-        playSoundFromDataUrl(soundDataUrl);
-      } else {
-        playBeep();
-      }
-      setTimeout(function() { window.location.reload(); }, 1500);
     }
 
     window.addEventListener('message', function(e) {
@@ -128,7 +115,7 @@
       if (e.data.type === 'gas-embed-sound' && e.data.soundDataUrl) {
         sessionStorage.setItem('gas-embed-sound-data', e.data.soundDataUrl);
       }
-      // Cache GAS sound as fallback
+      // Cache GAS sound
       if (e.data.type === 'gas-sound' && e.data.soundDataUrl) {
         sessionStorage.setItem('gas-sound-data', e.data.soundDataUrl);
       }
@@ -138,9 +125,7 @@
         if (e.data.soundDataUrl) {
           sessionStorage.setItem('gas-sound-data', e.data.soundDataUrl);
         }
-        // Play GAS sound before reloading too
-        var gasSound = e.data.soundDataUrl || sessionStorage.getItem('gas-sound-data');
-        playSoundAndReload(gasSound);
+        window.location.reload();
       }
     });
 
@@ -167,9 +152,7 @@
               indicator.querySelector('.label').textContent = 'Updating...';
               sessionStorage.setItem('gas-pending-sound', '1');
               sessionStorage.setItem('reload-source', 'build-version');
-              // Play embed sound before reloading too
-              var embedSound = sessionStorage.getItem('gas-embed-sound-data');
-              playSoundAndReload(embedSound);
+              setTimeout(function() { window.location.reload(); }, 2000);
             } else {
               setTimeout(function() { dot.className = 'dot'; }, 800);
               setTimeout(checkForUpdate, POLL_INTERVAL);
