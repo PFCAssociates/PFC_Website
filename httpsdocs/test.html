@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.12w">
+  <meta name="build-version" content="01.13w">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -123,6 +123,10 @@
         sessionStorage.setItem('gas-sound-data', e.data.soundDataUrl);
       }
       if (e.data.type === 'gas-reload') {
+        // Ignore gas-reload if we just reloaded within the last 30 seconds
+        var lastGasReload = parseInt(sessionStorage.getItem('gas-reload-time') || '0', 10);
+        if (Date.now() - lastGasReload < 30000) return;
+        sessionStorage.setItem('gas-reload-time', String(Date.now()));
         sessionStorage.setItem('gas-pending-sound', '1');
         sessionStorage.setItem('reload-source', 'gas');
         if (e.data.soundDataUrl) {

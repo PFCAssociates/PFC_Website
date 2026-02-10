@@ -869,7 +869,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.14g";
+var VERSION = "01.15g";
 var TITLE = "Attempt 42";
 
 // Google Sheets
@@ -1090,8 +1090,8 @@ function doGet() {
         }
         setInterval(pollPushedVersionFromCache, 15000);
 
-        // Auto-pull from GitHub on every page load
-        checkForUpdates();
+        // Auto-pull from GitHub on every page load (5s delay for deployment propagation)
+        setTimeout(checkForUpdates, 5000);
 
         // Poll token/quota usage (on load + every 60s)
         function pollQuotaAndLimits() {
