@@ -908,7 +908,7 @@ function doGet() {
         <h3>Live_Sheet</h3>
         <div id="token-info">...</div>
         <div id="live-b1" style="font-size: 20px; font-weight: bold; color: #333; margin-bottom: 4px; text-align: center;">...</div>
-        <iframe src="https://docs.google.com/spreadsheets/d/11bgXlf8renF2MUwRAs9QXQjhrv3AxJu5b66u0QLTAeI/edit?rm=minimal"></iframe>
+        <iframe src="https://docs.google.com/spreadsheets/d/13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk/edit?rm=minimal"></iframe>
       </div>
 
       <div style="margin-top: 10px; font-size: 14px; color: #333;">
@@ -1139,7 +1139,7 @@ function doPost(e) {
   var action = (e && e.parameter && e.parameter.action) || "";
   if (action === "writeC1") {
     var value = (e.parameter.value) || "";
-    var ss = SpreadsheetApp.openById("11bgXlf8renF2MUwRAs9QXQjhrv3AxJu5b66u0QLTAeI");
+    var ss = SpreadsheetApp.openById("13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk");
     var sheet = ss.getSheetByName("Live_Sheet");
     if (!sheet) sheet = ss.insertSheet("Live_Sheet");
     sheet.getRange("C1").setValue(value + " — " + new Date().toLocaleString());
@@ -1237,7 +1237,7 @@ function readB1FromCacheOrSheet() {
   var cached = cache.get("live_b1");
   if (cached !== null) return cached;
 
-  var ss = SpreadsheetApp.openById("11bgXlf8renF2MUwRAs9QXQjhrv3AxJu5b66u0QLTAeI");
+  var ss = SpreadsheetApp.openById("13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk");
   var sheet = ss.getSheetByName("Live_Sheet");
   if (!sheet) return "";
   var val = sheet.getRange("B1").getValue();
@@ -1260,7 +1260,7 @@ function onEditWriteB1ToCache(e) {
 }
 
 function writeVersionToSheetA1() {
-  var ss = SpreadsheetApp.openById("11bgXlf8renF2MUwRAs9QXQjhrv3AxJu5b66u0QLTAeI");
+  var ss = SpreadsheetApp.openById("13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk");
   var sheet = ss.getSheetByName("Live_Sheet");
   if (!sheet) {
     sheet = ss.insertSheet("Live_Sheet");
@@ -1269,7 +1269,7 @@ function writeVersionToSheetA1() {
 }
 
 function writeVersionToSheetC1() {
-  var ss = SpreadsheetApp.openById("11bgXlf8renF2MUwRAs9QXQjhrv3AxJu5b66u0QLTAeI");
+  var ss = SpreadsheetApp.openById("13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk");
   var sheet = ss.getSheetByName("Live_Sheet");
   if (!sheet) {
     sheet = ss.insertSheet("Live_Sheet");
