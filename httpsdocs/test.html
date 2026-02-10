@@ -3,10 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="build-version" content="1770752228">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
     iframe { width: 100%; height: 100%; border: none; }
+    #version-indicator {
+      position: fixed; bottom: 8px; right: 8px; z-index: 9999;
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(0,0,0,0.55); color: #ccc; padding: 4px 10px;
+      border-radius: 12px; font: 11px/1 monospace; user-select: none;
+      pointer-events: none; transition: all 0.3s ease;
+    }
+    #version-indicator .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #888; transition: background 0.3s ease;
+    }
+    #version-indicator .dot.checking { background: #ffa726; animation: pulse 0.6s infinite alternate; }
+    #version-indicator .dot.found    { background: #66bb6a; }
+    #version-indicator .dot.error    { background: #ef5350; }
+    @keyframes pulse { from { opacity: 1; } to { opacity: 0.4; } }
   </style>
 </head>
 <body>
@@ -83,6 +99,42 @@
         window.location.reload();
       }
     });
+
+    // Auto-refresh: poll own HTML every 10s for build-version changes
+    (function() {
+      var POLL_INTERVAL = 10000;
+      var currentVersion = (document.querySelector('meta[name="build-version"]') || {}).content;
+      if (!currentVersion) return;
+
+      var indicator = document.createElement('div');
+      indicator.id = 'version-indicator';
+      indicator.innerHTML = '<span class="dot"></span><span class="label">v' + currentVersion + '</span>';
+      document.body.appendChild(indicator);
+      var dot = indicator.querySelector('.dot');
+
+      function checkForUpdate() {
+        dot.className = 'dot checking';
+        fetch(window.location.href.split('?')[0] + '?_cb=' + Date.now(), { cache: 'no-store' })
+          .then(function(res) { return res.text(); })
+          .then(function(html) {
+            var match = html.match(/<meta\s+name="build-version"\s+content="([^"]+)"/);
+            if (match && match[1] !== currentVersion) {
+              dot.className = 'dot found';
+              indicator.querySelector('.label').textContent = 'Updating...';
+              setTimeout(function() { window.location.reload(); }, 2000);
+            } else {
+              setTimeout(function() { dot.className = 'dot'; }, 800);
+              setTimeout(checkForUpdate, POLL_INTERVAL);
+            }
+          })
+          .catch(function() {
+            dot.className = 'dot error';
+            setTimeout(function() { dot.className = 'dot'; }, 2000);
+            setTimeout(checkForUpdate, POLL_INTERVAL);
+          });
+      }
+      setTimeout(checkForUpdate, POLL_INTERVAL);
+    })();
 
     // Screen Wake Lock — keep Android screen on while page is visible
     var _wakeLock = null;

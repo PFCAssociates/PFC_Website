@@ -15,3 +15,9 @@
 - Example: if VERSION is `"01.03"`, change it to `"01.04"`
 - Do NOT bump VERSION if the commit doesn't touch `Code.gs`
 
+## Build Version (Auto-Refresh for test.html)
+- **Every commit that modifies `httpsdocs/test.html` MUST update the `build-version` meta tag** to the current Unix timestamp
+- Look for `<meta name="build-version" content="TIMESTAMP">` in the `<head>`
+- Generate the timestamp with: `date +%s`
+- The page polls itself every 10 seconds — when the deployed version differs from the loaded version, it auto-reloads
+
