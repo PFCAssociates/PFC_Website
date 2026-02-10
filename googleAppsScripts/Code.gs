@@ -160,14 +160,10 @@
 //   - This bypasses Google's aggressive server-side HTML caching
 //     which cannot be disabled on Apps Script web apps
 //
-// AUTO-PULL ON PAGE LOAD:
-//   Every time the web app is loaded/reloaded, checkForUpdates() is
-//   called automatically. This means the app always pulls the latest
-//   code from GitHub on load — if a new version is available, it deploys
-//   and refreshes the dynamic content. If already up to date, it shows
-//   "Already up to date" briefly. If the pull fails (e.g. GitHub API
-//   temporarily unavailable), the error IS shown to the user — do NOT
-//   hide errors silently. The manual button still works too.
+// DEPLOY MODEL:
+//   Deploy is triggered SERVER-SIDE by the GitHub Action via doPost(action=deploy).
+//   The web app does NOT auto-pull on page load. The "Manual Deploy from GitHub"
+//   button is the only way to trigger a client-side deploy (for fallback use).
 //
 // Pull flow when the button is clicked (or on auto-pull):
 //   1. pullAndDeployFromGitHub() fetches Code.gs from GitHub API
@@ -311,33 +307,35 @@
 // NOTE: Client-side approaches (gviz/tq via fetch or JSONP) do NOT work
 // in the Apps Script sandbox due to CSP restrictions.
 //
-// GITHUB ACTION → GOOGLE SHEET C1 (VIA doPost)
+// GITHUB ACTION → SERVER-SIDE DEPLOY (VIA doPost)
 // -----------------------------------------------
-// Every time the GitHub Action merges a claude/* branch to main, it also
-// POSTs the new version to the web app's doPost() endpoint, which writes
-// it to cell C1 of Live_Sheet. This happens automatically — no polling.
+// Every time the GitHub Action merges a claude/* branch to main, it POSTs
+// action=deploy to the web app's doPost() endpoint, which:
+//   1. Calls pullAndDeployFromGitHub() server-side
+//   2. Extracts the new version from the deploy result
+//   3. Writes deploy confirmation to sheet cells A1 and C1
+//   4. Sets "pushed_version" in CacheService (1hr TTL)
 //
-// Flow: GitHub Action → curl POST → doPost(e) → writes C1
-//   POST param: action=writeC1&value=vX.XX
-//   doPost() reads e.parameter.action and e.parameter.value, writes to C1.
-//
-// doPost() also sets a "pushed_version" cache flag. The client polls
-// readPushedVersionFromCache() every 15 seconds. If the pushed version differs from
-// the currently displayed version, it auto-triggers checkForUpdates() —
-// so the web app deploys itself within ~15 seconds of a push, fully
-// automatic with no user interaction.
+// The client polls readPushedVersionFromCache() every 15 seconds. This
+// uses a READ-AND-CLEAR pattern: after reading the value, it removes it
+// from cache. This prevents stale signals from causing infinite reloads.
+// If the pushed version differs from the currently displayed version,
+// the client sends a gas-reload postMessage to the parent page (test.html),
+// which reloads. The deploy already happened server-side — the client
+// just needs to reload to pick up the new code.
 //
 // Full auto-deploy flow:
 //   1. Claude Code pushes to claude/* branch
-//   2. GitHub Action merges to main + POSTs to doPost()
-//   3. doPost() writes C1 + sets "pushed_version" in cache
+//   2. GitHub Action merges to main + POSTs action=deploy to doPost()
+//   3. doPost() pulls from GitHub, deploys, writes sheet, sets cache
 //   4. Client polls readPushedVersionFromCache() every 15s
-//   5. Detects new version → auto-triggers checkForUpdates()
-//   6. pullAndDeployFromGitHub() deploys the new code
-//   7. App updates dynamically — zero manual clicks
+//   5. Detects new version → sends gas-reload postMessage
+//   6. test.html reloads → GAS iframe loads new code
+//   7. Next poll reads + clears pushed_version → versions match → done
 //
 // NOTE: doPost() runs on the CURRENTLY DEPLOYED code, not the just-pushed
-// code. So the doPost handler must already be deployed for this to work.
+// code. On the first push after adding a new doPost feature, the old code
+// won't recognize the new action. The workflow uses || true to handle this.
 //
 // EMBEDDING (for auto-reload + sound notification)
 // --------------------------------------------------
@@ -869,7 +867,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.16g";
+var VERSION = "01.17g";
 var TITLE = "Attempt 42";
 
 // Google Sheets
@@ -1294,7 +1292,12 @@ function fetchGitHubQuotaAndLimits() {
 }
 
 function readPushedVersionFromCache() {
-  return CacheService.getScriptCache().get("pushed_version") || "";
+  var cache = CacheService.getScriptCache();
+  var val = cache.get("pushed_version");
+  if (val) {
+    cache.remove("pushed_version");
+  }
+  return val || "";
 }
 
 function readB1FromCacheOrSheet() {
