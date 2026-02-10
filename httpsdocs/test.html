@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GAS Self-Update Dashboard</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    iframe { width: 100%; height: 100%; border: none; }
+  </style>
+</head>
+<body>
+  <iframe id="gas-app"
+    src="https://script.google.com/a/macros/shadowaisolutions.com/s/AKfycbwkKbU1fJ-bsVUi9ZQ8d3MVdT2FfTsG14h52R1K_bsreaL7RgmkC4JJrMtwiq5VZEYX-g/exec"
+    allow="*">
+  </iframe>
+  <script>
+    var _audioCtx = null;
+    function unlockAudio() {
+      if (!_audioCtx) {
+        _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var buf = _audioCtx.createBuffer(1, 1, 22050);
+        var src = _audioCtx.createBufferSource();
+        src.buffer = buf;
+        src.connect(_audioCtx.destination);
+        src.start(0);
+      }
+      if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    }
+    document.addEventListener('click', unlockAudio, { once: false });
+    document.addEventListener('touchstart', unlockAudio, { once: false });
+
+    function playBeep() {
+      try {
+        var ctx = _audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        gain.gain.value = 0.3;
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+      } catch(e) {}
+    }
+
+    function playSoundFromDataUrl(dataUrl) {
+      try {
+        var ctx = _audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') ctx.resume();
+        var base64 = dataUrl.split(',')[1];
+        var binary = atob(base64);
+        var bytes = new Uint8Array(binary.length);
+        for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        ctx.decodeAudioData(bytes.buffer, function(audioBuffer) {
+          var source = ctx.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(ctx.destination);
+          source.start(0);
+        }, function() { playBeep(); });
+      } catch(e) { playBeep(); }
+    }
+
+    // After reload: try to play stored sound + vibrate
+    if (sessionStorage.getItem('gas-pending-sound')) {
+      sessionStorage.removeItem('gas-pending-sound');
+      if (navigator.vibrate) navigator.vibrate(200);
+      var soundData = sessionStorage.getItem('gas-sound-data');
+      if (soundData) {
+        sessionStorage.removeItem('gas-sound-data');
+        playSoundFromDataUrl(soundData);
+      } else {
+        playBeep();
+      }
+    }
+
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'gas-reload') {
+        sessionStorage.setItem('gas-pending-sound', '1');
+        if (e.data.soundDataUrl) {
+          sessionStorage.setItem('gas-sound-data', e.data.soundDataUrl);
+        }
+        window.location.reload();
+      }
+    });
+
+    // Screen Wake Lock — keep Android screen on while page is visible
+    var _wakeLock = null;
+    async function requestWakeLock() {
+      try {
+        if (navigator.wakeLock) {
+          _wakeLock = await navigator.wakeLock.request('screen');
+          _wakeLock.addEventListener('release', function() { _wakeLock = null; });
+        }
+      } catch(e) {}
+    }
+    requestWakeLock();
+    // Re-acquire when tab becomes visible again (auto-releases on tab switch)
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible') requestWakeLock();
+    });
+  </script>
+</body>
+</html>
