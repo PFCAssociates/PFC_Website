@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.14w">
+  <meta name="build-version" content="01.15w">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -93,8 +93,8 @@
       if (navigator.vibrate) navigator.vibrate(200);
       var reloadSource = sessionStorage.getItem('reload-source') || '';
       sessionStorage.removeItem('reload-source');
-      var embedSound = sessionStorage.getItem('gas-embed-sound-data');
-      var gasSound = sessionStorage.getItem('gas-sound-data');
+      var embedSound = localStorage.getItem('gas-embed-sound-data');
+      var gasSound = localStorage.getItem('gas-sound-data');
       var splash = null;
       if (reloadSource === 'build-version') {
         splash = document.getElementById('splash-green');
@@ -116,11 +116,11 @@
       if (!e.data) return;
       // Cache embed-specific sound from GAS iframe for test.html auto-refresh
       if (e.data.type === 'gas-embed-sound' && e.data.soundDataUrl) {
-        sessionStorage.setItem('gas-embed-sound-data', e.data.soundDataUrl);
+        localStorage.setItem('gas-embed-sound-data', e.data.soundDataUrl);
       }
       // Cache GAS sound
       if (e.data.type === 'gas-sound' && e.data.soundDataUrl) {
-        sessionStorage.setItem('gas-sound-data', e.data.soundDataUrl);
+        localStorage.setItem('gas-sound-data', e.data.soundDataUrl);
       }
       if (e.data.type === 'gas-reload') {
         // Ignore gas-reload if we just reloaded within the last 30 seconds
@@ -130,7 +130,7 @@
         sessionStorage.setItem('gas-pending-sound', '1');
         sessionStorage.setItem('reload-source', 'gas');
         if (e.data.soundDataUrl) {
-          sessionStorage.setItem('gas-sound-data', e.data.soundDataUrl);
+          localStorage.setItem('gas-sound-data', e.data.soundDataUrl);
         }
         window.location.reload();
       }
