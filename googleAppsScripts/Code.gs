@@ -1299,8 +1299,13 @@ function pullAndDeployFromGitHub() {
   }
 
   var response = UrlFetchApp.fetch(apiUrl, {
-    headers: fetchHeaders
+    headers: fetchHeaders,
+    muteHttpExceptions: true
   });
+  if (response.getResponseCode() !== 200) {
+    throw new Error("GitHub API " + response.getResponseCode() + " for: " + apiUrl
+      + " | Response: " + response.getContentText().substring(0, 200));
+  }
   var newCode = response.getContentText();
 
   // Extract VERSION from the pulled code
