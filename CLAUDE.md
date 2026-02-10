@@ -12,12 +12,14 @@
 ## Version Bumping
 - **Every commit that modifies `googleAppsScripts/Code.gs` MUST also increment the `VERSION` variable by 0.01**
 - The `VERSION` variable is near the top of `Code.gs` (look for `var VERSION = "..."`)
-- Example: if VERSION is `"01.03"`, change it to `"01.04"`
+- Format includes a `g` suffix: e.g. `"01.13g"`
+- Example: if VERSION is `"01.13g"`, change it to `"01.14g"`
 - Do NOT bump VERSION if the commit doesn't touch `Code.gs`
 
 ## Build Version (Auto-Refresh for test.html)
 - **Every commit that modifies `httpsdocs/test.html` MUST increment the `build-version` meta tag by 0.01**
 - Look for `<meta name="build-version" content="...">` in the `<head>`
-- Example: if build-version is `"01.01"`, change it to `"01.02"`
+- Format includes a `w` suffix: e.g. `"01.11w"`
+- Example: if build-version is `"01.11w"`, change it to `"01.12w"`
 - The page polls itself every 10 seconds — when the deployed version differs from the loaded version, it auto-reloads
 

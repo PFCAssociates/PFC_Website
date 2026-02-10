@@ -869,7 +869,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.12";
+var VERSION = "01.13g";
 var TITLE = "Attempt 42";
 
 // Google Sheets
