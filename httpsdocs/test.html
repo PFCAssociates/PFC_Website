@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.20w">
+  <meta name="build-version" content="01.21w">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -83,20 +83,20 @@
       }).catch(function() {});
     })();
 
-    // Show splash + play sound only on update-triggered reloads
+    // Show splash on update-triggered reloads; sound only for website (build-version) updates
     if (sessionStorage.getItem('gas-pending-sound')) {
       sessionStorage.removeItem('gas-pending-sound');
-      if (navigator.vibrate) navigator.vibrate(200);
       var reloadSource = sessionStorage.getItem('reload-source') || '';
       sessionStorage.removeItem('reload-source');
-      var soundData = localStorage.getItem('update-sound-data');
       var splash = null;
       if (reloadSource === 'build-version') {
         splash = document.getElementById('splash-green');
+        if (navigator.vibrate) navigator.vibrate(200);
+        var soundData = localStorage.getItem('update-sound-data');
+        if (soundData) playSoundFromDataUrl(soundData);
       } else if (reloadSource === 'gas') {
         splash = document.getElementById('splash-blue');
       }
-      if (soundData) playSoundFromDataUrl(soundData);
       if (splash) {
         splash.style.display = 'flex';
         setTimeout(function() {
