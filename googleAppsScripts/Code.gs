@@ -869,7 +869,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.04";
+var VERSION = "01.05";
 var TITLE = "Attempt 40";
 
 // Google Sheets
@@ -959,9 +959,9 @@ function doGet() {
           <rect x="85" y="170" width="30" height="70" rx="4" fill="#8B5E3C"/>
           <rect x="88" y="170" width="6" height="70" rx="2" fill="#A0714F" opacity="0.5"/>
           <!-- tree layers (bottom to top) -->
-          <polygon points="100,10 30,100 170,100" fill="#2E7D32"/>
-          <polygon points="100,50 20,150 180,150" fill="#388E3C"/>
-          <polygon points="100,90 10,190 190,190" fill="#43A047"/>
+          <polygon points="100,10 30,100 170,100" fill="#C62828"/>
+          <polygon points="100,50 20,150 180,150" fill="#D32F2F"/>
+          <polygon points="100,90 10,190 190,190" fill="#E53935"/>
           <!-- ground -->
           <ellipse cx="100" cy="242" rx="70" ry="10" fill="#5D4037" opacity="0.3"/>
         </svg>
