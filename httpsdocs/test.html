@@ -3,11 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.01">
+  <meta name="build-version" content="01.02">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
     iframe { width: 100%; height: 100%; border: none; }
+    #splash {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #1b5e20; z-index: 10000;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+    #splash img { max-width: 500px; max-height: 500px; }
     #version-indicator {
       position: fixed; bottom: 8px; right: 8px; z-index: 9999;
       display: flex; align-items: center; gap: 6px;
@@ -26,6 +33,7 @@
   </style>
 </head>
 <body>
+  <div id="splash"><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
   <iframe id="gas-app"
     src="https://script.google.com/a/macros/pfcassociates.org/s/AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg/exec"
     allow="*">
@@ -77,6 +85,13 @@
       } catch(e) { playBeep(); }
     }
 
+    // Green splash screen — fade out after 1 second
+    setTimeout(function() {
+      var splash = document.getElementById('splash');
+      splash.style.opacity = '0';
+      setTimeout(function() { splash.style.display = 'none'; }, 300);
+    }, 1000);
+
     // After reload: try to play stored sound + vibrate
     if (sessionStorage.getItem('gas-pending-sound')) {
       sessionStorage.removeItem('gas-pending-sound');
@@ -121,6 +136,7 @@
             if (match && match[1] !== currentVersion) {
               dot.className = 'dot found';
               indicator.querySelector('.label').textContent = 'Updating...';
+              sessionStorage.setItem('gas-pending-sound', '1');
               setTimeout(function() { window.location.reload(); }, 2000);
             } else {
               setTimeout(function() { dot.className = 'dot'; }, 800);
