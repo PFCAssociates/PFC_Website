@@ -1,11 +1,14 @@
 # When Claude Code pushes to a claude/* branch, this workflow automatically
 # merges it into main, deletes the branch, and deploys to GitHub Pages.
+# Also deploys when pushing directly to main.
 name: Auto-merge Claude branches
 
 on:
   push:
     branches:
       - 'claude/**'
+      - 'main'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -14,10 +17,11 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   auto-merge:
+    if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,6 +43,7 @@ jobs:
           git push origin --delete ${{ github.ref_name }}
 
   deploy:
+    if: always() && (needs.auto-merge.result == 'success' || needs.auto-merge.result == 'skipped')
     needs: auto-merge
     environment:
       name: github-pages
