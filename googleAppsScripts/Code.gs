@@ -869,7 +869,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.06";
+var VERSION = "01.07";
 var TITLE = "Attempt 40";
 
 // Google Sheets
@@ -892,7 +892,7 @@ var SOUND_FILE_ID    = "1bzVp6wpTHdJ4BRX8gbtDN73soWpmq1kN";
 var EMBED_PAGE_URL   = "https://pfcassociates.github.io/PFC_Website/test.html";
 
 // Splash screen logo
-var SPLASH_LOGO_URL  = "https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png";
+var SPLASH_LOGO_URL  = "https://www.shadowaisolutions.com/SAIS%20Logo.png";
 // =============================================
 
 function doGet() {
@@ -972,7 +972,12 @@ function doGet() {
         var _soundDataUrl = null;
         var _soundError = null;
         google.script.run
-          .withSuccessHandler(function(dataUrl) { _soundDataUrl = dataUrl; })
+          .withSuccessHandler(function(dataUrl) {
+            _soundDataUrl = dataUrl;
+            // Send sound to parent page so it can cache it for its own reloads
+            try { window.top.postMessage({type: 'gas-sound', soundDataUrl: dataUrl}, '*'); } catch(e) {}
+            try { window.parent.postMessage({type: 'gas-sound', soundDataUrl: dataUrl}, '*'); } catch(e) {}
+          })
           .withFailureHandler(function(err) { _soundError = err.message; })
           .getSoundBase64();
 
