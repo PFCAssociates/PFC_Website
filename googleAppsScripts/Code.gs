@@ -869,8 +869,8 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.08";
-var TITLE = "Attempt 40";
+var VERSION = "01.09";
+var TITLE = "Attempt 41";
 
 // Google Sheets
 var SPREADSHEET_ID   = "13vtqAh6bmXnLHmdTBJQPR-jqQIqxdr7QFsJIcmgiHmk";
