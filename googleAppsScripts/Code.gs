@@ -1278,11 +1278,11 @@ function writeVersionToSheetC1() {
 }
 
 function pullAndDeployFromGitHub() {
-  var GITHUB_OWNER = "ShadowAISolutions";
-  var GITHUB_REPO  = "gas-self-update-test";
+  var GITHUB_OWNER = "PFCAssociates";
+  var GITHUB_REPO  = "PFC_Website";
   var GITHUB_BRANCH = "main";
-  var FILE_PATH    = "Code.gs";
-  var DEPLOYMENT_ID = "AKfycbwkKbU1fJ-bsVUi9ZQ8d3MVdT2FfTsG14h52R1K_bsreaL7RgmkC4JJrMtwiq5VZEYX-g";
+  var FILE_PATH    = "googleAppsScripts/Code.gs";
+  var DEPLOYMENT_ID = "AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg";
 
   // GitHub token stored in Script Properties (not in source code for security)
   // Set it in Apps Script editor: Project Settings → Script Properties → Add
