@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.09">
+  <meta name="build-version" content="01.10">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
     iframe { width: 100%; height: 100%; border: none; }
-    #splash {
+    .splash {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #1b5e20; z-index: 10000;
-      display: flex; align-items: center; justify-content: center;
+      z-index: 10000; display: none; align-items: center; justify-content: center;
       transition: opacity 0.3s ease;
     }
-    #splash img { max-width: 500px; max-height: 500px; }
+    .splash img { max-width: 500px; max-height: 500px; }
+    #splash-green { background: #1b5e20; }
+    #splash-blue  { background: #0d47a1; }
     #version-indicator {
       position: fixed; bottom: 8px; right: 8px; z-index: 9999;
       display: flex; align-items: center; gap: 6px;
@@ -33,7 +34,8 @@
   </style>
 </head>
 <body>
-  <div id="splash"><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
+  <div id="splash-green" class="splash"><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
+  <div id="splash-blue" class="splash"><img src="https://www.shadowaisolutions.com/SAIS%20Logo.png" alt=""></div>
   <iframe id="gas-app"
     src="https://script.google.com/a/macros/pfcassociates.org/s/AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg/exec"
     allow="*">
@@ -85,14 +87,7 @@
       } catch(e) { playBeep(); }
     }
 
-    // Green splash screen — fade out after 1 second
-    setTimeout(function() {
-      var splash = document.getElementById('splash');
-      splash.style.opacity = '0';
-      setTimeout(function() { splash.style.display = 'none'; }, 300);
-    }, 1000);
-
-    // After reload: play the correct sound based on what triggered the reload
+    // Show splash + play sound only on update-triggered reloads
     if (sessionStorage.getItem('gas-pending-sound')) {
       sessionStorage.removeItem('gas-pending-sound');
       if (navigator.vibrate) navigator.vibrate(200);
@@ -100,12 +95,20 @@
       sessionStorage.removeItem('reload-source');
       var embedSound = sessionStorage.getItem('gas-embed-sound-data');
       var gasSound = sessionStorage.getItem('gas-sound-data');
-      if (reloadSource === 'gas' && gasSound) {
-        playSoundFromDataUrl(gasSound);
-      } else if (reloadSource === 'build-version' && embedSound) {
-        playSoundFromDataUrl(embedSound);
-      } else {
-        playBeep();
+      var splash = null;
+      if (reloadSource === 'build-version') {
+        splash = document.getElementById('splash-green');
+        if (embedSound) playSoundFromDataUrl(embedSound); else playBeep();
+      } else if (reloadSource === 'gas') {
+        splash = document.getElementById('splash-blue');
+        if (gasSound) playSoundFromDataUrl(gasSound); else playBeep();
+      }
+      if (splash) {
+        splash.style.display = 'flex';
+        setTimeout(function() {
+          splash.style.opacity = '0';
+          setTimeout(function() { splash.style.display = 'none'; }, 300);
+        }, 1000);
       }
     }
 
