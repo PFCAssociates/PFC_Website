@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.06">
+  <meta name="build-version" content="01.07">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -92,23 +92,15 @@
       setTimeout(function() { splash.style.display = 'none'; }, 300);
     }, 1000);
 
-    // After reload: play the correct sound based on what triggered the reload
-    if (sessionStorage.getItem('gas-pending-sound')) {
-      sessionStorage.removeItem('gas-pending-sound');
+    // Play sound + vibrate, then reload after a short delay
+    function playSoundAndReload(soundDataUrl) {
       if (navigator.vibrate) navigator.vibrate(200);
-      var reloadSource = sessionStorage.getItem('reload-source') || '';
-      sessionStorage.removeItem('reload-source');
-      var embedSound = sessionStorage.getItem('gas-embed-sound-data');
-      var gasSound = sessionStorage.getItem('gas-sound-data');
-      if (reloadSource === 'gas' && gasSound) {
-        playSoundFromDataUrl(gasSound);
-      } else if (reloadSource === 'build-version' && embedSound) {
-        playSoundFromDataUrl(embedSound);
-      } else if (embedSound || gasSound) {
-        playSoundFromDataUrl(embedSound || gasSound);
+      if (soundDataUrl) {
+        playSoundFromDataUrl(soundDataUrl);
       } else {
         playBeep();
       }
+      setTimeout(function() { window.location.reload(); }, 1500);
     }
 
     window.addEventListener('message', function(e) {
@@ -122,12 +114,9 @@
         sessionStorage.setItem('gas-sound-data', e.data.soundDataUrl);
       }
       if (e.data.type === 'gas-reload') {
-        sessionStorage.setItem('gas-pending-sound', '1');
-        sessionStorage.setItem('reload-source', 'gas');
-        if (e.data.soundDataUrl) {
-          sessionStorage.setItem('gas-sound-data', e.data.soundDataUrl);
-        }
-        window.location.reload();
+        // Play GAS sound before reloading (audio context is still unlocked)
+        var gasSound = e.data.soundDataUrl || sessionStorage.getItem('gas-sound-data');
+        playSoundAndReload(gasSound);
       }
     });
 
@@ -152,9 +141,9 @@
             if (match && match[1] !== currentVersion) {
               dot.className = 'dot found';
               indicator.querySelector('.label').textContent = 'Updating...';
-              sessionStorage.setItem('gas-pending-sound', '1');
-              sessionStorage.setItem('reload-source', 'build-version');
-              setTimeout(function() { window.location.reload(); }, 2000);
+              // Play embed sound before reloading (audio context is still unlocked)
+              var embedSound = sessionStorage.getItem('gas-embed-sound-data');
+              playSoundAndReload(embedSound);
             } else {
               setTimeout(function() { dot.className = 'dot'; }, 800);
               setTimeout(checkForUpdate, POLL_INTERVAL);
