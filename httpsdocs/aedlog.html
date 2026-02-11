@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.13w">
+  <meta name="build-version" content="01.14w">
   <title>AED Monthly Inspection Log</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -151,7 +151,7 @@
     // Reload iframe, appending stored token so GAS can verify the user server-side
     function reloadIframe() {
       var iframe = document.getElementById('gas-app');
-      var token = sessionStorage.getItem('gis-token') || '';
+      var token = localStorage.getItem('gis-token') || '';
       iframe.src = _gasBaseUrl + (token ? '&token=' + encodeURIComponent(token) : '');
     }
     // Initial load — includes stored token if user previously signed in
@@ -164,12 +164,12 @@
           callback: function(resp) {
             if (resp && resp.access_token) {
               // Store token so GAS can verify the user server-side
-              sessionStorage.setItem('gis-token', resp.access_token);
+              localStorage.setItem('gis-token', resp.access_token);
               // Also fetch email for the auth wall display
               fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                 headers: { 'Authorization': 'Bearer ' + resp.access_token }
               }).then(function(r) { return r.json(); }).then(function(info) {
-                if (info.email) sessionStorage.setItem('gis-email', info.email);
+                if (info.email) localStorage.setItem('gis-email', info.email);
               }).catch(function() {}).finally(function() {
                 document.getElementById('auth-wall').classList.remove('show');
                 reloadIframe();
@@ -183,7 +183,7 @@
     function showAuthWall(authStatus, email) {
       var wall = document.getElementById('auth-wall');
       // GAS can't detect email for unauthorized users, so check if we stored one from GIS
-      var knownEmail = email || sessionStorage.getItem('gis-email') || '';
+      var knownEmail = email || localStorage.getItem('gis-email') || '';
       if (knownEmail) {
         // User IS signed in, but doesn't have spreadsheet access
         wall.innerHTML = '<h2 style="color:#d32f2f">Access Denied</h2>'
