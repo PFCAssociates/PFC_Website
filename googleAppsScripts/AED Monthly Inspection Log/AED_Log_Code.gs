@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.48g";
+var VERSION = "01.49g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -37,6 +37,7 @@ var SPREADSHEET_ID   = "1JhpU30Vd08lYPD6bWNR-BlYaKf4iAz1mY1IykCYMwSQ";
 var SHEET_NAME       = "Live_Sheet";
 var CONFIG_SHEET     = "AED_Config";
 var INSPECT_SHEET    = "AED_Inspections";
+var STATS_SHEET      = "API_Stats";
 
 // GitHub
 var GITHUB_OWNER     = "PFCAssociates";
@@ -587,6 +588,23 @@ function saveConfig(key, value) {
 }
 
 /**
+ * Increments a counter on the API_Stats sheet.
+ * Layout: A1="Writes", B1=count, A2="Deletes", B2=count
+ * statType: "write" (row 1) or "delete" (row 2)
+ * ss: already-opened spreadsheet object
+ */
+function incrementStat(ss, statType) {
+  var sheet = ss.getSheetByName(STATS_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(STATS_SHEET);
+    sheet.getRange("A1:B2").setValues([["Writes", 0], ["Deletes", 0]]);
+  }
+  var cell = sheet.getRange(statType === "write" ? "B1" : "B2");
+  var current = Number(cell.getValue()) || 0;
+  cell.setValue(current + 1);
+}
+
+/**
  * Stamps an inspection cell with the authenticated user's name + current timestamp.
  * Returns the stamped string so the client can display it immediately.
  */
@@ -620,6 +638,7 @@ function stampInspection(yearSuffix, monthIndex, colIndex, opt_token) {
   } else {
     insSheet.getRange(rowIdx, colIndex + 3).setValue(value);
   }
+  incrementStat(ss, "write");
   return value;
 }
 
@@ -638,6 +657,7 @@ function clearInspection(yearSuffix, monthIndex, colIndex, opt_token) {
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][0]) === String(yearSuffix) && String(data[i][1]) === String(monthIndex)) {
       insSheet.getRange(i + 1, colIndex + 3).setValue("");
+      incrementStat(ss, "delete");
       break;
     }
   }
