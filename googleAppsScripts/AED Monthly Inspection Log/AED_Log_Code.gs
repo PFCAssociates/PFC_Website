@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.41g";
+var VERSION = "01.42g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -102,8 +102,8 @@ function getUserInfo(opt_token) {
 /**
  * Checks whether the given email has access to the inspection log spreadsheet.
  * The script runs as the owner, so openById always succeeds — we must explicitly
- * verify the user is on the sharing list (editors or viewers), or that the file
- * has domain-wide / open sharing that covers them.
+ * verify the user is on the sharing list (editors or viewers).
+ * Uses only SpreadsheetApp (no DriveApp scopes required).
  */
 function checkSpreadsheetAccess(email) {
   if (!email) return false;
@@ -117,16 +117,6 @@ function checkSpreadsheetAccess(email) {
   var viewers = ss.getViewers();
   for (var i = 0; i < viewers.length; i++) {
     if (viewers[i].getEmail().toLowerCase() === lowerEmail) return true;
-  }
-
-  // Check domain-level or open sharing
-  var file = DriveApp.getFileById(SPREADSHEET_ID);
-  var access = file.getSharingAccess();
-  if (access === DriveApp.Access.ANYONE || access === DriveApp.Access.ANYONE_WITH_LINK) return true;
-  if (access === DriveApp.Access.DOMAIN || access === DriveApp.Access.DOMAIN_WITH_LINK) {
-    var userDomain = lowerEmail.split('@')[1] || '';
-    var ownerDomain = (file.getOwner().getEmail() || '').toLowerCase().split('@')[1] || '';
-    if (userDomain && userDomain === ownerDomain) return true;
   }
 
   return false;
