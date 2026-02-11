@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.46g";
+var VERSION = "01.47g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -380,7 +380,7 @@ function buildFormHtml(opt_token) {
           _user=d.user;\
           document.getElementById("uname").textContent=d.user.displayName+" ("+d.user.email+")";\
           document.getElementById("user-bar").style.display="";\
-          try{window.top.postMessage({type:"gas-auth-ok"},"*")}catch(e){}\
+          try{window.top.postMessage({type:"gas-auth-ok",version:d.version||""},"*")}catch(e){}\
           populate(d);\
           document.getElementById("ld").classList.add("off");\
         })\
