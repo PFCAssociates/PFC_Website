@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.17w">
+  <meta name="build-version" content="01.18w">
   <title>AED Monthly Inspection Log</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -170,8 +170,14 @@
       document.getElementById('sign-out-btn').style.display = 'none';
       showAuthWall('not_signed_in', '');
     }
-    // Initial load — includes stored token if user previously signed in
-    reloadIframe();
+    // Initial load — only load the iframe if the user has a stored token.
+    // Without a token, GAS falls back to Session.getActiveUser() which detects
+    // the user via Google session cookies, bypassing sign-out.
+    if (localStorage.getItem('gis-token')) {
+      reloadIframe();
+    } else {
+      showAuthWall('not_signed_in', '');
+    }
     function triggerGisSignIn() {
       loadGis(function() {
         var client = google.accounts.oauth2.initTokenClient({
