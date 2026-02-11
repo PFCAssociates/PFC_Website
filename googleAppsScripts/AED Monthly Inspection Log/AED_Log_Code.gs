@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.12g";
+var VERSION = "01.13g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -67,20 +67,75 @@ var COL_HEADERS = [
 // =============================================
 
 /**
- * Returns the signed-in user's email and a display name derived from
- * the email prefix (e.g. "john.doe@pfcassociates.org" → "John Doe").
- * Returns {authorized:false} if no active user is detected.
+ * Returns the signed-in user's info and access status.
+ * Possible statuses:
+ *   "not_signed_in" — no active Google session detected
+ *   "no_access"     — signed in but not on the spreadsheet's sharing list
+ *   "authorized"    — signed in and has spreadsheet access
+ * Always includes scriptUrl so the client can link to the GAS app for auth.
  */
 function getUserInfo() {
+  var scriptUrl = ScriptApp.getService().getUrl();
   var email = Session.getActiveUser().getEmail();
   if (!email) {
-    return { authorized: false };
+    return { status: "not_signed_in", scriptUrl: scriptUrl };
+  }
+  if (!hasSpreadsheetAccess_(email)) {
+    return { status: "no_access", email: email, scriptUrl: scriptUrl };
   }
   var prefix = email.split("@")[0];
   var displayName = prefix.split(/[._-]/).map(function(part) {
     return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
   }).join(" ");
-  return { authorized: true, email: email, displayName: displayName };
+  return { status: "authorized", email: email, displayName: displayName };
+}
+
+/**
+ * Checks whether the given email has access to the backend spreadsheet
+ * (owner, editor, viewer, or domain/link-level sharing).
+ * Uses DriveApp — requires the drive.readonly (or drive) OAuth scope.
+ */
+function hasSpreadsheetAccess_(email) {
+  try {
+    var file = DriveApp.getFileById(SPREADSHEET_ID);
+    var emailLower = email.toLowerCase();
+
+    // Domain-wide or public sharing
+    var access = file.getSharingAccess();
+    if (access === DriveApp.Access.ANYONE || access === DriveApp.Access.ANYONE_WITH_LINK) {
+      return true;
+    }
+    if (access === DriveApp.Access.DOMAIN || access === DriveApp.Access.DOMAIN_WITH_LINK) {
+      var owner = file.getOwner();
+      if (owner) {
+        var ownerDomain = owner.getEmail().split("@")[1];
+        var userDomain = email.split("@")[1];
+        if (ownerDomain && userDomain && ownerDomain.toLowerCase() === userDomain.toLowerCase()) {
+          return true;
+        }
+      }
+    }
+
+    // Explicit sharing — owner
+    var owner = file.getOwner();
+    if (owner && owner.getEmail().toLowerCase() === emailLower) return true;
+
+    // Explicit sharing — editors
+    var editors = file.getEditors();
+    for (var i = 0; i < editors.length; i++) {
+      if (editors[i].getEmail().toLowerCase() === emailLower) return true;
+    }
+
+    // Explicit sharing — viewers
+    var viewers = file.getViewers();
+    for (var i = 0; i < viewers.length; i++) {
+      if (viewers[i].getEmail().toLowerCase() === emailLower) return true;
+    }
+
+    return false;
+  } catch(e) {
+    return false;
+  }
 }
 
 // =============================================
@@ -174,10 +229,17 @@ function buildFormHtml() {
     .ld{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;z-index:9999;font-size:18px;color:#666;flex-direction:column;gap:12px}\
     .ld.off{display:none}\
     /* Auth wall */\
-    .auth-wall{position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:10000;flex-direction:column;gap:16px;text-align:center;padding:20px}\
+    .auth-wall{position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;display:none;align-items:center;justify-content:center;z-index:10000;flex-direction:column;gap:16px;text-align:center;padding:20px}\
+    .auth-wall.show{display:flex}\
     .auth-wall h2{margin:0;color:#d32f2f}\
-    .auth-wall p{margin:0;color:#666;max-width:400px;line-height:1.5}\
-    .auth-wall.off{display:none}\
+    .auth-wall p{margin:0;color:#666;max-width:440px;line-height:1.6;font-size:14px}\
+    .auth-wall .auth-email{font-weight:bold;color:#222}\
+    .auth-wall .auth-btn{display:inline-block;margin-top:4px;padding:10px 28px;border:none;border-radius:6px;font-size:15px;font-weight:bold;cursor:pointer;color:#fff;text-decoration:none;transition:background .2s}\
+    .auth-wall .auth-btn.signin{background:#1a73e8}\
+    .auth-wall .auth-btn.signin:hover{background:#1557b0}\
+    .auth-wall .auth-btn.switch{background:#f4511e}\
+    .auth-wall .auth-btn.switch:hover{background:#d63c0e}\
+    .auth-wall .auth-hint{font-size:12px;color:#999;margin-top:0}\
     /* Year warning */\
     .yr input.warn{border-bottom-color:#d32f2f;animation:pulse-warn .4s ease 2}\
     @keyframes pulse-warn{0%,100%{border-bottom-color:#d32f2f}50%{border-bottom-color:#ff8a80}}\
@@ -194,7 +256,7 @@ function buildFormHtml() {
   </style>\
 </head>\
 <body>\
-  <div class="auth-wall" id="auth"><h2>Sign-In Required</h2><p>You must be signed into your Google account and have access to the spreadsheet to use this inspection log.</p></div>\
+  <div class="auth-wall" id="auth-wall"></div>\
   <div class="ld" id="ld">Loading inspection log...</div>\
   <div class="sv" id="sv">Saving...</div>\
   <div class="wrap">\
@@ -280,15 +342,33 @@ function buildFormHtml() {
       cell.appendChild(clearBtn);\
     }\
 \
+    function showAuthWall(d){\
+      var wall=document.getElementById("auth-wall");\
+      var url=d.scriptUrl||"";\
+      if(d.authStatus==="no_access"){\
+        var switchUrl="https://accounts.google.com/AccountChooser"+(url?"?continue="+encodeURIComponent(url):"");\
+        wall.innerHTML="<h2>Access Denied</h2>"\
+          +"<p>Your account <span class=auth-email>"+((d.email||"")+"</span> does not have access to the inspection log spreadsheet.</p>")\
+          +"<a class=\\"auth-btn switch\\" href=\\""+switchUrl+"\\" target=\\"_blank\\">Switch Google Account</a>"\
+          +"<p class=auth-hint>Sign in with an account that has access, or ask your administrator to share the spreadsheet with you.</p>";\
+      }else{\
+        wall.innerHTML="<h2>Sign-In Required</h2>"\
+          +"<p>You must be signed into your Google account to use this inspection log.</p>"\
+          +(url?"<a class=\\"auth-btn signin\\" href=\\""+url+"\\" target=\\"_blank\\">Sign In with Google</a>":"")\
+          +"<p class=auth-hint>A new tab will open for sign-in. After signing in, come back here and refresh the page.</p>";\
+      }\
+      wall.classList.add("show");\
+    }\
+\
     function loadData(){\
       google.script.run\
         .withSuccessHandler(function(d){\
           if(!d.authorized){\
-            document.getElementById("auth").classList.remove("off");\
+            showAuthWall(d);\
             document.getElementById("ld").classList.add("off");\
             return;\
           }\
-          document.getElementById("auth").classList.add("off");\
+          document.getElementById("auth-wall").classList.remove("show");\
           _user=d.user;\
           document.getElementById("uname").textContent=d.user.displayName+" ("+d.user.email+")";\
           document.getElementById("user-bar").style.display="";\
@@ -406,8 +486,8 @@ function buildFormHtml() {
  */
 function getFormData() {
   var userInfo = getUserInfo();
-  if (!userInfo.authorized) {
-    return { authorized: false };
+  if (userInfo.status !== "authorized") {
+    return { authorized: false, authStatus: userInfo.status, email: userInfo.email || "", scriptUrl: userInfo.scriptUrl || "" };
   }
 
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
@@ -483,7 +563,7 @@ function saveConfig(key, value) {
  */
 function stampInspection(yearSuffix, monthIndex, colIndex) {
   var userInfo = getUserInfo();
-  if (!userInfo.authorized) throw new Error("You must be signed into your Google account.");
+  if (userInfo.status !== "authorized") throw new Error("You must be signed into a Google account with spreadsheet access.");
 
   var timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "M/d/yyyy h:mm a");
   var value = userInfo.displayName + " | " + timestamp;
@@ -519,7 +599,7 @@ function stampInspection(yearSuffix, monthIndex, colIndex) {
  */
 function clearInspection(yearSuffix, monthIndex, colIndex) {
   var userInfo = getUserInfo();
-  if (!userInfo.authorized) throw new Error("You must be signed into your Google account.");
+  if (userInfo.status !== "authorized") throw new Error("You must be signed into a Google account with spreadsheet access.");
 
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var insSheet = ss.getSheetByName(INSPECT_SHEET);
