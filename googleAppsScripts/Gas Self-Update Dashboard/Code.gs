@@ -867,7 +867,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.26g";
+var VERSION = "01.27g";
 var TITLE = "Attempt 42";
 
 // Google Sheets
@@ -1337,18 +1337,41 @@ function pullAndDeployFromGitHub() {
   //   Key: GITHUB_TOKEN   Value: your github_pat_... token
   var GITHUB_TOKEN = PropertiesService.getScriptProperties().getProperty("GITHUB_TOKEN");
 
-  var apiUrl = "https://api.github.com/repos/"
-    + GITHUB_OWNER + "/" + GITHUB_REPO + "/contents/" + FILE_PATH
-    + "?ref=" + GITHUB_BRANCH + "&t=" + new Date().getTime();
-
   var fetchHeaders = { "Accept": "application/vnd.github.v3.raw" };
   if (GITHUB_TOKEN) {
     fetchHeaders["Authorization"] = "token " + GITHUB_TOKEN;
   }
 
+  // Try the known FILE_PATH first; if 404 (file moved), find it via Git Trees API
+  var filePath = FILE_PATH;
+  var apiUrl = "https://api.github.com/repos/"
+    + GITHUB_OWNER + "/" + GITHUB_REPO + "/contents/" + filePath
+    + "?ref=" + GITHUB_BRANCH + "&t=" + new Date().getTime();
+
   var response = UrlFetchApp.fetch(apiUrl, {
-    headers: fetchHeaders
+    headers: fetchHeaders,
+    muteHttpExceptions: true
   });
+
+  if (response.getResponseCode() === 404) {
+    // FILE_PATH is stale (file was moved). Search the repo tree for Code.gs
+    var treeHeaders = {};
+    if (GITHUB_TOKEN) treeHeaders["Authorization"] = "token " + GITHUB_TOKEN;
+    var treeUrl = "https://api.github.com/repos/"
+      + GITHUB_OWNER + "/" + GITHUB_REPO + "/git/trees/" + GITHUB_BRANCH + "?recursive=1";
+    var treeResponse = UrlFetchApp.fetch(treeUrl, { headers: treeHeaders });
+    var tree = JSON.parse(treeResponse.getContentText()).tree;
+    var found = tree.filter(function(f) { return f.path.match(/\/Code\.gs$/) || f.path === "Code.gs"; });
+    if (found.length === 0) throw new Error("Code.gs not found anywhere in repo");
+    filePath = found[0].path;
+
+    // Re-fetch with the discovered path
+    apiUrl = "https://api.github.com/repos/"
+      + GITHUB_OWNER + "/" + GITHUB_REPO + "/contents/" + filePath
+      + "?ref=" + GITHUB_BRANCH + "&t=" + new Date().getTime();
+    response = UrlFetchApp.fetch(apiUrl, { headers: fetchHeaders });
+  }
+
   var newCode = response.getContentText();
 
   // Extract VERSION from the pulled code
