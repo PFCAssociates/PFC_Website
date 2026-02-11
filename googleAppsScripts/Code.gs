@@ -867,7 +867,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.23g";
+var VERSION = "01.24g";
 var TITLE = "Attempt 42";
 
 // Google Sheets
@@ -963,41 +963,50 @@ function doGet() {
       </div>
 
       <script>
-        // Pre-load Drive sound from server on page load
+        // Sound loaded lazily on Test Sound button click (not pre-loaded)
         var _soundDataUrl = null;
-        var _soundError = null;
-        google.script.run
-          .withSuccessHandler(function(dataUrl) { _soundDataUrl = dataUrl; })
-          .withFailureHandler(function(err) { _soundError = err.message; })
-          .getSoundBase64();
 
         function playReadySound() {
           var status = document.getElementById('result');
-          if (_soundError) {
-            status.style.background = '#ffebee';
-            status.textContent = 'Server error loading sound: ' + _soundError;
-            return;
-          }
-          if (!_soundDataUrl) {
+          if (_soundDataUrl) {
+            // Already loaded — play immediately
             status.style.background = '#fff3e0';
-            status.textContent = 'Sound still loading from server...';
+            status.textContent = 'Playing...';
+            try {
+              var audio = new Audio(_soundDataUrl);
+              audio.play().then(function() {
+                status.style.background = '#e8f5e9';
+                status.textContent = 'Drive sound playing';
+              }).catch(function(e) {
+                status.style.background = '#ffebee';
+                status.textContent = 'Play rejected: ' + e.message;
+              });
+            } catch(e) {
+              status.style.background = '#ffebee';
+              status.textContent = 'Audio error: ' + e.message;
+            }
             return;
           }
+          // First click — fetch from Drive, then play
           status.style.background = '#fff3e0';
-          status.textContent = 'Playing... (length: ' + _soundDataUrl.length + ')';
-          try {
-            var audio = new Audio(_soundDataUrl);
-            audio.play().then(function() {
-              status.style.background = '#e8f5e9';
-              status.textContent = 'Drive sound playing (length: ' + _soundDataUrl.length + ')';
-            }).catch(function(e) {
+          status.textContent = 'Loading sound from Drive...';
+          google.script.run
+            .withSuccessHandler(function(dataUrl) {
+              _soundDataUrl = dataUrl;
+              var audio = new Audio(dataUrl);
+              audio.play().then(function() {
+                status.style.background = '#e8f5e9';
+                status.textContent = 'Drive sound playing';
+              }).catch(function(e) {
+                status.style.background = '#ffebee';
+                status.textContent = 'Play rejected: ' + e.message;
+              });
+            })
+            .withFailureHandler(function(err) {
               status.style.background = '#ffebee';
-              status.textContent = 'Play rejected: ' + e.message;
-            });
-          } catch(e) {
-            status.style.background = '#ffebee';
-            status.textContent = 'Audio error: ' + e.message;
-          }
+              status.textContent = 'Server error: ' + err.message;
+            })
+            .getSoundBase64();
         }
 
         // Exact v1.67 beep code (AudioContext) — restored unchanged
@@ -1068,7 +1077,6 @@ function doGet() {
                 _autoPulling = true;
                 // Deploy already happened in doPost(). Just signal parent to reload.
                 var reloadMsg = {type: 'gas-reload', version: pushed};
-                if (_soundDataUrl) reloadMsg.soundDataUrl = _soundDataUrl;
                 try { window.top.postMessage(reloadMsg, '*'); } catch(e) {}
                 try { window.parent.postMessage(reloadMsg, '*'); } catch(e) {}
                 var btn = document.getElementById('reload-btn');
@@ -1132,7 +1140,6 @@ function doGet() {
                     // GAS double-iframes: your page > Google wrapper > sandbox (this code)
                     // So window.parent = Google wrapper, window.top = your page
                     var reloadMsg = {type: 'gas-reload', version: data.version};
-                    if (_soundDataUrl) reloadMsg.soundDataUrl = _soundDataUrl;
                     try { window.top.postMessage(reloadMsg, '*'); } catch(e) {}
                     try { window.parent.postMessage(reloadMsg, '*'); } catch(e) {}
                   })
