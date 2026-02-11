@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.43g";
+var VERSION = "01.44g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -213,7 +213,7 @@ function buildFormHtml(opt_token) {
     /* Version */\
     #gv{text-align:center;font-size:11px;color:#aaa;padding:4px}\
     /* Saving indicator */\
-    .sv{position:fixed;top:8px;right:8px;background:#1565c0;color:#fff;padding:4px 12px;border-radius:12px;font-size:12px;opacity:0;transition:opacity .3s;z-index:1000}\
+    .sv{position:fixed;top:8px;right:100px;background:#1565c0;color:#fff;padding:4px 12px;border-radius:12px;font-size:12px;opacity:0;transition:opacity .3s;z-index:1000}\
     .sv.on{opacity:1}\
     /* Loading */\
     .ld{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;z-index:9999;font-size:18px;color:#666;flex-direction:column;gap:12px}\
