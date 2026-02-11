@@ -10,7 +10,7 @@
 - The "Create a pull request" message in push output is just GitHub boilerplate — ignore it, the workflow handles merging automatically
 
 ## Version Bumping
-- **Every commit that modifies `googleAppsScripts/Code.gs` MUST also increment the `VERSION` variable by 0.01**
+- **Every commit that modifies `googleAppsScripts/Gas Self-Update Dashboard/Code.gs` MUST also increment the `VERSION` variable by 0.01**
 - The `VERSION` variable is near the top of `Code.gs` (look for `var VERSION = "..."`)
 - Format includes a `g` suffix: e.g. `"01.13g"`
 - Example: if VERSION is `"01.13g"`, change it to `"01.14g"`

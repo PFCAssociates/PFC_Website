@@ -1,6 +1,6 @@
 # Resource & Quota Usage Reference
 
-All resource-consuming mechanisms in the GAS app (`Code.gs`) and embedding page (`test.html`), with daily usage, limits, and code locations.
+All resource-consuming mechanisms in the GAS app (`googleAppsScripts/Gas Self-Update Dashboard/Code.gs`) and embedding page (`httpsdocs/test.html`), with daily usage, limits, and code locations.
 
 Assumes **1 open browser tab, 24 hours, no manual deploys**.
 

@@ -867,7 +867,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.24g";
+var VERSION = "01.25g";
 var TITLE = "Attempt 42";
 
 // Google Sheets
@@ -878,7 +878,7 @@ var SHEET_NAME       = "Live_Sheet";
 var GITHUB_OWNER     = "PFCAssociates";
 var GITHUB_REPO      = "PFC_Website";
 var GITHUB_BRANCH    = "main";
-var FILE_PATH        = "googleAppsScripts/Code.gs";
+var FILE_PATH        = "googleAppsScripts/Gas Self-Update Dashboard/Code.gs";
 
 // Apps Script Deployment
 var DEPLOYMENT_ID    = "AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg";
