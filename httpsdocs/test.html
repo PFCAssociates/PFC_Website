@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.25w">
+  <meta name="build-version" content="01.26w">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -100,8 +100,8 @@
         reader.readAsDataURL(blob);
       }).catch(function() {});
     }
-    cacheSound('sounds/embed-update.mp3', 'web-sound-data');
-    cacheSound('sounds/gas-update.mp3', 'gas-sound-data');
+    cacheSound('sounds/Website_Ready_Voice_1.mp3', 'web-sound-data');
+    cacheSound('sounds/Code_Ready_Voice_1.mp3', 'gas-sound-data');
 
     // Show splash + play appropriate sound on update-triggered reloads
     if (sessionStorage.getItem('gas-pending-sound')) {
