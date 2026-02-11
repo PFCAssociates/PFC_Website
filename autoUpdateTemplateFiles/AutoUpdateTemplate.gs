@@ -35,24 +35,24 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.05g";
-var TITLE = "AED Monthly Inspection Log";
+var VERSION = "01.00g";
+var TITLE = "YOUR_PROJECT_TITLE";
 
 // Google Sheets
-var SPREADSHEET_ID   = "1JhpU30Vd08lYPD6bWNR-BlYaKf4iAz1mY1IykCYMwSQ";
-var SHEET_NAME       = "Live_Sheet";
+var SPREADSHEET_ID   = "YOUR_SPREADSHEET_ID";
+var SHEET_NAME       = "YOUR_SHEET_NAME";
 
 // GitHub
 var GITHUB_OWNER     = "PFCAssociates";
 var GITHUB_REPO      = "PFC_Website";
 var GITHUB_BRANCH    = "main";
-var FILE_PATH        = "googleAppsScripts/AED Monthly Inspection Log/AED_Log_Code.gs";
+var FILE_PATH        = "googleAppsScripts/YOUR_PROJECT_FOLDER/YOUR_CODE_FILE.gs";
 
 // Apps Script Deployment
-var DEPLOYMENT_ID    = "AKfycbyvnX5EmqA1jlbMiHD8VsLBdY8Xf00xlHF8mHsP02luflJFfhZVJl8ApxJA7I5e1udu";
+var DEPLOYMENT_ID    = "YOUR_DEPLOYMENT_ID";
 
 // Embedding page URL (where the GAS app is iframed)
-var EMBED_PAGE_URL   = "https://pfcassociates.github.io/PFC_Website/AEDLog.html";
+var EMBED_PAGE_URL   = "https://pfcassociates.github.io/PFC_Website/YOUR_PAGE.html";
 // =============================================
 
 function doGet() {
