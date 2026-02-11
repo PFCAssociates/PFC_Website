@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.47g";
+var VERSION = "01.48g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -68,16 +68,20 @@ var COL_HEADERS = [
 
 /**
  * Returns the signed-in user's info and access status.
- * Possible statuses:
- *   "not_signed_in" — no active Google session detected
- *   "authorized"    — signed in (email resolved)
- * Always includes scriptUrl so the client can link to the GAS app for auth.
+ * Results are cached in CacheService for 5 minutes (keyed by token)
+ * to avoid hitting the OAuth userinfo endpoint on every call.
  */
 function getUserInfo(opt_token) {
+  var cache = CacheService.getScriptCache();
+
+  // Try cache first (keyed by a short hash of the token, or "session" for cookie-based auth)
+  var cacheKey = opt_token ? "userinfo_" + opt_token.substr(-20) : "userinfo_session_" + (Session.getActiveUser().getEmail() || "none");
+  var cached = cache.get(cacheKey);
+  if (cached) {
+    try { return JSON.parse(cached); } catch(e) {}
+  }
+
   var email = "";
-  // When the parent page provides a token, use it to identify the user.
-  // This takes priority over Session.getActiveUser() because the parent page
-  // controls which Google account the user signed in with (or signed out of).
   if (opt_token) {
     try {
       var resp = UrlFetchApp.fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
@@ -90,7 +94,6 @@ function getUserInfo(opt_token) {
       }
     } catch(e) {}
   }
-  // Fall back to GAS session if no token provided or token validation failed
   if (!email) {
     email = Session.getActiveUser().getEmail();
   }
@@ -101,29 +104,42 @@ function getUserInfo(opt_token) {
   var displayName = prefix.split(/[._-]/).map(function(part) {
     return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
   }).join(" ");
-  return { status: "authorized", email: email, displayName: displayName };
+  var result = { status: "authorized", email: email, displayName: displayName };
+  cache.put(cacheKey, JSON.stringify(result), 300);
+  return result;
 }
 
 /**
  * Checks whether the given email has access to the inspection log spreadsheet.
- * The script runs as the owner, so openById always succeeds — we must explicitly
- * verify the user is on the sharing list (editors or viewers).
- * Uses only SpreadsheetApp (no DriveApp scopes required).
+ * Results are cached for 10 minutes to avoid repeatedly listing editors/viewers.
+ * Accepts an optional spreadsheet object to avoid redundant openById calls.
  */
-function checkSpreadsheetAccess(email) {
+function checkSpreadsheetAccess(email, opt_ss) {
   if (!email) return false;
   var lowerEmail = email.toLowerCase();
-  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
+  var cache = CacheService.getScriptCache();
+  var cacheKey = "access_" + lowerEmail;
+  var cached = cache.get(cacheKey);
+  if (cached !== null) return cached === "1";
+
+  var ss = opt_ss || SpreadsheetApp.openById(SPREADSHEET_ID);
   var editors = ss.getEditors();
   for (var i = 0; i < editors.length; i++) {
-    if (editors[i].getEmail().toLowerCase() === lowerEmail) return true;
+    if (editors[i].getEmail().toLowerCase() === lowerEmail) {
+      cache.put(cacheKey, "1", 600);
+      return true;
+    }
   }
   var viewers = ss.getViewers();
   for (var i = 0; i < viewers.length; i++) {
-    if (viewers[i].getEmail().toLowerCase() === lowerEmail) return true;
+    if (viewers[i].getEmail().toLowerCase() === lowerEmail) {
+      cache.put(cacheKey, "1", 600);
+      return true;
+    }
   }
 
+  cache.put(cacheKey, "0", 600);
   return false;
 }
 
@@ -499,11 +515,11 @@ function getFormData(opt_token) {
     return { authorized: false, authStatus: userInfo.status, email: userInfo.email || "", version: "v" + VERSION };
   }
 
-  if (!checkSpreadsheetAccess(userInfo.email)) {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+
+  if (!checkSpreadsheetAccess(userInfo.email, ss)) {
     return { authorized: false, authStatus: "no_access", email: userInfo.email || "", version: "v" + VERSION };
   }
-
-  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
   // --- Config sheet ---
   var cfgSheet = ss.getSheetByName(CONFIG_SHEET);
@@ -577,12 +593,11 @@ function saveConfig(key, value) {
 function stampInspection(yearSuffix, monthIndex, colIndex, opt_token) {
   var userInfo = getUserInfo(opt_token);
   if (userInfo.status !== "authorized") throw new Error("You must be signed into a Google account.");
-  if (!checkSpreadsheetAccess(userInfo.email)) throw new Error("Your account does not have access to the inspection log spreadsheet.");
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  if (!checkSpreadsheetAccess(userInfo.email, ss)) throw new Error("Your account does not have access to the inspection log spreadsheet.");
 
   var timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "M/d/yyyy h:mm:ss a");
   var value = userInfo.displayName + " | " + timestamp;
-
-  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var insSheet = ss.getSheetByName(INSPECT_SHEET);
   if (!insSheet) {
     insSheet = ss.insertSheet(INSPECT_SHEET);
@@ -614,9 +629,8 @@ function stampInspection(yearSuffix, monthIndex, colIndex, opt_token) {
 function clearInspection(yearSuffix, monthIndex, colIndex, opt_token) {
   var userInfo = getUserInfo(opt_token);
   if (userInfo.status !== "authorized") throw new Error("You must be signed into a Google account.");
-  if (!checkSpreadsheetAccess(userInfo.email)) throw new Error("Your account does not have access to the inspection log spreadsheet.");
-
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  if (!checkSpreadsheetAccess(userInfo.email, ss)) throw new Error("Your account does not have access to the inspection log spreadsheet.");
   var insSheet = ss.getSheetByName(INSPECT_SHEET);
   if (!insSheet) return true;
 

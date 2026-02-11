@@ -50,6 +50,14 @@
   5. If the returned version differs from the version displayed in `#gv`, it sends a `gas-reload` postMessage to the parent embedding page
   6. The embedding page (e.g. `aedlog.html`) receives the message, sets session storage flags, reloads, and shows the blue "Code Ready" splash
 
+## API Call Optimization (Scaling Goal)
+- **Minimize Google API calls** in every GAS function — the app is designed to scale to many users
+- **Cache `getUserInfo` results** in `CacheService` (keyed by token suffix) for 5 minutes to avoid hitting the OAuth userinfo endpoint on every `google.script.run` call
+- **Cache `checkSpreadsheetAccess` results** in `CacheService` (keyed by email) for 10 minutes to avoid listing editors/viewers on every call
+- **Open `SpreadsheetApp.openById()` once per function** — pass the `ss` object to `checkSpreadsheetAccess(email, opt_ss)` instead of opening the spreadsheet twice
+- When adding new server-side functions, always consider: can this result be cached? Can I reuse an already-opened spreadsheet object? Avoid redundant `UrlFetchApp` or `SpreadsheetApp` calls
+- Cache TTLs are intentionally short (5–10 min) so permission changes and token revocations take effect quickly
+
 ## Execution Style
 - For clear, straightforward requests: **just do it** — make the changes, commit, and push without asking for plan approval
 - Only ask clarifying questions when the request is genuinely ambiguous or has multiple valid interpretations
