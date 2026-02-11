@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.36g";
+var VERSION = "01.37g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -250,28 +250,6 @@ function buildFormHtml() {
       try{window.top.postMessage(msg,"*")}catch(e){}\
       try{window.parent.postMessage(msg,"*")}catch(e){}\
     }\
-    var _gisLoaded=false;\
-    function loadGis(cb){\
-      if(_gisLoaded){cb();return;}\
-      var s=document.createElement("script");\
-      s.src="https://accounts.google.com/gsi/client";\
-      s.onload=function(){_gisLoaded=true;cb();};\
-      document.head.appendChild(s);\
-    }\
-    function openSignIn(){\
-      loadGis(function(){\
-        google.accounts.oauth2.initCodeClient({\
-          client_id:"1065458024858-fp9s8h7hiogq114ct4bnc4qhdof2r6j6.apps.googleusercontent.com",\
-          scope:"email profile",\
-          ux_mode:"popup",\
-          callback:function(resp){\
-            if(resp&&!resp.error){\
-              notifyParentAuth();\
-            }\
-          }\
-        }).requestCode();\
-      });\
-    }\
     function sOn(){_sav++;document.getElementById("sv").classList.add("on")}\
     function sOff(){_sav--;if(_sav<=0){_sav=0;document.getElementById("sv").classList.remove("on")}}\
 \
@@ -317,20 +295,9 @@ function buildFormHtml() {
     }\
 \
     function showAuthWall(d){\
-      var wall=document.getElementById("auth-wall");\
-      if(d.authStatus==="no_access"){\
-        wall.innerHTML="<h2>Access Denied</h2>"\
-          +"<p>Your account <span class=auth-email>"+((d.email||"")+"</span> does not have access to the inspection log spreadsheet.</p>")\
-          +"<a class=\'auth-btn switch\' href=\'#\' onclick=\'openSignIn();return false;\'>Switch Google Account</a>"\
-          +"<p class=auth-hint>Sign in with an account that has access, or ask your administrator to share the spreadsheet with you.</p>";\
-      }else{\
-        wall.innerHTML="<h2>Sign-In Required</h2>"\
-          +"<p>You must be signed into an authorized Google account to use this inspection log.</p>"\
-          +"<p>If you are already signed in, your account may not have access. Try switching to an authorized account.</p>"\
-          +"<a class=\'auth-btn signin\' href=\'#\' onclick=\'openSignIn();return false;\'>Sign In / Switch Account</a>"\
-          +"<p class=auth-hint>A Google sign-in popup will appear. This page will refresh automatically once you sign in.</p>";\
-      }\
-      wall.classList.add("show");\
+      var msg={type:"gas-needs-auth",authStatus:d.authStatus||"not_signed_in",email:d.email||""};\
+      try{window.top.postMessage(msg,"*")}catch(e){}\
+      try{window.parent.postMessage(msg,"*")}catch(e){}\
     }\
 \
     function loadData(){\

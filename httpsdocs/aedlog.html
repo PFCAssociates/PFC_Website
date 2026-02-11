@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.08w">
+  <meta name="build-version" content="01.09w">
   <title>AED Monthly Inspection Log</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -32,9 +32,31 @@
     #version-indicator .dot.found    { background: #66bb6a; }
     #version-indicator .dot.error    { background: #ef5350; }
     @keyframes pulse { from { opacity: 1; } to { opacity: 0.4; } }
+    /* Auth wall (shown when GAS iframe reports auth needed) */
+    .auth-wall {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #fff;
+      display: none; align-items: center; justify-content: center; z-index: 10000;
+      flex-direction: column; gap: 16px; text-align: center; padding: 20px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .auth-wall.show { display: flex; }
+    .auth-wall h2 { margin: 0; }
+    .auth-wall p { margin: 0; color: #666; max-width: 440px; line-height: 1.6; font-size: 14px; }
+    .auth-wall .auth-email { font-weight: bold; color: #222; }
+    .auth-wall .auth-btn {
+      display: inline-block; margin-top: 4px; padding: 10px 28px; border: none;
+      border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer;
+      color: #fff; text-decoration: none; transition: background 0.2s;
+    }
+    .auth-wall .auth-btn.signin { background: #1a73e8; }
+    .auth-wall .auth-btn.signin:hover { background: #1557b0; }
+    .auth-wall .auth-btn.switch { background: #f4511e; }
+    .auth-wall .auth-btn.switch:hover { background: #d63c0e; }
+    .auth-wall .auth-hint { font-size: 12px; color: #999; margin-top: 0; }
   </style>
 </head>
 <body>
+  <div id="auth-wall" class="auth-wall"></div>
   <div id="splash-green" class="splash"><div class="splash-title">Website Ready</div><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
   <div id="splash-blue" class="splash"><div class="splash-title">Code Ready</div><img src="https://www.shadowaisolutions.com/SAIS%20Logo.png" alt=""></div>
   <iframe id="gas-app"
@@ -119,14 +141,60 @@
       }
     }
 
-    // Listen for gas-reload postMessage from the GAS iframe
+    // GIS sign-in (runs from pfcassociates.github.io origin)
+    var _gisLoaded = false;
+    function loadGis(cb) {
+      if (_gisLoaded) { cb(); return; }
+      var s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = function() { _gisLoaded = true; cb(); };
+      document.head.appendChild(s);
+    }
+    function triggerGisSignIn() {
+      loadGis(function() {
+        google.accounts.oauth2.initCodeClient({
+          client_id: '1065458024858-fp9s8h7hiogq114ct4bnc4qhdof2r6j6.apps.googleusercontent.com',
+          scope: 'email profile',
+          ux_mode: 'popup',
+          callback: function(resp) {
+            if (resp && !resp.error) {
+              document.getElementById('auth-wall').classList.remove('show');
+              document.getElementById('gas-app').src = document.getElementById('gas-app').src;
+            }
+          }
+        }).requestCode();
+      });
+    }
+    function showAuthWall(authStatus, email) {
+      var wall = document.getElementById('auth-wall');
+      if (authStatus === 'no_access') {
+        wall.innerHTML = '<h2 style="color:#d32f2f">Access Denied</h2>'
+          + '<p>Your account <span class="auth-email">' + (email || '') + '</span> does not have access to the inspection log spreadsheet.</p>'
+          + '<a class="auth-btn switch" href="#" onclick="triggerGisSignIn();return false;">Switch Google Account</a>'
+          + '<p class="auth-hint">Sign in with an account that has access, or ask your administrator to share the spreadsheet with you.</p>';
+      } else {
+        wall.innerHTML = '<h2 style="color:#d32f2f">Sign-In Required</h2>'
+          + '<p>You must be signed into an authorized Google account to use this inspection log.</p>'
+          + '<p>If you are already signed in, your account may not have access. Try switching to an authorized account.</p>'
+          + '<a class="auth-btn signin" href="#" onclick="triggerGisSignIn();return false;">Sign In / Switch Account</a>'
+          + '<p class="auth-hint">A Google sign-in popup will appear. This page will refresh automatically once you sign in.</p>';
+      }
+      wall.classList.add('show');
+    }
+
+    // Listen for postMessages from the GAS iframe
     window.addEventListener('message', function(e) {
       if (!e.data) return;
+      if (e.data.type === 'gas-needs-auth') {
+        showAuthWall(e.data.authStatus, e.data.email);
+        return;
+      }
       if (e.data.type === 'manual-reload') {
         window.location.reload();
       }
       if (e.data.type === 'gas-auth-complete') {
-        window.location.reload();
+        document.getElementById('auth-wall').classList.remove('show');
+        document.getElementById('gas-app').src = document.getElementById('gas-app').src;
         return;
       }
       if (e.data.type === 'gas-reload') {
