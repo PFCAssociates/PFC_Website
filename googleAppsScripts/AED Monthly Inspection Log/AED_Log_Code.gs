@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.26g";
+var VERSION = "01.27g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -96,10 +96,9 @@ function doGet(e) {
   if (!e || !e.parameter || !e.parameter.embedded) {
     var redirectUrl = "https://pfcassociates.github.io/PFC_Website/signin-complete.html";
     return HtmlService.createHtmlOutput(
-      '<html><head><meta http-equiv="refresh" content="0;url=' + redirectUrl + '"></head>'
-      + '<body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666">'
+      '<html><body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666">'
       + '<p>Sign-in complete. Redirecting...</p>'
-      + '<script>window.location.href="' + redirectUrl + '";</script></body></html>'
+      + '<script>window.top.location.href="' + redirectUrl + '";</script></body></html>'
     );
   }
   var html = buildFormHtml();
