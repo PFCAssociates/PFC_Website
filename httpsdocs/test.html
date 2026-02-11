@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.24w">
+  <meta name="build-version" content="01.25w">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -13,6 +13,8 @@
       z-index: 10000; display: none; align-items: center; justify-content: center;
       transition: opacity 0.3s ease;
     }
+    .splash { flex-direction: column; }
+    .splash .splash-title { color: #fff; font: bold 36px/1 sans-serif; margin-bottom: 20px; }
     .splash img { max-width: 500px; max-height: 500px; }
     #splash-green { background: #1b5e20; }
     #splash-blue  { background: #0d47a1; }
@@ -50,8 +52,8 @@
     <button id="btn-test-gas" onclick="sessionStorage.setItem('gas-pending-sound','1');sessionStorage.setItem('reload-source','gas');window.location.reload();">Test GAS</button>
     <button id="btn-test-web" onclick="sessionStorage.setItem('gas-pending-sound','1');sessionStorage.setItem('reload-source','build-version');window.location.reload();">Test Web</button>
   </div>
-  <div id="splash-green" class="splash"><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
-  <div id="splash-blue" class="splash"><img src="https://www.shadowaisolutions.com/SAIS%20Logo.png" alt=""></div>
+  <div id="splash-green" class="splash"><div class="splash-title">Website Ready</div><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
+  <div id="splash-blue" class="splash"><div class="splash-title">Code Ready</div><img src="https://www.shadowaisolutions.com/SAIS%20Logo.png" alt=""></div>
   <iframe id="gas-app"
     src="https://script.google.com/a/macros/pfcassociates.org/s/AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg/exec"
     allow="*">
