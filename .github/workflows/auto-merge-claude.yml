@@ -1,6 +1,23 @@
-# When Claude Code pushes to a claude/* branch, this workflow automatically
-# merges it into main, deletes the branch, and deploys to GitHub Pages.
-# Also deploys when pushing directly to main.
+# SINGLE WORKFLOW for merge + all deploys
+#
+# Why one file instead of separate workflows per deploy type:
+#   - The merge into main MUST happen first and only once. Separate workflows
+#     would each need the merge step, creating a race condition (two workflows
+#     trying to merge the same branch simultaneously).
+#   - Splitting would require a shared merge workflow + workflow_run triggers,
+#     adding complexity for no benefit.
+#   - Each deploy step is already independent and conditional (only runs when
+#     its files changed), so it behaves like separate deploys within one pipeline.
+#   - Adding a new GAS project = adding one more conditional step. Simple.
+#
+# Flow:
+#   1. Push to claude/* branch triggers this workflow
+#   2. Merge into main (once)
+#   3. Check what changed (git diff)
+#   4. Deploy GAS projects — only if their Code.gs was modified
+#   5. Delete the claude branch
+#   6. Deploy GitHub Pages — only if httpsdocs/ files were modified
+#   7. Direct pushes to main skip merge and just deploy
 name: Auto-merge Claude branches
 
 on:
