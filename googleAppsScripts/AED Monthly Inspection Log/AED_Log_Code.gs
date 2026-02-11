@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.37g";
+var VERSION = "01.38g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -431,7 +431,12 @@ function getFormData() {
     return { authorized: false, authStatus: userInfo.status, email: userInfo.email || "", version: "v" + VERSION };
   }
 
-  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var ss;
+  try {
+    ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  } catch (e) {
+    return { authorized: false, authStatus: "no_access", email: userInfo.email || "", version: "v" + VERSION };
+  }
 
   // --- Config sheet ---
   var cfgSheet = ss.getSheetByName(CONFIG_SHEET);

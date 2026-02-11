@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.09w">
+  <meta name="build-version" content="01.10w">
   <title>AED Monthly Inspection Log</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -167,16 +167,19 @@
     }
     function showAuthWall(authStatus, email) {
       var wall = document.getElementById('auth-wall');
-      if (authStatus === 'no_access') {
+      if (authStatus === 'no_access' && email) {
         wall.innerHTML = '<h2 style="color:#d32f2f">Access Denied</h2>'
-          + '<p>Your account <span class="auth-email">' + (email || '') + '</span> does not have access to the inspection log spreadsheet.</p>'
+          + '<p style="margin-bottom:4px">Currently signed in as:</p>'
+          + '<p><span class="auth-email">' + email + '</span></p>'
+          + '<p>This account does not have access to the inspection log spreadsheet.</p>'
           + '<a class="auth-btn switch" href="#" onclick="triggerGisSignIn();return false;">Switch Google Account</a>'
           + '<p class="auth-hint">Sign in with an account that has access, or ask your administrator to share the spreadsheet with you.</p>';
       } else {
         wall.innerHTML = '<h2 style="color:#d32f2f">Sign-In Required</h2>'
-          + '<p>You must be signed into an authorized Google account to use this inspection log.</p>'
-          + '<p>If you are already signed in, your account may not have access. Try switching to an authorized account.</p>'
-          + '<a class="auth-btn signin" href="#" onclick="triggerGisSignIn();return false;">Sign In / Switch Account</a>'
+          + '<p style="margin-bottom:4px">Currently signed in as:</p>'
+          + '<p><span class="auth-email">No Google account detected</span></p>'
+          + '<p>You must sign into an authorized Google account to use this inspection log.</p>'
+          + '<a class="auth-btn signin" href="#" onclick="triggerGisSignIn();return false;">Sign In with Google</a>'
           + '<p class="auth-hint">A Google sign-in popup will appear. This page will refresh automatically once you sign in.</p>';
       }
       wall.classList.add('show');
