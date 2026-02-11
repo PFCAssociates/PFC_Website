@@ -867,11 +867,11 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.00g";
+var VERSION = "01.01g";
 var TITLE = "AED Monthly Inspection Log";
 
 // Google Sheets
-var SPREADSHEET_ID   = "PLACEHOLDER_SPREADSHEET_ID";  // TODO: Replace with actual Google Sheets ID
+var SPREADSHEET_ID   = "1JhpU30Vd08lYPD6bWNR-BlYaKf4iAz1mY1IykCYMwSQ";
 var SHEET_NAME       = "Live_Sheet";
 
 // GitHub
@@ -881,10 +881,10 @@ var GITHUB_BRANCH    = "main";
 var FILE_PATH        = "googleAppsScripts/AED Monthly Inspection Log/AED_Log_Code.gs";
 
 // Apps Script Deployment
-var DEPLOYMENT_ID    = "PLACEHOLDER_DEPLOYMENT_ID";  // TODO: Replace with actual deployment ID
+var DEPLOYMENT_ID    = "AKfycbyvnX5EmqA1jlbMiHD8VsLBdY8Xf00xlHF8mHsP02luflJFfhZVJl8ApxJA7I5e1udu";
 
 // Google Drive sound file (for GAS "Test Sound" button only)
-var SOUND_FILE_ID    = "PLACEHOLDER_SOUND_FILE_ID";  // TODO: Replace with actual Drive file ID (or reuse existing)
+var SOUND_FILE_ID    = "1bzVp6wpTHdJ4BRX8gbtDN73soWpmq1kN";
 
 // Embedding page URL (where the GAS app is iframed)
 var EMBED_PAGE_URL   = "https://pfcassociates.github.io/PFC_Website/AEDLog.html";
