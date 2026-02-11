@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.28g";
+var VERSION = "01.29g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -95,10 +95,11 @@ function doGet(e) {
   // close the tab so the user returns to the original page
   if (!e || !e.parameter || !e.parameter.embedded) {
     return HtmlService.createHtmlOutput(
-      '<html><body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666;flex-direction:column;gap:16px">'
-      + '<p>Sign-in complete. Redirecting...</p>'
-      + '<a href="' + EMBED_PAGE_URL + '" target="_top" style="color:#1a73e8;font-size:15px">Click here if not redirected</a>'
-      + '<script>window.top.location.href="' + EMBED_PAGE_URL + '";</script></body></html>'
+      '<html><body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666;flex-direction:column;gap:16px;text-align:center">'
+      + '<div style="font-size:48px;color:#43a047">&#10003;</div>'
+      + '<h2 style="margin:0;color:#222">Sign-In Complete</h2>'
+      + '<p>You can close this tab. The inspection log will refresh automatically.</p>'
+      + '<script>window.close();</script></body></html>'
     );
   }
   var html = buildFormHtml();
@@ -257,7 +258,20 @@ function buildFormHtml() {
     var _sav=0;\
     var _user=null;\
     function openSignIn(url){\
-      window.top.location.href=url;\
+      var w=window.open(url,"_blank");\
+      var authPoll=setInterval(function(){\
+        google.script.run.withSuccessHandler(function(info){\
+          if(info&&info.status==="authorized"){\
+            clearInterval(authPoll);\
+            window.location.reload();\
+          }\
+        }).withFailureHandler(function(){}).getUserInfo();\
+      },3000);\
+      if(w){\
+        var closePoll=setInterval(function(){\
+          try{if(w.closed){clearInterval(closePoll);clearInterval(authPoll);window.location.reload();}}catch(e){}\
+        },500);\
+      }\
     }\
     function sOn(){_sav++;document.getElementById("sv").classList.add("on")}\
     function sOff(){_sav--;if(_sav<=0){_sav=0;document.getElementById("sv").classList.remove("on")}}\
@@ -318,7 +332,7 @@ function buildFormHtml() {
           +"<p>You must be signed into an authorized Google account to use this inspection log.</p>"\
           +"<p>If you are already signed in, your account may not have access. Try switching to an authorized account.</p>"\
           +"<a class=\'auth-btn signin\' href=\'#\' onclick=\'openSignIn(_signInUrl);return false;\'>Sign In / Switch Account</a>"\
-          +"<p class=auth-hint>You will be redirected to sign in, then returned here automatically.</p>";\
+          +"<p class=auth-hint>A sign-in tab will open. This page will refresh automatically once you sign in.</p>";\
       }\
       wall.classList.add("show");\
     }\
