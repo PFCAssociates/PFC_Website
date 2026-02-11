@@ -20,7 +20,7 @@
 | Project | Code File | Embedding Page |
 |---------|-----------|----------------|
 | Gas Self-Update Dashboard | `googleAppsScripts/Gas Self-Update Dashboard/Code.gs` | `httpsdocs/test.html` |
-| AED Monthly Inspection Log | `googleAppsScripts/AED Monthly Inspection Log/AED_Log_Code.gs` | `httpsdocs/AEDLog.html` |
+| AED Monthly Inspection Log | `googleAppsScripts/AED Monthly Inspection Log/AED_Log_Code.gs` | `httpsdocs/aedlog.html` |
 
 ## Build Version (Auto-Refresh for embedding pages)
 - **Every commit that modifies an embedding HTML page MUST increment its `build-version` meta tag by 0.01**

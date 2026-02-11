@@ -35,7 +35,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.09g";
+var VERSION = "01.10g";
 var TITLE = "AED Monthly Inspection Log";
 
 // Auto-refresh: set to false to disable GAS-side version polling
@@ -60,7 +60,7 @@ var FILE_PATH        = "googleAppsScripts/AED Monthly Inspection Log/AED_Log_Cod
 var DEPLOYMENT_ID    = "AKfycbyvnX5EmqA1jlbMiHD8VsLBdY8Xf00xlHF8mHsP02luflJFfhZVJl8ApxJA7I5e1udu";
 
 // Embedding page URL (where the GAS app is iframed)
-var EMBED_PAGE_URL   = "https://pfcassociates.github.io/PFC_Website/AEDLog.html";
+var EMBED_PAGE_URL   = "https://pfcassociates.github.io/PFC_Website/aedlog.html";
 // =============================================
 
 function doGet() {
