@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.22w">
+  <meta name="build-version" content="01.23w">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -23,6 +23,18 @@
       border-radius: 12px; font: 11px/1 monospace; user-select: none;
       pointer-events: none; transition: all 0.3s ease;
     }
+    #test-buttons {
+      position: fixed; bottom: 8px; left: 8px; z-index: 9999;
+      display: flex; gap: 6px;
+    }
+    #test-buttons button {
+      border: none; color: #fff; padding: 6px 10px;
+      border-radius: 8px; font: bold 11px/1 sans-serif; cursor: pointer;
+      opacity: 0.7; transition: opacity 0.2s;
+    }
+    #test-buttons button:hover { opacity: 1; }
+    #btn-test-gas { background: #0d47a1; }
+    #btn-test-web { background: #1b5e20; }
     #version-indicator .dot {
       width: 8px; height: 8px; border-radius: 50%;
       background: #888; transition: background 0.3s ease;
@@ -34,6 +46,10 @@
   </style>
 </head>
 <body>
+  <div id="test-buttons">
+    <button id="btn-test-gas" onclick="sessionStorage.setItem('gas-pending-sound','1');sessionStorage.setItem('reload-source','gas');window.location.reload();">Test GAS</button>
+    <button id="btn-test-web" onclick="sessionStorage.setItem('gas-pending-sound','1');sessionStorage.setItem('reload-source','build-version');window.location.reload();">Test Web</button>
+  </div>
   <div id="splash-green" class="splash"><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
   <div id="splash-blue" class="splash"><img src="https://www.shadowaisolutions.com/SAIS%20Logo.png" alt=""></div>
   <iframe id="gas-app"
