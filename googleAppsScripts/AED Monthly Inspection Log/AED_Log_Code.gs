@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.33g";
+var VERSION = "01.34g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -94,10 +94,18 @@ function doGet(e) {
   // If not loaded inside the embedding page (e.g. after Google sign-in redirect),
   // close the tab so the user returns to the original page
   if (!e || !e.parameter || !e.parameter.embedded) {
+    var closeUrl = EMBED_PAGE_URL.replace('/aedlog.html', '/signin-complete.html');
     return HtmlService.createHtmlOutput(
-      '<html><head><meta http-equiv="refresh" content="0;url=' + EMBED_PAGE_URL.replace('/aedlog.html', '/signin-complete.html') + '"></head>'
-      + '<body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666">'
-      + '<p>Redirecting...</p></body></html>'
+      '<html><head><meta http-equiv="refresh" content="1;url=' + closeUrl + '"></head>'
+      + '<body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666;flex-direction:column;gap:16px;text-align:center">'
+      + '<div style="font-size:48px;color:#43a047">&#10003;</div>'
+      + '<h2 style="margin:0;color:#222">Sign-In Complete</h2>'
+      + '<p>Redirecting... <a href="' + closeUrl + '" target="_top">Click here</a> if not redirected.</p>'
+      + '<script>'
+      + 'window.close();'
+      + 'setTimeout(function(){window.location.href="' + closeUrl + '";},500);'
+      + 'setTimeout(function(){window.top.location.href="' + closeUrl + '";},1000);'
+      + '</script></body></html>'
     );
   }
   var html = buildFormHtml();
@@ -324,7 +332,7 @@ function buildFormHtml() {
     function showAuthWall(d){\
       var wall=document.getElementById("auth-wall");\
       var scriptUrl=d.scriptUrl||"";\
-      _signInUrl=scriptUrl||"";\
+      _signInUrl="https://accounts.google.com/AccountChooser"+(scriptUrl?"?continue="+encodeURIComponent(scriptUrl):"");\
       if(d.authStatus==="no_access"){\
         wall.innerHTML="<h2>Access Denied</h2>"\
           +"<p>Your account <span class=auth-email>"+((d.email||"")+"</span> does not have access to the inspection log spreadsheet.</p>")\
