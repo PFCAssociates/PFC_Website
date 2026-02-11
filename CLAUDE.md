@@ -38,6 +38,18 @@
 - Example: `v01.19g Fix sign-in popup to auto-close after authentication`
 - Example: `v01.19g w01.12w Add auth wall with build version bump`
 
+## GAS Code Constraints
+- **All GAS `.gs` code must be valid Google Apps Script syntax** — test mentally that strings, escapes, and quotes parse correctly before committing
+- Avoid deeply nested quote escaping in HTML strings built inside `.gs` files. Instead, store values in global JS variables and reference them in `onclick` handlers (e.g. `_signInUrl` pattern)
+- **`readPushedVersionFromCache()` must NOT delete the cache entry** — it must return the value without calling `cache.remove()`. Deleting it causes only the first polling client to see the update; all others miss the "Code Ready" blue splash reload. The cache has a 1-hour TTL and expires naturally.
+- The GAS auto-update "Code Ready" splash flow works as follows:
+  1. GitHub Actions workflow calls `doPost(?action=deploy)` on the **old** deployed GAS
+  2. `pullAndDeployFromGitHub()` fetches new code from GitHub, updates the script, creates a new version, updates the deployment
+  3. It writes the new version string to `CacheService.getScriptCache()` with key `"pushed_version"`
+  4. Client-side JS polls `readPushedVersionFromCache()` every 15 seconds
+  5. If the returned version differs from the version displayed in `#gv`, it sends a `gas-reload` postMessage to the parent embedding page
+  6. The embedding page (e.g. `aedlog.html`) receives the message, sets session storage flags, reloads, and shows the blue "Code Ready" splash
+
 ## Execution Style
 - For clear, straightforward requests: **just do it** — make the changes, commit, and push without asking for plan approval
 - Only ask clarifying questions when the request is genuinely ambiguous or has multiple valid interpretations
