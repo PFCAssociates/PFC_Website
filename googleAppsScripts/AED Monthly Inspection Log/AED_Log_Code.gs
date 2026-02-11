@@ -35,7 +35,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.06g";
+var VERSION = "01.07g";
 var TITLE = "AED Monthly Inspection Log";
 
 // Google Sheets
@@ -61,8 +61,8 @@ function doGet() {
     <head>
       <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
       <style>
-        html, body { height: 100%; margin: 0; overflow: hidden; }
-        body { font-family: Arial; display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
+        html, body { height: 100%; margin: 0; overflow: auto; }
+        body { font-family: Arial; display: flex; flex-direction: column; align-items: center; }
         #title { font-size: 28px; margin: 0 0 4px 0; }
         #version { font-size: 14px; color: #888; }
       </style>

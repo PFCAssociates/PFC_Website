@@ -62,7 +62,7 @@ function doGet() {
       <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
       <style>
         html, body { height: 100%; margin: 0; overflow: auto; }
-        body { font-family: Arial; display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
+        body { font-family: Arial; display: flex; flex-direction: column; align-items: center; }
         #title { font-size: 28px; margin: 0 0 4px 0; }
         #version { font-size: 14px; color: #888; }
       </style>
