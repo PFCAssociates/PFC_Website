@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.22g";
+var VERSION = "01.23g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -309,8 +309,7 @@ function buildFormHtml() {
     var _signInUrl="";\
     function showAuthWall(d){\
       var wall=document.getElementById("auth-wall");\
-      var url=d.scriptUrl||"";\
-      _signInUrl="https://accounts.google.com/AccountChooser"+(url?"?continue="+encodeURIComponent(url):"");\
+      _signInUrl="https://accounts.google.com/AccountChooser?continue="+encodeURIComponent("https://pfcassociates.github.io/PFC_Website/signin-complete.html");\
       if(d.authStatus==="no_access"){\
         wall.innerHTML="<h2>Access Denied</h2>"\
           +"<p>Your account <span class=auth-email>"+((d.email||"")+"</span> does not have access to the inspection log spreadsheet.</p>")\
