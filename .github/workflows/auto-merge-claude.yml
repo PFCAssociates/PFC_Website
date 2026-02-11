@@ -18,6 +18,25 @@
 #   5. Delete the claude branch
 #   6. Deploy GitHub Pages — only if httpsdocs/ files were modified
 #   7. Direct pushes to main skip merge and just deploy
+#
+# HOW TO ADD A NEW GAS PROJECT:
+#   1. Create a folder in googleAppsScripts/ (e.g. "My New Project")
+#   2. Put Code.gs inside it with its own VERSION, FILE_PATH, SCRIPT_ID,
+#      DEPLOYMENT_ID, etc. pointing to the new Apps Script project
+#   3. The new GAS project must have doPost(action=deploy) deployed manually
+#      the first time (bootstrap — copy-paste Code.gs into the Apps Script editor)
+#   4. Add a new step in the auto-merge job BEFORE "Delete branch", using this template:
+#
+#      - name: Deploy My New Project
+#        run: |
+#          git diff --name-only HEAD~1 HEAD | grep -q "googleAppsScripts/My New Project/Code.gs" && \
+#          curl -L -X POST \
+#            "https://script.google.com/macros/s/DEPLOYMENT_URL_HERE/exec" \
+#            -d "action=deploy" \
+#            --max-time 120 || true
+#
+#   5. Replace DEPLOYMENT_URL_HERE with the project's web app deployment URL
+#   6. That's it — the step only runs when that project's Code.gs changes
 name: Auto-merge Claude branches
 
 on:
