@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.10w">
+  <meta name="build-version" content="01.11w">
   <title>AED Monthly Inspection Log</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -152,29 +152,41 @@
     }
     function triggerGisSignIn() {
       loadGis(function() {
-        google.accounts.oauth2.initCodeClient({
+        var client = google.accounts.oauth2.initTokenClient({
           client_id: '1065458024858-fp9s8h7hiogq114ct4bnc4qhdof2r6j6.apps.googleusercontent.com',
           scope: 'email profile',
-          ux_mode: 'popup',
           callback: function(resp) {
-            if (resp && !resp.error) {
-              document.getElementById('auth-wall').classList.remove('show');
-              document.getElementById('gas-app').src = document.getElementById('gas-app').src;
+            if (resp && resp.access_token) {
+              // Fetch user email from Google userinfo API
+              fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { 'Authorization': 'Bearer ' + resp.access_token }
+              }).then(function(r) { return r.json(); }).then(function(info) {
+                if (info.email) sessionStorage.setItem('gis-email', info.email);
+              }).catch(function() {}).finally(function() {
+                // Reload iframe regardless — GAS will re-check auth
+                document.getElementById('auth-wall').classList.remove('show');
+                document.getElementById('gas-app').src = document.getElementById('gas-app').src;
+              });
             }
           }
-        }).requestCode();
+        });
+        client.requestAccessToken();
       });
     }
     function showAuthWall(authStatus, email) {
       var wall = document.getElementById('auth-wall');
-      if (authStatus === 'no_access' && email) {
+      // GAS can't detect email for unauthorized users, so check if we stored one from GIS
+      var knownEmail = email || sessionStorage.getItem('gis-email') || '';
+      if (knownEmail) {
+        // User IS signed in, but doesn't have spreadsheet access
         wall.innerHTML = '<h2 style="color:#d32f2f">Access Denied</h2>'
           + '<p style="margin-bottom:4px">Currently signed in as:</p>'
-          + '<p><span class="auth-email">' + email + '</span></p>'
+          + '<p><span class="auth-email">' + knownEmail + '</span></p>'
           + '<p>This account does not have access to the inspection log spreadsheet.</p>'
           + '<a class="auth-btn switch" href="#" onclick="triggerGisSignIn();return false;">Switch Google Account</a>'
           + '<p class="auth-hint">Sign in with an account that has access, or ask your administrator to share the spreadsheet with you.</p>';
       } else {
+        // No sign-in detected at all
         wall.innerHTML = '<h2 style="color:#d32f2f">Sign-In Required</h2>'
           + '<p style="margin-bottom:4px">Currently signed in as:</p>'
           + '<p><span class="auth-email">No Google account detected</span></p>'
