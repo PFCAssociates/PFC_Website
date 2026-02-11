@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.21g";
+var VERSION = "01.22g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -618,9 +618,7 @@ function getAppData() {
 
 function readPushedVersionFromCache() {
   var cache = CacheService.getScriptCache();
-  var val = cache.get("pushed_version");
-  if (val) cache.remove("pushed_version");
-  return val || "";
+  return cache.get("pushed_version") || "";
 }
 
 function writeVersionToSheetA1() {
