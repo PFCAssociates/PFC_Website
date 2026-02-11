@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.23w">
+  <meta name="build-version" content="01.24w">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -89,30 +89,34 @@
       } catch(e) {}
     }
 
-    // Pre-load sound file from same-origin (no GAS dependency)
-    (function() {
-      if (localStorage.getItem('update-sound-data')) return;
-      fetch('sounds/embed-update.mp3').then(function(res) { return res.blob(); }).then(function(blob) {
+    // Pre-load both sound files from same-origin
+    function cacheSound(url, key) {
+      if (localStorage.getItem(key)) return;
+      fetch(url).then(function(res) { return res.blob(); }).then(function(blob) {
         var reader = new FileReader();
-        reader.onloadend = function() { localStorage.setItem('update-sound-data', reader.result); };
+        reader.onloadend = function() { localStorage.setItem(key, reader.result); };
         reader.readAsDataURL(blob);
       }).catch(function() {});
-    })();
+    }
+    cacheSound('sounds/embed-update.mp3', 'web-sound-data');
+    cacheSound('sounds/gas-update.mp3', 'gas-sound-data');
 
-    // Show splash + play sound on update-triggered reloads
+    // Show splash + play appropriate sound on update-triggered reloads
     if (sessionStorage.getItem('gas-pending-sound')) {
       sessionStorage.removeItem('gas-pending-sound');
       if (navigator.vibrate) navigator.vibrate(200);
       var reloadSource = sessionStorage.getItem('reload-source') || '';
       sessionStorage.removeItem('reload-source');
-      var soundData = localStorage.getItem('update-sound-data');
-      if (soundData) playSoundFromDataUrl(soundData);
       var splash = null;
+      var soundData = null;
       if (reloadSource === 'build-version') {
         splash = document.getElementById('splash-green');
+        soundData = localStorage.getItem('web-sound-data');
       } else if (reloadSource === 'gas') {
         splash = document.getElementById('splash-blue');
+        soundData = localStorage.getItem('gas-sound-data');
       }
+      if (soundData) playSoundFromDataUrl(soundData);
       if (splash) {
         splash.style.display = 'flex';
         setTimeout(function() {
