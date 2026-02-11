@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.32g";
+var VERSION = "01.33g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -324,7 +324,7 @@ function buildFormHtml() {
     function showAuthWall(d){\
       var wall=document.getElementById("auth-wall");\
       var scriptUrl=d.scriptUrl||"";\
-      _signInUrl="https://accounts.google.com/AccountChooser"+(scriptUrl?"?continue="+encodeURIComponent(scriptUrl):"");\
+      _signInUrl=scriptUrl||"";\
       if(d.authStatus==="no_access"){\
         wall.innerHTML="<h2>Access Denied</h2>"\
           +"<p>Your account <span class=auth-email>"+((d.email||"")+"</span> does not have access to the inspection log spreadsheet.</p>")\
