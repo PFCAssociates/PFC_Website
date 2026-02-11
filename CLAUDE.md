@@ -54,3 +54,30 @@
 - For clear, straightforward requests: **just do it** — make the changes, commit, and push without asking for plan approval
 - Only ask clarifying questions when the request is genuinely ambiguous or has multiple valid interpretations
 - Do not use formal plan-mode approval workflows for routine tasks (version bumps, file moves, feature additions, bug fixes, etc.)
+
+## Google Sign-In (GIS) for GAS Embedded Apps
+When a GAS app embedded in a GitHub Pages iframe needs Google sign-in (e.g. to restrict access to authorized users), the sign-in **must run from the parent embedding page**, not from inside the GAS iframe.
+
+### Why
+- GAS iframes are served from dynamic `*.googleusercontent.com` subdomains (e.g. `n-jwwet4h7gq6evljb4a4cz5vjanqp3hbuqcnqunq-0lu-script.googleusercontent.com`)
+- Google OAuth requires the JavaScript origin to be registered in Cloud Console
+- These GAS origins are long hashes that change when the deployment changes — they can't be reliably registered
+- The parent page (`pfcassociates.github.io`) is a stable origin that can be registered once
+
+### Architecture
+1. **GAS iframe** detects auth is needed → sends a `gas-needs-auth` postMessage to the parent (with `authStatus` and `email` fields)
+2. **Parent embedding page** receives the message → shows an auth wall overlay → loads GIS and triggers sign-in popup
+3. After successful sign-in → parent hides the auth wall → reloads just the iframe (`iframe.src = iframe.src`)
+4. GIS code (Google Identity Services library) lives **only** in the parent HTML, never in the `.gs` file
+
+### OAuth Setup (Google Cloud Console)
+- **OAuth Client ID**: `1065458024858-fp9s8h7hiogq114ct4bnc4qhdof2r6j6.apps.googleusercontent.com`
+- **Authorized JavaScript origins** must include: `https://pfcassociates.github.io`
+- To configure: Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs → edit the client → add the origin
+- If you add new embedding domains (e.g. a custom domain), add those origins too
+
+### Key postMessage Types for Auth
+| Message Type | Direction | Purpose |
+|---|---|---|
+| `gas-needs-auth` | GAS iframe → parent | Tells parent to show sign-in wall (includes `authStatus`, `email`) |
+| `gas-auth-complete` | GAS iframe → parent | Tells parent auth succeeded (hides wall, reloads iframe) |
