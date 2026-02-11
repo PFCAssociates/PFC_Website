@@ -20,23 +20,48 @@
 #   7. Direct pushes to main skip merge and just deploy
 #
 # HOW TO ADD A NEW GAS PROJECT:
-#   1. Create a folder in googleAppsScripts/ (e.g. "My New Project")
-#   2. Put Code.gs inside it with its own VERSION, FILE_PATH, SCRIPT_ID,
-#      DEPLOYMENT_ID, etc. pointing to the new Apps Script project
-#   3. The new GAS project must have doPost(action=deploy) deployed manually
-#      the first time (bootstrap — copy-paste Code.gs into the Apps Script editor)
-#   4. Add a new step in the auto-merge job BEFORE "Delete branch", using this template:
 #
-#      - name: Deploy My New Project
-#        run: |
-#          git diff --name-only HEAD~1 HEAD | grep -q "googleAppsScripts/My New Project/Code.gs" && \
-#          curl -L -X POST \
-#            "https://script.google.com/macros/s/DEPLOYMENT_URL_HERE/exec" \
-#            -d "action=deploy" \
-#            --max-time 120 || true
+#   Prerequisites — collect these from the new Apps Script project:
+#     - DEPLOYMENT_ID    : Web app deployment ID (from Deploy → Manage deployments)
+#                          This is also the long string in the /exec URL
+#     - SPREADSHEET_ID   : Google Sheets ID (from the sheet URL between /d/ and /edit)
+#     - SHEET_NAME       : Name of the sheet tab to read/write (e.g. "Live_Sheet")
+#     - GITHUB_TOKEN     : Set in Apps Script: Project Settings → Script Properties
+#                          Key: GITHUB_TOKEN  Value: github_pat_... token
+#     - SOUND_FILE_ID    : Google Drive file ID for the GAS "Test Sound" button (optional)
+#     - EMBED_PAGE_URL   : The GitHub Pages URL where this GAS app is iframed (optional)
+#     - SPLASH_LOGO_URL  : Logo shown on the blue "Code Ready" splash screen (optional)
 #
-#   5. Replace DEPLOYMENT_URL_HERE with the project's web app deployment URL
-#   6. That's it — the step only runs when that project's Code.gs changes
+#   Steps:
+#     1. Create a folder in googleAppsScripts/ (e.g. "My New Project")
+#     2. Copy Code.gs from an existing project as a template
+#     3. Update the PROJECT CONFIG section at the top of Code.gs:
+#          var VERSION        = "01.00g";
+#          var TITLE          = "My New Project";
+#          var SPREADSHEET_ID = "your-spreadsheet-id";
+#          var SHEET_NAME     = "Live_Sheet";
+#          var GITHUB_OWNER   = "PFCAssociates";
+#          var GITHUB_REPO    = "PFC_Website";
+#          var GITHUB_BRANCH  = "main";
+#          var FILE_PATH      = "googleAppsScripts/My New Project/Code.gs";
+#          var DEPLOYMENT_ID  = "your-deployment-id";
+#          var SOUND_FILE_ID  = "your-drive-file-id";
+#          var EMBED_PAGE_URL = "https://pfcassociates.github.io/PFC_Website/your-page.html";
+#          var SPLASH_LOGO_URL = "https://your-logo-url";
+#     4. Bootstrap: manually copy-paste Code.gs into the Apps Script editor and save
+#        (first deploy must be manual — doPost can't deploy itself before it exists)
+#     5. Add a new step in this workflow BEFORE "Delete branch", using this template:
+#
+#        - name: Deploy My New Project
+#          run: |
+#            git diff --name-only HEAD~1 HEAD | grep -q "googleAppsScripts/My New Project/Code.gs" && \
+#            curl -L -X POST \
+#              "https://script.google.com/macros/s/DEPLOYMENT_ID_HERE/exec" \
+#              -d "action=deploy" \
+#              --max-time 120 || true
+#
+#     6. Replace DEPLOYMENT_ID_HERE with the project's deployment ID
+#     7. That's it — the step only runs when that project's Code.gs changes
 name: Auto-merge Claude branches
 
 on:
