@@ -23,6 +23,8 @@ jobs:
   auto-merge:
     if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
+    outputs:
+      pages-changed: ${{ steps.check-changes.outputs.pages-changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,6 +40,15 @@ jobs:
           git merge --ff-only ${{ github.ref_name }} || git merge --no-edit ${{ github.ref_name }}
           git push origin main
 
+      - name: Check what changed
+        id: check-changes
+        run: |
+          if git diff --name-only HEAD~1 HEAD | grep -q "^httpsdocs/"; then
+            echo "pages-changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pages-changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Deploy Gas Self-Update Dashboard
         run: |
           # Only deploy if Code.gs was modified in this push
@@ -52,7 +63,10 @@ jobs:
           git push origin --delete ${{ github.ref_name }}
 
   deploy:
-    if: always() && (needs.auto-merge.result == 'success' || needs.auto-merge.result == 'skipped')
+    if: >-
+      always() &&
+      (needs.auto-merge.result == 'skipped' ||
+       (needs.auto-merge.result == 'success' && needs.auto-merge.outputs.pages-changed == 'true'))
     needs: auto-merge
     environment:
       name: github-pages
