@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.16g";
+var VERSION = "01.17g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -204,6 +204,7 @@ function buildFormHtml() {
   </style>\
 </head>\
 <body>\
+  <script>if(window.top===window.self){window.location.replace("' + EMBED_PAGE_URL + '");}</script>\
   <div class="auth-wall" id="auth-wall"></div>\
   <div class="ld" id="ld">Loading inspection log...</div>\
   <div class="sv" id="sv">Saving...</div>\
