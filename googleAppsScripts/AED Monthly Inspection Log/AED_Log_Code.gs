@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.20g";
+var VERSION = "01.21g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
