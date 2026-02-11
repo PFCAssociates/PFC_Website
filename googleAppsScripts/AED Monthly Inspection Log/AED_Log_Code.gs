@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.35g";
+var VERSION = "01.36g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -74,10 +74,9 @@ var COL_HEADERS = [
  * Always includes scriptUrl so the client can link to the GAS app for auth.
  */
 function getUserInfo() {
-  var scriptUrl = ScriptApp.getService().getUrl();
   var email = Session.getActiveUser().getEmail();
   if (!email) {
-    return { status: "not_signed_in", scriptUrl: scriptUrl };
+    return { status: "not_signed_in" };
   }
   var prefix = email.split("@")[0];
   var displayName = prefix.split(/[._-]/).map(function(part) {
@@ -91,21 +90,6 @@ function getUserInfo() {
 // =============================================
 
 function doGet(e) {
-  // If not loaded inside the embedding page (e.g. after Google sign-in redirect),
-  // close the tab so the user returns to the original page
-  if (!e || !e.parameter || !e.parameter.embedded) {
-    return HtmlService.createHtmlOutput(
-      '<html><body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666;flex-direction:column;gap:16px;text-align:center">'
-      + '<div style="font-size:48px;color:#43a047">&#10003;</div>'
-      + '<h2 style="margin:0;color:#222">Sign-In Complete</h2>'
-      + '<p>This tab should close automatically.<br>If not, you can close it now.</p>'
-      + '<script>'
-      + 'try{window.top.close()}catch(e){}'
-      + 'try{window.close()}catch(e){}'
-      + 'setTimeout(function(){try{window.top.close()}catch(e){}},500);'
-      + '</script></body></html>'
-    );
-  }
   var html = buildFormHtml();
   return HtmlService.createHtmlOutput(html)
     .setTitle(TITLE)
@@ -266,21 +250,27 @@ function buildFormHtml() {
       try{window.top.postMessage(msg,"*")}catch(e){}\
       try{window.parent.postMessage(msg,"*")}catch(e){}\
     }\
-    function openSignIn(url){\
-      var w=window.open(url,"_blank");\
-      var authPoll=setInterval(function(){\
-        google.script.run.withSuccessHandler(function(info){\
-          if(info&&info.status==="authorized"){\
-            clearInterval(authPoll);\
-            notifyParentAuth();\
+    var _gisLoaded=false;\
+    function loadGis(cb){\
+      if(_gisLoaded){cb();return;}\
+      var s=document.createElement("script");\
+      s.src="https://accounts.google.com/gsi/client";\
+      s.onload=function(){_gisLoaded=true;cb();};\
+      document.head.appendChild(s);\
+    }\
+    function openSignIn(){\
+      loadGis(function(){\
+        google.accounts.oauth2.initCodeClient({\
+          client_id:"1065458024858-fp9s8h7hiogq114ct4bnc4qhdof2r6j6.apps.googleusercontent.com",\
+          scope:"email profile",\
+          ux_mode:"popup",\
+          callback:function(resp){\
+            if(resp&&!resp.error){\
+              notifyParentAuth();\
+            }\
           }\
-        }).withFailureHandler(function(){}).getUserInfo();\
-      },3000);\
-      if(w){\
-        var closePoll=setInterval(function(){\
-          try{if(w.closed){clearInterval(closePoll);clearInterval(authPoll);notifyParentAuth();}}catch(e){}\
-        },500);\
-      }\
+        }).requestCode();\
+      });\
     }\
     function sOn(){_sav++;document.getElementById("sv").classList.add("on")}\
     function sOff(){_sav--;if(_sav<=0){_sav=0;document.getElementById("sv").classList.remove("on")}}\
@@ -326,22 +316,19 @@ function buildFormHtml() {
       cell.appendChild(clearBtn);\
     }\
 \
-    var _signInUrl="";\
     function showAuthWall(d){\
       var wall=document.getElementById("auth-wall");\
-      var scriptUrl=d.scriptUrl||"";\
-      _signInUrl="https://accounts.google.com/AccountChooser"+(scriptUrl?"?continue="+encodeURIComponent(scriptUrl):"");\
       if(d.authStatus==="no_access"){\
         wall.innerHTML="<h2>Access Denied</h2>"\
           +"<p>Your account <span class=auth-email>"+((d.email||"")+"</span> does not have access to the inspection log spreadsheet.</p>")\
-          +"<a class=\'auth-btn switch\' href=\'#\' onclick=\'openSignIn(_signInUrl);return false;\'>Switch Google Account</a>"\
+          +"<a class=\'auth-btn switch\' href=\'#\' onclick=\'openSignIn();return false;\'>Switch Google Account</a>"\
           +"<p class=auth-hint>Sign in with an account that has access, or ask your administrator to share the spreadsheet with you.</p>";\
       }else{\
         wall.innerHTML="<h2>Sign-In Required</h2>"\
           +"<p>You must be signed into an authorized Google account to use this inspection log.</p>"\
           +"<p>If you are already signed in, your account may not have access. Try switching to an authorized account.</p>"\
-          +"<a class=\'auth-btn signin\' href=\'#\' onclick=\'openSignIn(_signInUrl);return false;\'>Sign In / Switch Account</a>"\
-          +"<p class=auth-hint>A sign-in tab will open. This page will refresh automatically once you sign in.</p>";\
+          +"<a class=\'auth-btn signin\' href=\'#\' onclick=\'openSignIn();return false;\'>Sign In / Switch Account</a>"\
+          +"<p class=auth-hint>A Google sign-in popup will appear. This page will refresh automatically once you sign in.</p>";\
       }\
       wall.classList.add("show");\
     }\
@@ -474,7 +461,7 @@ function buildFormHtml() {
 function getFormData() {
   var userInfo = getUserInfo();
   if (userInfo.status !== "authorized") {
-    return { authorized: false, authStatus: userInfo.status, email: userInfo.email || "", scriptUrl: userInfo.scriptUrl || "", version: "v" + VERSION };
+    return { authorized: false, authStatus: userInfo.status, email: userInfo.email || "", version: "v" + VERSION };
   }
 
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
