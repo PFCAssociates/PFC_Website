@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.19w">
+  <meta name="build-version" content="01.20w">
   <title>AED Monthly Inspection Log</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -150,6 +150,7 @@
     // GIS sign-in (runs from pfcassociates.github.io origin)
     var _gisLoaded = false;
     var _gasVersion = localStorage.getItem('gas-version') || '';
+    var _requireAuth = false;
     var _gasBaseUrl = 'https://script.google.com/a/macros/pfcassociates.org/s/AKfycbyvnX5EmqA1jlbMiHD8VsLBdY8Xf00xlHF8mHsP02luflJFfhZVJl8ApxJA7I5e1udu/exec?embedded=1';
     function loadGis(cb) {
       if (_gisLoaded) { cb(); return; }
@@ -168,14 +169,15 @@
       localStorage.removeItem('gis-token');
       localStorage.removeItem('gis-email');
       document.getElementById('sign-out-btn').style.display = 'none';
+      _requireAuth = true;
       showAuthWall('not_signed_in', '');
     }
-    // Initial load — only load the iframe if the user has a stored token.
-    // Without a token, GAS falls back to Session.getActiveUser() which detects
-    // the user via Google session cookies, bypassing sign-out.
-    if (localStorage.getItem('gis-token')) {
-      reloadIframe();
-    } else {
+    // Initial load — always load the iframe so we get the GAS version.
+    // If no token, show the auth wall and set _requireAuth so we ignore
+    // gas-auth-ok messages (GAS may auto-detect the user via session cookies).
+    reloadIframe();
+    if (!localStorage.getItem('gis-token')) {
+      _requireAuth = true;
       showAuthWall('not_signed_in', '');
     }
     function triggerGisSignIn() {
@@ -244,13 +246,23 @@
         return;
       }
       if (e.data.type === 'gas-auth-ok') {
-        document.getElementById('sign-out-btn').style.display = '';
+        if (e.data.version) {
+          _gasVersion = e.data.version; localStorage.setItem('gas-version', e.data.version);
+          // Update auth wall versions if it's visible
+          var av = document.querySelector('.auth-versions');
+          if (av) {
+            var wv = (document.querySelector('meta[name="build-version"]') || {}).content || '';
+            av.innerHTML = (wv ? 'Web: v' + wv : '') + (wv ? ' &nbsp;|&nbsp; ' : '') + 'Code: ' + _gasVersion;
+          }
+        }
+        if (!_requireAuth) document.getElementById('sign-out-btn').style.display = '';
         return;
       }
       if (e.data.type === 'manual-reload') {
         window.location.reload();
       }
       if (e.data.type === 'gas-auth-complete') {
+        _requireAuth = false;
         document.getElementById('auth-wall').classList.remove('show');
         reloadIframe();
         return;
