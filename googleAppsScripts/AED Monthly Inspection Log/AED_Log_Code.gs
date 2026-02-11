@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.45g";
+var VERSION = "01.46g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -231,8 +231,8 @@ function buildFormHtml(opt_token) {
     .auth-wall .auth-btn.switch:hover{background:#d63c0e}\
     .auth-wall .auth-hint{font-size:12px;color:#999;margin-top:0}\
     /* Confirm modal */\
-    .confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:11000;opacity:0;transition:opacity .15s}\
-    .confirm-overlay.show{opacity:1}\
+    .confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:11000;opacity:0;pointer-events:none;transition:opacity .15s}\
+    .confirm-overlay.show{opacity:1;pointer-events:auto}\
     .confirm-box{background:#fff;border-radius:10px;padding:20px 24px;max-width:320px;width:90%;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.25)}\
     .confirm-box p{margin:0 0 16px;font-size:14px;color:#333;line-height:1.5}\
     .confirm-btns{display:flex;gap:10px;justify-content:center}\
