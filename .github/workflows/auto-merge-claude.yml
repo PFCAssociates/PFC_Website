@@ -38,8 +38,10 @@ jobs:
           git merge --ff-only ${{ github.ref_name }} || git merge --no-edit ${{ github.ref_name }}
           git push origin main
 
-      - name: Deploy to Google Apps Script
+      - name: Deploy Gas Self-Update Dashboard
         run: |
+          # Only deploy if Code.gs was modified in this push
+          git diff --name-only HEAD~1 HEAD | grep -q "googleAppsScripts/Gas Self-Update Dashboard/Code.gs" && \
           curl -L -X POST \
             "https://script.google.com/macros/s/AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg/exec" \
             -d "action=deploy" \
