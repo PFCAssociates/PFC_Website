@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.40g";
+var VERSION = "01.41g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -97,6 +97,39 @@ function getUserInfo(opt_token) {
     return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
   }).join(" ");
   return { status: "authorized", email: email, displayName: displayName };
+}
+
+/**
+ * Checks whether the given email has access to the inspection log spreadsheet.
+ * The script runs as the owner, so openById always succeeds — we must explicitly
+ * verify the user is on the sharing list (editors or viewers), or that the file
+ * has domain-wide / open sharing that covers them.
+ */
+function checkSpreadsheetAccess(email) {
+  if (!email) return false;
+  var lowerEmail = email.toLowerCase();
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+
+  var editors = ss.getEditors();
+  for (var i = 0; i < editors.length; i++) {
+    if (editors[i].getEmail().toLowerCase() === lowerEmail) return true;
+  }
+  var viewers = ss.getViewers();
+  for (var i = 0; i < viewers.length; i++) {
+    if (viewers[i].getEmail().toLowerCase() === lowerEmail) return true;
+  }
+
+  // Check domain-level or open sharing
+  var file = DriveApp.getFileById(SPREADSHEET_ID);
+  var access = file.getSharingAccess();
+  if (access === DriveApp.Access.ANYONE || access === DriveApp.Access.ANYONE_WITH_LINK) return true;
+  if (access === DriveApp.Access.DOMAIN || access === DriveApp.Access.DOMAIN_WITH_LINK) {
+    var userDomain = lowerEmail.split('@')[1] || '';
+    var ownerDomain = (file.getOwner().getEmail() || '').toLowerCase().split('@')[1] || '';
+    if (userDomain && userDomain === ownerDomain) return true;
+  }
+
+  return false;
 }
 
 // =============================================
@@ -448,12 +481,11 @@ function getFormData(opt_token) {
     return { authorized: false, authStatus: userInfo.status, email: userInfo.email || "", version: "v" + VERSION };
   }
 
-  var ss;
-  try {
-    ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  } catch (e) {
+  if (!checkSpreadsheetAccess(userInfo.email)) {
     return { authorized: false, authStatus: "no_access", email: userInfo.email || "", version: "v" + VERSION };
   }
+
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
   // --- Config sheet ---
   var cfgSheet = ss.getSheetByName(CONFIG_SHEET);
@@ -526,7 +558,8 @@ function saveConfig(key, value) {
  */
 function stampInspection(yearSuffix, monthIndex, colIndex, opt_token) {
   var userInfo = getUserInfo(opt_token);
-  if (userInfo.status !== "authorized") throw new Error("You must be signed into a Google account with spreadsheet access.");
+  if (userInfo.status !== "authorized") throw new Error("You must be signed into a Google account.");
+  if (!checkSpreadsheetAccess(userInfo.email)) throw new Error("Your account does not have access to the inspection log spreadsheet.");
 
   var timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "M/d/yyyy h:mm a");
   var value = userInfo.displayName + " | " + timestamp;
@@ -562,7 +595,8 @@ function stampInspection(yearSuffix, monthIndex, colIndex, opt_token) {
  */
 function clearInspection(yearSuffix, monthIndex, colIndex, opt_token) {
   var userInfo = getUserInfo(opt_token);
-  if (userInfo.status !== "authorized") throw new Error("You must be signed into a Google account with spreadsheet access.");
+  if (userInfo.status !== "authorized") throw new Error("You must be signed into a Google account.");
+  if (!checkSpreadsheetAccess(userInfo.email)) throw new Error("Your account does not have access to the inspection log spreadsheet.");
 
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var insSheet = ss.getSheetByName(INSPECT_SHEET);
