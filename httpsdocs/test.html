@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.26w">
+  <meta name="build-version" content="01.27w">
   <title>GAS Self-Update Dashboard</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -49,8 +49,8 @@
 </head>
 <body>
   <div id="test-buttons">
-    <button id="btn-test-gas" onclick="sessionStorage.setItem('gas-pending-sound','1');sessionStorage.setItem('reload-source','gas');window.location.reload();">Test GAS</button>
-    <button id="btn-test-web" onclick="sessionStorage.setItem('gas-pending-sound','1');sessionStorage.setItem('reload-source','build-version');window.location.reload();">Test Web</button>
+    <button id="btn-test-gas" onclick="sessionStorage.setItem('gas-pending-sound','1');sessionStorage.setItem('reload-source','gas');window.location.reload();">Test "Code Ready" Reload</button>
+    <button id="btn-test-web" onclick="sessionStorage.setItem('gas-pending-sound','1');sessionStorage.setItem('reload-source','build-version');window.location.reload();">Test "Website Ready" Reload</button>
   </div>
   <div id="splash-green" class="splash"><div class="splash-title">Website Ready</div><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
   <div id="splash-blue" class="splash"><div class="splash-title">Code Ready</div><img src="https://www.shadowaisolutions.com/SAIS%20Logo.png" alt=""></div>
