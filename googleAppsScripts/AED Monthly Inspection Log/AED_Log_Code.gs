@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.19g";
+var VERSION = "01.20g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -306,21 +306,21 @@ function buildFormHtml() {
       cell.appendChild(clearBtn);\
     }\
 \
+    var _signInUrl="";\
     function showAuthWall(d){\
       var wall=document.getElementById("auth-wall");\
       var url=d.scriptUrl||"";\
+      _signInUrl="https://accounts.google.com/AccountChooser"+(url?"?continue="+encodeURIComponent(url):"");\
       if(d.authStatus==="no_access"){\
-        var switchUrl="https://accounts.google.com/AccountChooser"+(url?"?continue="+encodeURIComponent(url):"");\
         wall.innerHTML="<h2>Access Denied</h2>"\
           +"<p>Your account <span class=auth-email>"+((d.email||"")+"</span> does not have access to the inspection log spreadsheet.</p>")\
-          +"<a class=\\"auth-btn switch\\" href=\\"#\\" onclick=\\"openSignIn(\'"+switchUrl.replace(/'/g,"\\\\'")+"\');return false;\\">Switch Google Account</a>"\
+          +"<a class=\'auth-btn switch\' href=\'#\' onclick=\'openSignIn(_signInUrl);return false;\'>Switch Google Account</a>"\
           +"<p class=auth-hint>Sign in with an account that has access, or ask your administrator to share the spreadsheet with you.</p>";\
       }else{\
-        var loginUrl="https://accounts.google.com/AccountChooser"+(url?"?continue="+encodeURIComponent(url):"");\
         wall.innerHTML="<h2>Sign-In Required</h2>"\
           +"<p>You must be signed into an authorized Google account to use this inspection log.</p>"\
           +"<p>If you are already signed in, your account may not have access. Try switching to an authorized account.</p>"\
-          +(url?"<a class=\\"auth-btn signin\\" href=\\"#\\" onclick=\\"openSignIn(\'"+loginUrl.replace(/'/g,"\\\\'")+"\');return false;\\">Sign In / Switch Account</a>":"")\
+          +(url?"<a class=\'auth-btn signin\' href=\'#\' onclick=\'openSignIn(_signInUrl);return false;\'>Sign In / Switch Account</a>":"")\
           +"<p class=auth-hint>A new tab will open. After signing in, this page will refresh automatically.</p>";\
       }\
       wall.classList.add("show");\
