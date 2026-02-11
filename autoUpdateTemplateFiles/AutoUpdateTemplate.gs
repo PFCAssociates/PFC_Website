@@ -42,6 +42,10 @@ var TITLE = "YOUR_PROJECT_TITLE";
 // (doPost will still deploy new code, but won't signal the page to reload)
 var AUTO_REFRESH = true;
 
+// Show/hide: set to false to hide the title or GAS version in the iframe
+var SHOW_TITLE = true;
+var SHOW_VERSION = true;
+
 // Google Sheets
 var SPREADSHEET_ID   = "YOUR_SPREADSHEET_ID";
 var SHEET_NAME       = "YOUR_SHEET_NAME";
@@ -86,6 +90,10 @@ function doGet() {
         google.script.run
           .withSuccessHandler(function(data) { applyData(data); })
           .getAppData();
+
+        // Hide title/version if toggled off
+        if (!${SHOW_TITLE}) document.getElementById('title').style.display = 'none';
+        if (!${SHOW_VERSION}) document.getElementById('version').style.display = 'none';
 
         // Poll for new deployed version every 15s (set by doPost after deploy)
         var _autoRefresh = ${AUTO_REFRESH};

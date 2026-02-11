@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.05w">
+  <meta name="build-version" content="01.06w">
   <title>AED Monthly Inspection Log</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -45,6 +45,9 @@
     // Auto-refresh: set to false to disable build-version polling
     // (the version indicator will still show, but won't check for updates)
     var AUTO_REFRESH = true;
+
+    // Show/hide: set to false to hide the website version indicator
+    var SHOW_WEB_VERSION = true;
 
     // AudioContext for sound playback
     var _audioCtx = null;
@@ -142,7 +145,7 @@
       var indicator = document.createElement('div');
       indicator.id = 'version-indicator';
       indicator.innerHTML = '<span class="dot"></span><span class="label">v' + currentVersion + '</span>';
-      document.body.appendChild(indicator);
+      if (SHOW_WEB_VERSION) document.body.appendChild(indicator);
       var dot = indicator.querySelector('.dot');
 
       function checkForUpdate() {

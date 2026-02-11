@@ -46,6 +46,9 @@
     // (the version indicator will still show, but won't check for updates)
     var AUTO_REFRESH = true;
 
+    // Show/hide: set to false to hide the website version indicator
+    var SHOW_WEB_VERSION = true;
+
     // AudioContext for sound playback
     var _audioCtx = null;
     function unlockAudio() {
@@ -142,7 +145,7 @@
       var indicator = document.createElement('div');
       indicator.id = 'version-indicator';
       indicator.innerHTML = '<span class="dot"></span><span class="label">v' + currentVersion + '</span>';
-      document.body.appendChild(indicator);
+      if (SHOW_WEB_VERSION) document.body.appendChild(indicator);
       var dot = indicator.querySelector('.dot');
 
       function checkForUpdate() {
