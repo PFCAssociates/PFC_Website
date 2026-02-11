@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.14g";
+var VERSION = "01.15g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -70,8 +70,7 @@ var COL_HEADERS = [
  * Returns the signed-in user's info and access status.
  * Possible statuses:
  *   "not_signed_in" — no active Google session detected
- *   "no_access"     — signed in but not on the spreadsheet's sharing list
- *   "authorized"    — signed in and has spreadsheet access
+ *   "authorized"    — signed in (email resolved)
  * Always includes scriptUrl so the client can link to the GAS app for auth.
  */
 function getUserInfo() {
@@ -80,69 +79,11 @@ function getUserInfo() {
   if (!email) {
     return { status: "not_signed_in", scriptUrl: scriptUrl };
   }
-  if (!hasSpreadsheetAccess_(email)) {
-    return { status: "no_access", email: email, scriptUrl: scriptUrl };
-  }
   var prefix = email.split("@")[0];
   var displayName = prefix.split(/[._-]/).map(function(part) {
     return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
   }).join(" ");
   return { status: "authorized", email: email, displayName: displayName };
-}
-
-/**
- * Checks whether the given email has access to the backend spreadsheet
- * (owner, editor, viewer, or domain/link-level sharing).
- * Uses DriveApp — requires the drive.readonly (or drive) OAuth scope.
- *
- * FAIL-OPEN: If DriveApp throws (e.g. scope not yet authorized after
- * auto-deploy), returns true so signed-in users aren't locked out.
- * Once the script is manually re-authorized with the Drive scope,
- * the full sharing-list check will activate automatically.
- */
-function hasSpreadsheetAccess_(email) {
-  try {
-    var file = DriveApp.getFileById(SPREADSHEET_ID);
-    var emailLower = email.toLowerCase();
-
-    // Domain-wide or public sharing
-    var access = file.getSharingAccess();
-    if (access === DriveApp.Access.ANYONE || access === DriveApp.Access.ANYONE_WITH_LINK) {
-      return true;
-    }
-    if (access === DriveApp.Access.DOMAIN || access === DriveApp.Access.DOMAIN_WITH_LINK) {
-      var owner = file.getOwner();
-      if (owner) {
-        var ownerDomain = owner.getEmail().split("@")[1];
-        var userDomain = email.split("@")[1];
-        if (ownerDomain && userDomain && ownerDomain.toLowerCase() === userDomain.toLowerCase()) {
-          return true;
-        }
-      }
-    }
-
-    // Explicit sharing — owner
-    var owner = file.getOwner();
-    if (owner && owner.getEmail().toLowerCase() === emailLower) return true;
-
-    // Explicit sharing — editors
-    var editors = file.getEditors();
-    for (var i = 0; i < editors.length; i++) {
-      if (editors[i].getEmail().toLowerCase() === emailLower) return true;
-    }
-
-    // Explicit sharing — viewers
-    var viewers = file.getViewers();
-    for (var i = 0; i < viewers.length; i++) {
-      if (viewers[i].getEmail().toLowerCase() === emailLower) return true;
-    }
-
-    return false;
-  } catch(e) {
-    // DriveApp scope likely not authorized yet — fail open so signed-in
-    // users aren't blocked. Full check activates after manual re-auth.
-    return true;
-  }
 }
 
 // =============================================
