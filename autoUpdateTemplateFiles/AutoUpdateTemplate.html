@@ -42,6 +42,10 @@
     allow="*">
   </iframe>
   <script>
+    // Auto-refresh: set to false to disable build-version polling
+    // (the version indicator will still show, but won't check for updates)
+    var AUTO_REFRESH = true;
+
     // AudioContext for sound playback
     var _audioCtx = null;
     function unlockAudio() {
@@ -133,6 +137,7 @@
       var POLL_INTERVAL = 10000;
       var currentVersion = (document.querySelector('meta[name="build-version"]') || {}).content;
       if (!currentVersion) return;
+      if (!AUTO_REFRESH) return;
 
       var indicator = document.createElement('div');
       indicator.id = 'version-indicator';

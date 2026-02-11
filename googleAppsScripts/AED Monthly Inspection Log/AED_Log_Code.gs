@@ -35,8 +35,12 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.07g";
+var VERSION = "01.08g";
 var TITLE = "AED Monthly Inspection Log";
+
+// Auto-refresh: set to false to disable GAS-side version polling
+// (doPost will still deploy new code, but won't signal the page to reload)
+var AUTO_REFRESH = true;
 
 // Google Sheets
 var SPREADSHEET_ID   = "1JhpU30Vd08lYPD6bWNR-BlYaKf4iAz1mY1IykCYMwSQ";
@@ -84,24 +88,27 @@ function doGet() {
           .getAppData();
 
         // Poll for new deployed version every 15s (set by doPost after deploy)
+        var _autoRefresh = ${AUTO_REFRESH};
         var _autoPulling = false;
-        function pollPushedVersionFromCache() {
-          if (_autoPulling) return;
-          google.script.run
-            .withSuccessHandler(function(pushed) {
-              if (!pushed) return;
-              var current = (document.getElementById('version').textContent || '').trim();
-              if (pushed !== current && pushed !== '') {
-                _autoPulling = true;
-                var reloadMsg = {type: 'gas-reload', version: pushed};
-                try { window.top.postMessage(reloadMsg, '*'); } catch(e) {}
-                try { window.parent.postMessage(reloadMsg, '*'); } catch(e) {}
-                setTimeout(function() { _autoPulling = false; }, 30000);
-              }
-            })
-            .readPushedVersionFromCache();
+        if (_autoRefresh) {
+          function pollPushedVersionFromCache() {
+            if (_autoPulling) return;
+            google.script.run
+              .withSuccessHandler(function(pushed) {
+                if (!pushed) return;
+                var current = (document.getElementById('version').textContent || '').trim();
+                if (pushed !== current && pushed !== '') {
+                  _autoPulling = true;
+                  var reloadMsg = {type: 'gas-reload', version: pushed};
+                  try { window.top.postMessage(reloadMsg, '*'); } catch(e) {}
+                  try { window.parent.postMessage(reloadMsg, '*'); } catch(e) {}
+                  setTimeout(function() { _autoPulling = false; }, 30000);
+                }
+              })
+              .readPushedVersionFromCache();
+          }
+          setInterval(pollPushedVersionFromCache, 15000);
         }
-        setInterval(pollPushedVersionFromCache, 15000);
       </script>
     </body>
     </html>
