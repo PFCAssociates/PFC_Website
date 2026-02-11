@@ -5,18 +5,18 @@
 // A Google Apps Script web app that renders an AED Monthly Inspection Log
 // form matching the standard paper form. Uses Google Sheets as the backend
 // for storing configuration (AED location, serial no., etc.) and monthly
-// inspection data (inspector initials for each checklist item).
+// inspection data (auto-stamped with the signed-in user's name + timestamp).
+//
+// AUTH:
+//   Users must be signed into their Google account. The active user's email
+//   is resolved via Session.getActiveUser(). The display name is derived
+//   from the email prefix. Clicking a cell auto-stamps it server-side
+//   with the authenticated user's name and a timestamp — no manual input.
 //
 // SHEET STRUCTURE:
-//   AED_Config    — key/value pairs for header fields (year, location, etc.)
-//   AED_Inspections — rows of year|month|col1..col6 initials
-//   Live_Sheet    — used by self-update mechanism (version tracking)
-//
-// HOW IT WORKS:
-//   1. doGet() renders the full HTML inspection log form
-//   2. Client JS calls getFormData() to load config + inspections
-//   3. Edits auto-save via saveConfig() and saveInspection()
-//   4. Self-update infrastructure (doPost, pullAndDeploy) preserved
+//   AED_Config      — key/value pairs for header fields (year, location, etc.)
+//   AED_Inspections — rows of year|month|col1..col6 (each cell: "Name | timestamp")
+//   Live_Sheet      — used by self-update mechanism (version tracking)
 //
 // IMPORTANT — AUTO-INCREMENT VERSION ON EVERY COMMIT:
 //   Whenever you (Claude Code) make ANY change to this file and commit,
@@ -24,15 +24,12 @@
 // =============================================
 
 // =============================================
-// PROJECT CONFIG — Change these when reusing for a different project
+// PROJECT CONFIG
 // =============================================
-var VERSION = "01.11g";
+var VERSION = "01.12g";
 var TITLE = "AED Monthly Inspection Log";
 
-// Auto-refresh: set to false to disable GAS-side version polling
 var AUTO_REFRESH = true;
-
-// Show/hide: set to false to hide the GAS version in the iframe
 var SHOW_VERSION = true;
 
 // Google Sheets
@@ -50,10 +47,8 @@ var FILE_PATH        = "googleAppsScripts/AED Monthly Inspection Log/AED_Log_Cod
 // Apps Script Deployment
 var DEPLOYMENT_ID    = "AKfycbyvnX5EmqA1jlbMiHD8VsLBdY8Xf00xlHF8mHsP02luflJFfhZVJl8ApxJA7I5e1udu";
 
-// Embedding page URL (where the GAS app is iframed)
 var EMBED_PAGE_URL   = "https://pfcassociates.github.io/PFC_Website/aedlog.html";
 
-// Month names and inspection column headers
 var MONTHS = ["January","February","March","April","May","June",
               "July","August","September","October","November","December"];
 
@@ -67,6 +62,31 @@ var COL_HEADERS = [
 ];
 // =============================================
 
+// =============================================
+// AUTH — Get the active Google user's info
+// =============================================
+
+/**
+ * Returns the signed-in user's email and a display name derived from
+ * the email prefix (e.g. "john.doe@pfcassociates.org" → "John Doe").
+ * Returns {authorized:false} if no active user is detected.
+ */
+function getUserInfo() {
+  var email = Session.getActiveUser().getEmail();
+  if (!email) {
+    return { authorized: false };
+  }
+  var prefix = email.split("@")[0];
+  var displayName = prefix.split(/[._-]/).map(function(part) {
+    return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+  }).join(" ");
+  return { authorized: true, email: email, displayName: displayName };
+}
+
+// =============================================
+// WEB APP ENTRY POINT
+// =============================================
+
 function doGet() {
   var html = buildFormHtml();
   return HtmlService.createHtmlOutput(html)
@@ -75,13 +95,11 @@ function doGet() {
 }
 
 function buildFormHtml() {
-  // Build column header <th> elements
   var colThs = "";
   for (var i = 0; i < COL_HEADERS.length; i++) {
-    colThs += '<th class="check-col"><div class="col-text">' + COL_HEADERS[i] + '</div><div class="init-lbl">(initial)</div></th>';
+    colThs += '<th class="check-col"><div class="col-text">' + COL_HEADERS[i] + '</div><div class="init-lbl">(click to sign)</div></th>';
   }
 
-  // Build month <tr> rows
   var monthRows = "";
   for (var m = 0; m < 12; m++) {
     monthRows += '<tr><td class="mo-cell">' + MONTHS[m] + '</td>';
@@ -109,6 +127,10 @@ function buildFormHtml() {
     .yr{font-size:16px;font-weight:bold;white-space:nowrap}\
     .yr input{width:36px;border:none;border-bottom:2px solid #333;font-size:16px;font-weight:bold;text-align:center;outline:none;background:transparent}\
     .yr input:focus{border-bottom-color:#1565c0}\
+    /* User bar */\
+    .user-bar{background:#e3f2fd;border-bottom:1px solid #90caf9;padding:6px 18px;font-size:12px;color:#1565c0;display:flex;align-items:center;gap:6px}\
+    .user-bar .dot{width:8px;height:8px;border-radius:50%;background:#43a047;flex-shrink:0}\
+    .user-bar .uname{font-weight:bold}\
     /* Config fields */\
     .cfg{display:grid;grid-template-columns:1fr 1fr;gap:5px 20px}\
     .fr{display:flex;align-items:baseline;gap:5px;font-size:13px}\
@@ -126,11 +148,16 @@ function buildFormHtml() {
     .col-text{font-size:10.5px}\
     .init-lbl{font-size:9px;font-weight:normal;color:#666;font-style:italic;margin-top:2px}\
     .mo-cell{font-weight:bold;font-size:13px;padding:8px 6px;background:#fafafa;text-align:left;white-space:nowrap}\
-    .init-cell{padding:0;height:38px;cursor:pointer;position:relative;font-size:15px;font-weight:bold;color:#1565c0;transition:background .15s}\
+    .init-cell{padding:4px 2px;height:48px;cursor:pointer;position:relative;transition:background .15s;vertical-align:middle}\
     .init-cell:hover{background:#e3f2fd}\
-    .init-cell.has{background:#e8f5e9}\
+    .init-cell.has{background:#e8f5e9;cursor:default}\
     .init-cell.has:hover{background:#c8e6c9}\
-    .init-cell input{position:absolute;top:0;left:0;right:0;bottom:0;width:100%;height:100%;border:2px solid #1565c0;background:#fff;text-align:center;font-size:15px;font-weight:bold;outline:none;text-transform:uppercase}\
+    .init-cell .stamp-name{font-size:11px;font-weight:bold;color:#1565c0;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\
+    .init-cell .stamp-date{font-size:9px;color:#888;line-height:1.2;white-space:nowrap}\
+    .init-cell .stamp-clear{position:absolute;top:1px;right:2px;font-size:10px;color:#999;cursor:pointer;display:none;padding:0 3px;line-height:1;border-radius:3px}\
+    .init-cell.has:hover .stamp-clear{display:block}\
+    .init-cell .stamp-clear:hover{color:#d32f2f;background:rgba(211,47,47,.1)}\
+    .init-cell.stamping{pointer-events:none;opacity:.6}\
     /* Footnotes */\
     .foot{border-top:2px solid #333;padding:10px 18px 14px;font-size:11.5px;line-height:1.5}\
     .foot h3{margin:0 0 3px;font-size:12px}\
@@ -144,8 +171,13 @@ function buildFormHtml() {
     .sv{position:fixed;top:8px;right:8px;background:#1565c0;color:#fff;padding:4px 12px;border-radius:12px;font-size:12px;opacity:0;transition:opacity .3s;z-index:1000}\
     .sv.on{opacity:1}\
     /* Loading */\
-    .ld{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;z-index:9999;font-size:18px;color:#666}\
+    .ld{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;z-index:9999;font-size:18px;color:#666;flex-direction:column;gap:12px}\
     .ld.off{display:none}\
+    /* Auth wall */\
+    .auth-wall{position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:10000;flex-direction:column;gap:16px;text-align:center;padding:20px}\
+    .auth-wall h2{margin:0;color:#d32f2f}\
+    .auth-wall p{margin:0;color:#666;max-width:400px;line-height:1.5}\
+    .auth-wall.off{display:none}\
     /* Year warning */\
     .yr input.warn{border-bottom-color:#d32f2f;animation:pulse-warn .4s ease 2}\
     @keyframes pulse-warn{0%,100%{border-bottom-color:#d32f2f}50%{border-bottom-color:#ff8a80}}\
@@ -156,13 +188,17 @@ function buildFormHtml() {
       .tbl th.mo-hdr{width:68px}\
       .mo-cell{font-size:11px}\
       .col-text{font-size:9px}\
+      .init-cell .stamp-name{font-size:10px}\
+      .init-cell .stamp-date{font-size:8px}\
     }\
   </style>\
 </head>\
 <body>\
+  <div class="auth-wall" id="auth"><h2>Sign-In Required</h2><p>You must be signed into your Google account and have access to the spreadsheet to use this inspection log.</p></div>\
   <div class="ld" id="ld">Loading inspection log...</div>\
   <div class="sv" id="sv">Saving...</div>\
   <div class="wrap">\
+    <div class="user-bar" id="user-bar" style="display:none"><span class="dot"></span>Signed in as: <span class="uname" id="uname"></span></div>\
     <div class="hdr">\
       <div class="title-row">\
         <h1>AED Monthly Inspection Log</h1>\
@@ -199,12 +235,63 @@ function buildFormHtml() {
   <script>\
     var _yr="";\
     var _sav=0;\
+    var _user=null;\
     function sOn(){_sav++;document.getElementById("sv").classList.add("on")}\
     function sOff(){_sav--;if(_sav<=0){_sav=0;document.getElementById("sv").classList.remove("on")}}\
+\
+    /* Render a stamp value ("Name | date") into a cell */\
+    function renderCell(cell,val){\
+      cell.innerHTML="";\
+      if(!val){cell.classList.remove("has");return;}\
+      cell.classList.add("has");\
+      var parts=val.split(" | ");\
+      var nameDiv=document.createElement("div");\
+      nameDiv.className="stamp-name";\
+      nameDiv.textContent=parts[0]||"";\
+      cell.appendChild(nameDiv);\
+      if(parts[1]){\
+        var dateDiv=document.createElement("div");\
+        dateDiv.className="stamp-date";\
+        dateDiv.textContent=parts[1];\
+        cell.appendChild(dateDiv);\
+      }\
+      var clearBtn=document.createElement("span");\
+      clearBtn.className="stamp-clear";\
+      clearBtn.textContent="\\u2715";\
+      clearBtn.title="Clear this entry";\
+      clearBtn.addEventListener("click",function(e){\
+        e.stopPropagation();\
+        if(!confirm("Clear this inspection entry?"))return;\
+        cell.classList.add("stamping");\
+        sOn();\
+        google.script.run\
+          .withSuccessHandler(function(){\
+            sOff();\
+            cell.classList.remove("stamping");\
+            renderCell(cell,"");\
+          })\
+          .withFailureHandler(function(err){\
+            sOff();\
+            cell.classList.remove("stamping");\
+            alert("Error: "+err.message);\
+          })\
+          .clearInspection(document.getElementById("yr").value,parseInt(cell.getAttribute("data-m")),parseInt(cell.getAttribute("data-c")));\
+      });\
+      cell.appendChild(clearBtn);\
+    }\
 \
     function loadData(){\
       google.script.run\
         .withSuccessHandler(function(d){\
+          if(!d.authorized){\
+            document.getElementById("auth").classList.remove("off");\
+            document.getElementById("ld").classList.add("off");\
+            return;\
+          }\
+          document.getElementById("auth").classList.add("off");\
+          _user=d.user;\
+          document.getElementById("uname").textContent=d.user.displayName+" ("+d.user.email+")";\
+          document.getElementById("user-bar").style.display="";\
           populate(d);\
           document.getElementById("ld").classList.add("off");\
         })\
@@ -227,14 +314,12 @@ function buildFormHtml() {
       for(var i=0;i<cells.length;i++){\
         var c=cells[i];\
         var k=c.getAttribute("data-m")+"_"+c.getAttribute("data-c");\
-        var v=ins[k]||"";\
-        c.textContent=v;\
-        if(v)c.classList.add("has");else c.classList.remove("has");\
+        renderCell(c,ins[k]||"");\
       }\
       if(d.version)document.getElementById("gv").textContent=d.version;\
     }\
 \
-    /* Config field auto-save on change */\
+    /* Config field auto-save */\
     ["aed_location","serial_no","battery_date","pad_expiration"].forEach(function(id){\
       var el=document.getElementById(id);\
       el.addEventListener("change",function(){\
@@ -254,10 +339,11 @@ function buildFormHtml() {
       }\
     });\
 \
-    /* Inspection cell editing */\
+    /* Inspection cell click — auto-stamp with user name + timestamp */\
     document.querySelectorAll(".init-cell").forEach(function(cell){\
       cell.addEventListener("click",function(){\
-        if(cell.querySelector("input"))return;\
+        if(cell.classList.contains("has"))return;\
+        if(cell.classList.contains("stamping"))return;\
         var yr=document.getElementById("yr");\
         if(!yr.value){\
           yr.focus();\
@@ -265,28 +351,20 @@ function buildFormHtml() {
           setTimeout(function(){yr.classList.remove("warn");},1500);\
           return;\
         }\
-        var cur=cell.textContent.trim();\
-        var inp=document.createElement("input");\
-        inp.type="text";inp.maxLength=4;inp.value=cur;\
-        cell.textContent="";\
-        cell.appendChild(inp);\
-        inp.focus();inp.select();\
-        function done(){\
-          var nv=inp.value.trim().toUpperCase();\
-          if(inp.parentNode)inp.parentNode.removeChild(inp);\
-          cell.textContent=nv;\
-          if(nv)cell.classList.add("has");else cell.classList.remove("has");\
-          if(nv!==cur){\
-            sOn();\
-            google.script.run.withSuccessHandler(sOff).withFailureHandler(sOff)\
-              .saveInspection(yr.value,parseInt(cell.getAttribute("data-m")),parseInt(cell.getAttribute("data-c")),nv);\
-          }\
-        }\
-        inp.addEventListener("blur",done);\
-        inp.addEventListener("keydown",function(e){\
-          if(e.key==="Enter")inp.blur();\
-          if(e.key==="Escape"){if(inp.parentNode)inp.parentNode.removeChild(inp);cell.textContent=cur;if(cur)cell.classList.add("has");}\
-        });\
+        cell.classList.add("stamping");\
+        sOn();\
+        google.script.run\
+          .withSuccessHandler(function(stampValue){\
+            sOff();\
+            cell.classList.remove("stamping");\
+            renderCell(cell,stampValue);\
+          })\
+          .withFailureHandler(function(err){\
+            sOff();\
+            cell.classList.remove("stamping");\
+            alert("Error: "+err.message);\
+          })\
+          .stampInspection(yr.value,parseInt(cell.getAttribute("data-m")),parseInt(cell.getAttribute("data-c")));\
       });\
     });\
 \
@@ -323,10 +401,15 @@ function buildFormHtml() {
 // =============================================
 
 /**
- * Returns all form data: config fields + inspections for the current year.
- * Called by client JS on page load.
+ * Returns all form data: config + inspections for the current year + user info.
+ * If the user is not signed in, returns {authorized:false}.
  */
 function getFormData() {
+  var userInfo = getUserInfo();
+  if (!userInfo.authorized) {
+    return { authorized: false };
+  }
+
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
   // --- Config sheet ---
@@ -368,7 +451,7 @@ function getFormData() {
     }
   }
 
-  return { config: config, inspections: inspections, version: "v" + VERSION };
+  return { authorized: true, user: userInfo, config: config, inspections: inspections, version: "v" + VERSION };
 }
 
 /**
@@ -390,19 +473,21 @@ function saveConfig(key, value) {
       return true;
     }
   }
-  // Key not found — append it
   cfgSheet.appendRow([key, value]);
   return true;
 }
 
 /**
- * Saves (upserts) a single inspection cell.
- * @param {string} yearSuffix  2-digit year suffix (e.g. "25")
- * @param {number} monthIndex  0-based month (0=Jan, 11=Dec)
- * @param {number} colIndex    0-based column (0=secure .. 5=extra)
- * @param {string} value       Inspector initials or ""
+ * Stamps an inspection cell with the authenticated user's name + current timestamp.
+ * Returns the stamped string so the client can display it immediately.
  */
-function saveInspection(yearSuffix, monthIndex, colIndex, value) {
+function stampInspection(yearSuffix, monthIndex, colIndex) {
+  var userInfo = getUserInfo();
+  if (!userInfo.authorized) throw new Error("You must be signed into your Google account.");
+
+  var timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "M/d/yyyy h:mm a");
+  var value = userInfo.displayName + " | " + timestamp;
+
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var insSheet = ss.getSheetByName(INSPECT_SHEET);
   if (!insSheet) {
@@ -410,33 +495,50 @@ function saveInspection(yearSuffix, monthIndex, colIndex, value) {
     insSheet.appendRow(["year","month","secure","expiration","operation","ppe","electrodes","extra"]);
   }
 
-  // Find existing row for this year + month
   var data = insSheet.getDataRange().getValues();
   var rowIdx = -1;
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][0]) === String(yearSuffix) && String(data[i][1]) === String(monthIndex)) {
-      rowIdx = i + 1; // 1-based for Sheets API
+      rowIdx = i + 1;
       break;
     }
   }
 
   if (rowIdx === -1) {
-    // New row
     var newRow = [yearSuffix, monthIndex, "", "", "", "", "", ""];
     newRow[colIndex + 2] = value;
     insSheet.appendRow(newRow);
   } else {
-    // Update existing cell (colIndex + 3 because 1-based + year col + month col)
     insSheet.getRange(rowIdx, colIndex + 3).setValue(value);
+  }
+  return value;
+}
+
+/**
+ * Clears an inspection cell (sets it to empty).
+ */
+function clearInspection(yearSuffix, monthIndex, colIndex) {
+  var userInfo = getUserInfo();
+  if (!userInfo.authorized) throw new Error("You must be signed into your Google account.");
+
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var insSheet = ss.getSheetByName(INSPECT_SHEET);
+  if (!insSheet) return true;
+
+  var data = insSheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === String(yearSuffix) && String(data[i][1]) === String(monthIndex)) {
+      insSheet.getRange(i + 1, colIndex + 3).setValue("");
+      break;
+    }
   }
   return true;
 }
 
 // =============================================
-// SELF-UPDATE INFRASTRUCTURE — Do not modify unless updating the deploy mechanism
+// SELF-UPDATE INFRASTRUCTURE
 // =============================================
 
-// POST endpoint — called by GitHub Action after merging to main.
 function doPost(e) {
   var action = (e && e.parameter && e.parameter.action) || "";
   if (action === "deploy") {
