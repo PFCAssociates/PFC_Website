@@ -94,17 +94,20 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge into main
+        id: merge
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout main
+          echo "pre_merge_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           git merge --ff-only ${{ github.ref_name }} || git merge --no-edit ${{ github.ref_name }}
           git push origin main
 
       - name: Check what changed
         id: check-changes
         run: |
-          if git diff --name-only HEAD~1 HEAD | grep -q "^httpsdocs/"; then
+          PRE=${{ steps.merge.outputs.pre_merge_sha }}
+          if git diff --name-only "$PRE" HEAD | grep -q "^httpsdocs/"; then
             echo "pages-changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "pages-changed=false" >> "$GITHUB_OUTPUT"
@@ -112,8 +115,9 @@ jobs:
 
       - name: Deploy Gas Self-Update Dashboard
         run: |
-          # Only deploy if Code.gs was modified in this push
-          git diff --name-only HEAD~1 HEAD | grep -q "googleAppsScripts/Gas Self-Update Dashboard/Code.gs" && \
+          PRE=${{ steps.merge.outputs.pre_merge_sha }}
+          # Only deploy if Code.gs was modified in this merge
+          git diff --name-only "$PRE" HEAD | grep -q "googleAppsScripts/Gas Self-Update Dashboard/Code.gs" && \
           curl -L -X POST \
             "https://script.google.com/macros/s/AKfycbxL_CaBgztJ_RtpzB4mym8s5Kl0Uqu1WLNNPbbYsB7_ckvUnGAvTLbA02r_MlmP0TAg/exec" \
             -d "action=deploy" \
@@ -121,8 +125,9 @@ jobs:
 
       - name: Deploy AED Monthly Inspection Log
         run: |
-          # Only deploy if AED_Log_Code.gs was modified in this push
-          git diff --name-only HEAD~1 HEAD | grep -q "googleAppsScripts/AED Monthly Inspection Log/AED_Log_Code.gs" && \
+          PRE=${{ steps.merge.outputs.pre_merge_sha }}
+          # Only deploy if AED_Log_Code.gs was modified in this merge
+          git diff --name-only "$PRE" HEAD | grep -q "googleAppsScripts/AED Monthly Inspection Log/AED_Log_Code.gs" && \
           curl -L -X POST \
             "https://script.google.com/macros/s/AKfycbyvnX5EmqA1jlbMiHD8VsLBdY8Xf00xlHF8mHsP02luflJFfhZVJl8ApxJA7I5e1udu/exec" \
             -d "action=deploy" \
