@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.34g";
+var VERSION = "01.35g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -94,17 +94,15 @@ function doGet(e) {
   // If not loaded inside the embedding page (e.g. after Google sign-in redirect),
   // close the tab so the user returns to the original page
   if (!e || !e.parameter || !e.parameter.embedded) {
-    var closeUrl = EMBED_PAGE_URL.replace('/aedlog.html', '/signin-complete.html');
     return HtmlService.createHtmlOutput(
-      '<html><head><meta http-equiv="refresh" content="1;url=' + closeUrl + '"></head>'
-      + '<body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666;flex-direction:column;gap:16px;text-align:center">'
+      '<html><body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666;flex-direction:column;gap:16px;text-align:center">'
       + '<div style="font-size:48px;color:#43a047">&#10003;</div>'
       + '<h2 style="margin:0;color:#222">Sign-In Complete</h2>'
-      + '<p>Redirecting... <a href="' + closeUrl + '" target="_top">Click here</a> if not redirected.</p>'
+      + '<p>This tab should close automatically.<br>If not, you can close it now.</p>'
       + '<script>'
-      + 'window.close();'
-      + 'setTimeout(function(){window.location.href="' + closeUrl + '";},500);'
-      + 'setTimeout(function(){window.top.location.href="' + closeUrl + '";},1000);'
+      + 'try{window.top.close()}catch(e){}'
+      + 'try{window.close()}catch(e){}'
+      + 'setTimeout(function(){try{window.top.close()}catch(e){}},500);'
       + '</script></body></html>'
     );
   }
