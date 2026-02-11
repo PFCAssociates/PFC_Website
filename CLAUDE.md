@@ -23,3 +23,7 @@
 - Example: if build-version is `"01.11w"`, change it to `"01.12w"`
 - The page polls itself every 10 seconds — when the deployed version differs from the loaded version, it auto-reloads
 
+## Execution Style
+- For clear, straightforward requests: **just do it** — make the changes, commit, and push without asking for plan approval
+- Only ask clarifying questions when the request is genuinely ambiguous or has multiple valid interpretations
+- Do not use formal plan-mode approval workflows for routine tasks (version bumps, file moves, feature additions, bug fixes, etc.)
