@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.49g";
+var VERSION = "01.50g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -561,6 +561,7 @@ function getFormData(opt_token) {
     }
   }
 
+  flushStats(ss);
   return { authorized: true, user: userInfo, config: config, inspections: inspections, version: "v" + VERSION };
 }
 
@@ -588,20 +589,38 @@ function saveConfig(key, value) {
 }
 
 /**
- * Increments a counter on the API_Stats sheet.
- * Layout: A1="Writes", B1=count, A2="Deletes", B2=count
- * statType: "write" (row 1) or "delete" (row 2)
- * ss: already-opened spreadsheet object
+ * Accumulates a stat counter in CacheService (zero Spreadsheet calls).
+ * Counts are flushed to the API_Stats sheet by flushStats() during getFormData.
  */
-function incrementStat(ss, statType) {
+function incrementStat(statType) {
+  var cache = CacheService.getScriptCache();
+  var key = "stat_" + statType;
+  var current = Number(cache.get(key)) || 0;
+  cache.put(key, String(current + 1), 21600);
+}
+
+/**
+ * Flushes accumulated stat counters from CacheService to the API_Stats sheet.
+ * Called during getFormData so it piggybacks on the already-open spreadsheet.
+ * Layout: A1="Writes", B1=count, A2="Deletes", B2=count
+ */
+function flushStats(ss) {
+  var cache = CacheService.getScriptCache();
+  var pendingWrites = Number(cache.get("stat_write")) || 0;
+  var pendingDeletes = Number(cache.get("stat_delete")) || 0;
+  if (pendingWrites === 0 && pendingDeletes === 0) return;
+
   var sheet = ss.getSheetByName(STATS_SHEET);
   if (!sheet) {
     sheet = ss.insertSheet(STATS_SHEET);
     sheet.getRange("A1:B2").setValues([["Writes", 0], ["Deletes", 0]]);
   }
-  var cell = sheet.getRange(statType === "write" ? "B1" : "B2");
-  var current = Number(cell.getValue()) || 0;
-  cell.setValue(current + 1);
+  var counts = sheet.getRange("B1:B2").getValues();
+  var newWrites = (Number(counts[0][0]) || 0) + pendingWrites;
+  var newDeletes = (Number(counts[1][0]) || 0) + pendingDeletes;
+  sheet.getRange("B1:B2").setValues([[newWrites], [newDeletes]]);
+  cache.remove("stat_write");
+  cache.remove("stat_delete");
 }
 
 /**
@@ -638,7 +657,7 @@ function stampInspection(yearSuffix, monthIndex, colIndex, opt_token) {
   } else {
     insSheet.getRange(rowIdx, colIndex + 3).setValue(value);
   }
-  incrementStat(ss, "write");
+  incrementStat("write");
   return value;
 }
 
@@ -657,7 +676,7 @@ function clearInspection(yearSuffix, monthIndex, colIndex, opt_token) {
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][0]) === String(yearSuffix) && String(data[i][1]) === String(monthIndex)) {
       insSheet.getRange(i + 1, colIndex + 3).setValue("");
-      incrementStat(ss, "delete");
+      incrementStat("delete");
       break;
     }
   }
