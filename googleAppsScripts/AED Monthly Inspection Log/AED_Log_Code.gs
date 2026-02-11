@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.18g";
+var VERSION = "01.19g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -91,10 +91,13 @@ function getUserInfo() {
 // =============================================
 
 function doGet(e) {
-  // If not loaded inside the embedding page, redirect there
+  // If not loaded inside the embedding page (e.g. after Google sign-in redirect),
+  // close the tab so the user returns to the original page
   if (!e || !e.parameter || !e.parameter.embedded) {
     return HtmlService.createHtmlOutput(
-      '<script>window.top.location.href="' + EMBED_PAGE_URL + '";</script>'
+      '<html><body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666">'
+      + '<p>Sign-in complete. This tab will close automatically...</p>'
+      + '<script>window.close();</script></body></html>'
     );
   }
   var html = buildFormHtml();
@@ -252,6 +255,13 @@ function buildFormHtml() {
     var _yr="";\
     var _sav=0;\
     var _user=null;\
+    function openSignIn(url){\
+      var w=window.open(url,"_blank");\
+      if(!w)return;\
+      var poll=setInterval(function(){\
+        if(w.closed){clearInterval(poll);window.location.reload();}\
+      },500);\
+    }\
     function sOn(){_sav++;document.getElementById("sv").classList.add("on")}\
     function sOff(){_sav--;if(_sav<=0){_sav=0;document.getElementById("sv").classList.remove("on")}}\
 \
@@ -303,15 +313,15 @@ function buildFormHtml() {
         var switchUrl="https://accounts.google.com/AccountChooser"+(url?"?continue="+encodeURIComponent(url):"");\
         wall.innerHTML="<h2>Access Denied</h2>"\
           +"<p>Your account <span class=auth-email>"+((d.email||"")+"</span> does not have access to the inspection log spreadsheet.</p>")\
-          +"<a class=\\"auth-btn switch\\" href=\\""+switchUrl+"\\" target=\\"_blank\\">Switch Google Account</a>"\
+          +"<a class=\\"auth-btn switch\\" href=\\"#\\" onclick=\\"openSignIn(\'"+switchUrl.replace(/'/g,"\\\\'")+"\');return false;\\">Switch Google Account</a>"\
           +"<p class=auth-hint>Sign in with an account that has access, or ask your administrator to share the spreadsheet with you.</p>";\
       }else{\
         var loginUrl="https://accounts.google.com/AccountChooser"+(url?"?continue="+encodeURIComponent(url):"");\
         wall.innerHTML="<h2>Sign-In Required</h2>"\
           +"<p>You must be signed into an authorized Google account to use this inspection log.</p>"\
           +"<p>If you are already signed in, your account may not have access. Try switching to an authorized account.</p>"\
-          +(url?"<a class=\\"auth-btn signin\\" href=\\""+loginUrl+"\\" target=\\"_blank\\">Sign In / Switch Account</a>":"")\
-          +"<p class=auth-hint>A new tab will open. After signing in, come back here and refresh the page.</p>";\
+          +(url?"<a class=\\"auth-btn signin\\" href=\\"#\\" onclick=\\"openSignIn(\'"+loginUrl.replace(/'/g,"\\\\'")+"\');return false;\\">Sign In / Switch Account</a>":"")\
+          +"<p class=auth-hint>A new tab will open. After signing in, this page will refresh automatically.</p>";\
       }\
       wall.classList.add("show");\
     }\
