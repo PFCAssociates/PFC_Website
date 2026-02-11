@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.14w">
+  <meta name="build-version" content="01.15w">
   <title>AED Monthly Inspection Log</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -53,10 +53,19 @@
     .auth-wall .auth-btn.switch { background: #f4511e; }
     .auth-wall .auth-btn.switch:hover { background: #d63c0e; }
     .auth-wall .auth-hint { font-size: 12px; color: #999; margin-top: 0; }
+    .auth-wall .auth-versions { font-size: 11px; color: #aaa; font-family: monospace; margin-top: 8px; }
+    .sign-out-btn {
+      position: fixed; bottom: 8px; left: 8px; z-index: 9999;
+      background: rgba(0,0,0,0.55); color: #ccc; padding: 4px 10px;
+      border-radius: 12px; font: 11px/1 monospace; cursor: pointer;
+      border: none; transition: all 0.2s; user-select: none;
+    }
+    .sign-out-btn:hover { background: rgba(211,47,47,0.8); color: #fff; }
   </style>
 </head>
 <body>
   <div id="auth-wall" class="auth-wall"></div>
+  <button id="sign-out-btn" class="sign-out-btn" style="display:none" onclick="signOut()">Sign Out</button>
   <div id="splash-green" class="splash"><div class="splash-title">Website Ready</div><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
   <div id="splash-blue" class="splash"><div class="splash-title">Code Ready</div><img src="https://www.shadowaisolutions.com/SAIS%20Logo.png" alt=""></div>
   <iframe id="gas-app" allow="*"></iframe>
@@ -140,6 +149,7 @@
 
     // GIS sign-in (runs from pfcassociates.github.io origin)
     var _gisLoaded = false;
+    var _gasVersion = '';
     var _gasBaseUrl = 'https://script.google.com/a/macros/pfcassociates.org/s/AKfycbyvnX5EmqA1jlbMiHD8VsLBdY8Xf00xlHF8mHsP02luflJFfhZVJl8ApxJA7I5e1udu/exec?embedded=1';
     function loadGis(cb) {
       if (_gisLoaded) { cb(); return; }
@@ -153,6 +163,12 @@
       var iframe = document.getElementById('gas-app');
       var token = localStorage.getItem('gis-token') || '';
       iframe.src = _gasBaseUrl + (token ? '&token=' + encodeURIComponent(token) : '');
+    }
+    function signOut() {
+      localStorage.removeItem('gis-token');
+      localStorage.removeItem('gis-email');
+      document.getElementById('sign-out-btn').style.display = 'none';
+      reloadIframe();
     }
     // Initial load — includes stored token if user previously signed in
     reloadIframe();
@@ -172,6 +188,7 @@
                 if (info.email) localStorage.setItem('gis-email', info.email);
               }).catch(function() {}).finally(function() {
                 document.getElementById('auth-wall').classList.remove('show');
+                document.getElementById('sign-out-btn').style.display = '';
                 reloadIframe();
               });
             }
@@ -180,8 +197,14 @@
         client.requestAccessToken();
       });
     }
-    function showAuthWall(authStatus, email) {
+    function showAuthWall(authStatus, email, gasVersion) {
       var wall = document.getElementById('auth-wall');
+      if (gasVersion) _gasVersion = gasVersion;
+      var webVersion = (document.querySelector('meta[name="build-version"]') || {}).content || '';
+      var versions = '<p class="auth-versions">'
+        + (webVersion ? 'Web: v' + webVersion : '')
+        + (_gasVersion ? (webVersion ? ' &nbsp;|&nbsp; ' : '') + 'Code: ' + _gasVersion : '')
+        + '</p>';
       // GAS can't detect email for unauthorized users, so check if we stored one from GIS
       var knownEmail = email || localStorage.getItem('gis-email') || '';
       if (knownEmail) {
@@ -191,7 +214,8 @@
           + '<p><span class="auth-email">' + knownEmail + '</span></p>'
           + '<p>This account does not have access to the inspection log spreadsheet.</p>'
           + '<a class="auth-btn switch" href="#" onclick="triggerGisSignIn();return false;">Switch Google Account</a>'
-          + '<p class="auth-hint">Sign in with an account that has access, or ask your administrator to share the spreadsheet with you.</p>';
+          + '<p class="auth-hint">Sign in with an account that has access, or ask your administrator to share the spreadsheet with you.</p>'
+          + versions;
       } else {
         // No sign-in detected at all
         wall.innerHTML = '<h2 style="color:#d32f2f">Sign-In Required</h2>'
@@ -199,8 +223,10 @@
           + '<p><span class="auth-email">No Google account detected</span></p>'
           + '<p>You must sign into an authorized Google account to use this inspection log.</p>'
           + '<a class="auth-btn signin" href="#" onclick="triggerGisSignIn();return false;">Sign In with Google</a>'
-          + '<p class="auth-hint">A Google sign-in popup will appear. This page will refresh automatically once you sign in.</p>';
+          + '<p class="auth-hint">A Google sign-in popup will appear. This page will refresh automatically once you sign in.</p>'
+          + versions;
       }
+      document.getElementById('sign-out-btn').style.display = 'none';
       wall.classList.add('show');
     }
 
@@ -208,7 +234,11 @@
     window.addEventListener('message', function(e) {
       if (!e.data) return;
       if (e.data.type === 'gas-needs-auth') {
-        showAuthWall(e.data.authStatus, e.data.email);
+        showAuthWall(e.data.authStatus, e.data.email, e.data.version);
+        return;
+      }
+      if (e.data.type === 'gas-auth-ok') {
+        document.getElementById('sign-out-btn').style.display = '';
         return;
       }
       if (e.data.type === 'manual-reload') {
