@@ -35,7 +35,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.02g";
+var VERSION = "01.03g";
 var TITLE = "AED Monthly Inspection Log";
 
 // Google Sheets
@@ -63,20 +63,13 @@ function doGet() {
       <style>
         html, body { height: 100%; margin: 0; overflow: auto; }
         body { font-family: Arial; display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
-        #version { font-size: 80px; font-weight: bold; color: #e65100; line-height: 1; }
-        button { background: #e65100; color: white; border: none; padding: 8px 20px;
-                 border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 10px; }
-        button:hover { background: #bf360c; }
-        #result { margin-top: 8px; padding: 8px 15px; border-radius: 8px; font-size: 13px; }
+        #title { font-size: 28px; margin: 0 0 4px 0; }
+        #version { font-size: 14px; color: #888; }
       </style>
     </head>
     <body>
-      <h1 id="title" style="font-size: 28px; margin: 0 0 4px 0;">...</h1>
+      <h1 id="title">...</h1>
       <div id="version">...</div>
-      <button onclick="checkForUpdates()">Manual Deploy from GitHub</button>
-      <button id="reload-btn" onclick="try{window.top.postMessage({type:'manual-reload'},'*')}catch(e){}" style="background:#2e7d32;">Reload Page</button>
-      <div id="result"></div>
-      <div id="versionCount" style="margin-top: 6px; font-size: 12px; color: #888;"></div>
 
       <script>
         function applyData(data) {
@@ -103,48 +96,12 @@ function doGet() {
                 var reloadMsg = {type: 'gas-reload', version: pushed};
                 try { window.top.postMessage(reloadMsg, '*'); } catch(e) {}
                 try { window.parent.postMessage(reloadMsg, '*'); } catch(e) {}
-                var btn = document.getElementById('reload-btn');
-                if (btn) {
-                  btn.style.background = '#d32f2f';
-                  btn.textContent = 'Update Available — Reload Page';
-                }
                 setTimeout(function() { _autoPulling = false; }, 30000);
               }
             })
             .readPushedVersionFromCache();
         }
         setInterval(pollPushedVersionFromCache, 15000);
-
-        function checkForUpdates() {
-          document.getElementById('result').style.background = '#fff3e0';
-          document.getElementById('result').textContent = 'Pulling...';
-          google.script.run
-            .withSuccessHandler(function(msg) {
-              var wasUpdated = msg.indexOf('Updated to') === 0;
-              document.getElementById('result').style.background = '#e8f5e9';
-              document.getElementById('result').textContent = msg;
-              if (!wasUpdated) return;
-              setTimeout(function() {
-                google.script.run.writeVersionToSheetA1();
-                google.script.run
-                  .withSuccessHandler(function(data) {
-                    applyData(data);
-                    var btn = document.getElementById('reload-btn');
-                    btn.style.background = '#d32f2f';
-                    btn.textContent = 'Update Available — Reload Page';
-                    var reloadMsg = {type: 'gas-reload', version: data.version};
-                    try { window.top.postMessage(reloadMsg, '*'); } catch(e) {}
-                    try { window.parent.postMessage(reloadMsg, '*'); } catch(e) {}
-                  })
-                  .getAppData();
-              }, 2000);
-            })
-            .withFailureHandler(function(err) {
-              document.getElementById('result').style.background = '#ffebee';
-              document.getElementById('result').textContent = err.message;
-            })
-            .pullAndDeployFromGitHub();
-        }
       </script>
     </body>
     </html>
