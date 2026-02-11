@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.11w">
+  <meta name="build-version" content="01.12w">
   <title>AED Monthly Inspection Log</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -143,12 +143,19 @@
 
     // GIS sign-in (runs from pfcassociates.github.io origin)
     var _gisLoaded = false;
+    var _gasBaseUrl = 'https://script.google.com/a/macros/pfcassociates.org/s/AKfycbyvnX5EmqA1jlbMiHD8VsLBdY8Xf00xlHF8mHsP02luflJFfhZVJl8ApxJA7I5e1udu/exec?embedded=1';
     function loadGis(cb) {
       if (_gisLoaded) { cb(); return; }
       var s = document.createElement('script');
       s.src = 'https://accounts.google.com/gsi/client';
       s.onload = function() { _gisLoaded = true; cb(); };
       document.head.appendChild(s);
+    }
+    // Reload iframe, appending stored token so GAS can verify the user server-side
+    function reloadIframe() {
+      var iframe = document.getElementById('gas-app');
+      var token = sessionStorage.getItem('gis-token') || '';
+      iframe.src = _gasBaseUrl + (token ? '&token=' + encodeURIComponent(token) : '');
     }
     function triggerGisSignIn() {
       loadGis(function() {
@@ -157,15 +164,16 @@
           scope: 'email profile',
           callback: function(resp) {
             if (resp && resp.access_token) {
-              // Fetch user email from Google userinfo API
+              // Store token so GAS can verify the user server-side
+              sessionStorage.setItem('gis-token', resp.access_token);
+              // Also fetch email for the auth wall display
               fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                 headers: { 'Authorization': 'Bearer ' + resp.access_token }
               }).then(function(r) { return r.json(); }).then(function(info) {
                 if (info.email) sessionStorage.setItem('gis-email', info.email);
               }).catch(function() {}).finally(function() {
-                // Reload iframe regardless — GAS will re-check auth
                 document.getElementById('auth-wall').classList.remove('show');
-                document.getElementById('gas-app').src = document.getElementById('gas-app').src;
+                reloadIframe();
               });
             }
           }
@@ -209,7 +217,7 @@
       }
       if (e.data.type === 'gas-auth-complete') {
         document.getElementById('auth-wall').classList.remove('show');
-        document.getElementById('gas-app').src = document.getElementById('gas-app').src;
+        reloadIframe();
         return;
       }
       if (e.data.type === 'gas-reload') {

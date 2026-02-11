@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.38g";
+var VERSION = "01.39g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -73,8 +73,22 @@ var COL_HEADERS = [
  *   "authorized"    — signed in (email resolved)
  * Always includes scriptUrl so the client can link to the GAS app for auth.
  */
-function getUserInfo() {
+function getUserInfo(opt_token) {
   var email = Session.getActiveUser().getEmail();
+  // GAS can't detect the user when sign-in happens on the parent page (different origin).
+  // Fall back to verifying the OAuth access token from GIS.
+  if (!email && opt_token) {
+    try {
+      var resp = UrlFetchApp.fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: { "Authorization": "Bearer " + opt_token },
+        muteHttpExceptions: true
+      });
+      if (resp.getResponseCode() === 200) {
+        var info = JSON.parse(resp.getContentText());
+        email = info.email || "";
+      }
+    } catch(e) {}
+  }
   if (!email) {
     return { status: "not_signed_in" };
   }
@@ -90,13 +104,14 @@ function getUserInfo() {
 // =============================================
 
 function doGet(e) {
-  var html = buildFormHtml();
+  var token = (e && e.parameter && e.parameter.token) || "";
+  var html = buildFormHtml(token);
   return HtmlService.createHtmlOutput(html)
     .setTitle(TITLE)
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
-function buildFormHtml() {
+function buildFormHtml(opt_token) {
   var colThs = "";
   for (var i = 0; i < COL_HEADERS.length; i++) {
     colThs += '<th class="check-col"><div class="col-text">' + COL_HEADERS[i] + '</div><div class="init-lbl">(click to sign)</div></th>';
@@ -245,6 +260,7 @@ function buildFormHtml() {
     var _yr="";\
     var _sav=0;\
     var _user=null;\
+    var _gasToken=' + JSON.stringify(opt_token || "") + ';\
     function notifyParentAuth(){\
       var msg={type:"gas-auth-complete"};\
       try{window.top.postMessage(msg,"*")}catch(e){}\
@@ -289,7 +305,7 @@ function buildFormHtml() {
             cell.classList.remove("stamping");\
             alert("Error: "+err.message);\
           })\
-          .clearInspection(document.getElementById("yr").value,parseInt(cell.getAttribute("data-m")),parseInt(cell.getAttribute("data-c")));\
+          .clearInspection(document.getElementById("yr").value,parseInt(cell.getAttribute("data-m")),parseInt(cell.getAttribute("data-c")),_gasToken);\
       });\
       cell.appendChild(clearBtn);\
     }\
@@ -319,7 +335,7 @@ function buildFormHtml() {
         .withFailureHandler(function(e){\
           document.getElementById("ld").textContent="Error: "+e.message;\
         })\
-        .getFormData();\
+        .getFormData(_gasToken);\
     }\
 \
     function populate(d){\
@@ -385,7 +401,7 @@ function buildFormHtml() {
             cell.classList.remove("stamping");\
             alert("Error: "+err.message);\
           })\
-          .stampInspection(yr.value,parseInt(cell.getAttribute("data-m")),parseInt(cell.getAttribute("data-c")));\
+          .stampInspection(yr.value,parseInt(cell.getAttribute("data-m")),parseInt(cell.getAttribute("data-c")),_gasToken);\
       });\
     });\
 \
@@ -425,8 +441,8 @@ function buildFormHtml() {
  * Returns all form data: config + inspections for the current year + user info.
  * If the user is not signed in, returns {authorized:false}.
  */
-function getFormData() {
-  var userInfo = getUserInfo();
+function getFormData(opt_token) {
+  var userInfo = getUserInfo(opt_token);
   if (userInfo.status !== "authorized") {
     return { authorized: false, authStatus: userInfo.status, email: userInfo.email || "", version: "v" + VERSION };
   }
@@ -507,8 +523,8 @@ function saveConfig(key, value) {
  * Stamps an inspection cell with the authenticated user's name + current timestamp.
  * Returns the stamped string so the client can display it immediately.
  */
-function stampInspection(yearSuffix, monthIndex, colIndex) {
-  var userInfo = getUserInfo();
+function stampInspection(yearSuffix, monthIndex, colIndex, opt_token) {
+  var userInfo = getUserInfo(opt_token);
   if (userInfo.status !== "authorized") throw new Error("You must be signed into a Google account with spreadsheet access.");
 
   var timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "M/d/yyyy h:mm a");
@@ -543,8 +559,8 @@ function stampInspection(yearSuffix, monthIndex, colIndex) {
 /**
  * Clears an inspection cell (sets it to empty).
  */
-function clearInspection(yearSuffix, monthIndex, colIndex) {
-  var userInfo = getUserInfo();
+function clearInspection(yearSuffix, monthIndex, colIndex, opt_token) {
+  var userInfo = getUserInfo(opt_token);
   if (userInfo.status !== "authorized") throw new Error("You must be signed into a Google account with spreadsheet access.");
 
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
