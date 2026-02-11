@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.25g";
+var VERSION = "01.26g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -94,10 +94,12 @@ function doGet(e) {
   // If not loaded inside the embedding page (e.g. after Google sign-in redirect),
   // close the tab so the user returns to the original page
   if (!e || !e.parameter || !e.parameter.embedded) {
+    var redirectUrl = "https://pfcassociates.github.io/PFC_Website/signin-complete.html";
     return HtmlService.createHtmlOutput(
-      '<html><body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666">'
-      + '<p>Sign-in complete. This tab will close automatically...</p>'
-      + '<script>window.close();</script></body></html>'
+      '<html><head><meta http-equiv="refresh" content="0;url=' + redirectUrl + '"></head>'
+      + '<body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666">'
+      + '<p>Sign-in complete. Redirecting...</p>'
+      + '<script>window.location.href="' + redirectUrl + '";</script></body></html>'
     );
   }
   var html = buildFormHtml();
@@ -309,7 +311,8 @@ function buildFormHtml() {
     var _signInUrl="";\
     function showAuthWall(d){\
       var wall=document.getElementById("auth-wall");\
-      _signInUrl="https://accounts.google.com/AccountChooser?continue="+encodeURIComponent("https://pfcassociates.github.io/PFC_Website/signin-complete.html");\
+      var scriptUrl=d.scriptUrl||"";\
+      _signInUrl="https://accounts.google.com/AccountChooser"+(scriptUrl?"?continue="+encodeURIComponent(scriptUrl):"");\
       if(d.authStatus==="no_access"){\
         wall.innerHTML="<h2>Access Denied</h2>"\
           +"<p>Your account <span class=auth-email>"+((d.email||"")+"</span> does not have access to the inspection log spreadsheet.</p>")\
