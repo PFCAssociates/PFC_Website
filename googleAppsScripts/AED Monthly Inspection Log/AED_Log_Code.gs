@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.23g";
+var VERSION = "01.24g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -329,6 +329,7 @@ function buildFormHtml() {
       google.script.run\
         .withSuccessHandler(function(d){\
           if(!d.authorized){\
+            if(d.version)document.getElementById("gv").textContent=d.version;\
             showAuthWall(d);\
             document.getElementById("ld").classList.add("off");\
             return;\
@@ -424,7 +425,7 @@ function buildFormHtml() {
         google.script.run.withSuccessHandler(function(pushed){\
           if(!pushed)return;\
           var cur=(document.getElementById("gv").textContent||"").trim();\
-          if(pushed!==cur&&pushed!==""){\
+          if(pushed!==cur&&pushed!==""&&cur!==""){\
             _ap=true;\
             var msg={type:"gas-reload",version:pushed};\
             try{window.top.postMessage(msg,"*")}catch(e){}\
@@ -452,7 +453,7 @@ function buildFormHtml() {
 function getFormData() {
   var userInfo = getUserInfo();
   if (userInfo.status !== "authorized") {
-    return { authorized: false, authStatus: userInfo.status, email: userInfo.email || "", scriptUrl: userInfo.scriptUrl || "" };
+    return { authorized: false, authStatus: userInfo.status, email: userInfo.email || "", scriptUrl: userInfo.scriptUrl || "", version: "v" + VERSION };
   }
 
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
