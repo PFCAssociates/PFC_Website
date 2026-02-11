@@ -35,7 +35,7 @@
 // =============================================
 // PROJECT CONFIG — Change these when reusing for a different project
 // =============================================
-var VERSION = "01.04g";
+var VERSION = "01.05g";
 var TITLE = "AED Monthly Inspection Log";
 
 // Google Sheets
