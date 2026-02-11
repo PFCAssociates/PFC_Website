@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.42g";
+var VERSION = "01.43g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -74,10 +74,11 @@ var COL_HEADERS = [
  * Always includes scriptUrl so the client can link to the GAS app for auth.
  */
 function getUserInfo(opt_token) {
-  var email = Session.getActiveUser().getEmail();
-  // GAS can't detect the user when sign-in happens on the parent page (different origin).
-  // Fall back to verifying the OAuth access token from GIS.
-  if (!email && opt_token) {
+  var email = "";
+  // When the parent page provides a token, use it to identify the user.
+  // This takes priority over Session.getActiveUser() because the parent page
+  // controls which Google account the user signed in with (or signed out of).
+  if (opt_token) {
     try {
       var resp = UrlFetchApp.fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
         headers: { "Authorization": "Bearer " + opt_token },
@@ -88,6 +89,10 @@ function getUserInfo(opt_token) {
         email = info.email || "";
       }
     } catch(e) {}
+  }
+  // Fall back to GAS session if no token provided or token validation failed
+  if (!email) {
+    email = Session.getActiveUser().getEmail();
   }
   if (!email) {
     return { status: "not_signed_in" };
