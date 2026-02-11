@@ -119,6 +119,16 @@ jobs:
             -d "action=deploy" \
             --max-time 120 || true
 
+      # TODO: Uncomment and replace PLACEHOLDER_DEPLOYMENT_ID when the AED Log
+      # Apps Script project is set up with its own deployment
+      # - name: Deploy AED Monthly Inspection Log
+      #   run: |
+      #     git diff --name-only HEAD~1 HEAD | grep -q "googleAppsScripts/AED Monthly Inspection Log/AED_Log_Code.gs" && \
+      #     curl -L -X POST \
+      #       "https://script.google.com/macros/s/PLACEHOLDER_DEPLOYMENT_ID/exec" \
+      #       -d "action=deploy" \
+      #       --max-time 120 || true
+
       - name: Delete branch
         run: |
           git push origin --delete ${{ github.ref_name }}
