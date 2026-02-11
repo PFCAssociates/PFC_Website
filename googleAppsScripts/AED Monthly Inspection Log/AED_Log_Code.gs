@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.27g";
+var VERSION = "01.28g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -94,11 +94,11 @@ function doGet(e) {
   // If not loaded inside the embedding page (e.g. after Google sign-in redirect),
   // close the tab so the user returns to the original page
   if (!e || !e.parameter || !e.parameter.embedded) {
-    var redirectUrl = "https://pfcassociates.github.io/PFC_Website/signin-complete.html";
     return HtmlService.createHtmlOutput(
-      '<html><body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666">'
+      '<html><body style="font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100%;margin:0;color:#666;flex-direction:column;gap:16px">'
       + '<p>Sign-in complete. Redirecting...</p>'
-      + '<script>window.top.location.href="' + redirectUrl + '";</script></body></html>'
+      + '<a href="' + EMBED_PAGE_URL + '" target="_top" style="color:#1a73e8;font-size:15px">Click here if not redirected</a>'
+      + '<script>window.top.location.href="' + EMBED_PAGE_URL + '";</script></body></html>'
     );
   }
   var html = buildFormHtml();
@@ -257,11 +257,7 @@ function buildFormHtml() {
     var _sav=0;\
     var _user=null;\
     function openSignIn(url){\
-      var w=window.open(url,"_blank");\
-      if(!w)return;\
-      var poll=setInterval(function(){\
-        if(w.closed){clearInterval(poll);window.location.reload();}\
-      },500);\
+      window.top.location.href=url;\
     }\
     function sOn(){_sav++;document.getElementById("sv").classList.add("on")}\
     function sOff(){_sav--;if(_sav<=0){_sav=0;document.getElementById("sv").classList.remove("on")}}\
@@ -322,7 +318,7 @@ function buildFormHtml() {
           +"<p>You must be signed into an authorized Google account to use this inspection log.</p>"\
           +"<p>If you are already signed in, your account may not have access. Try switching to an authorized account.</p>"\
           +"<a class=\'auth-btn signin\' href=\'#\' onclick=\'openSignIn(_signInUrl);return false;\'>Sign In / Switch Account</a>"\
-          +"<p class=auth-hint>A new tab will open. After signing in, this page will refresh automatically.</p>";\
+          +"<p class=auth-hint>You will be redirected to sign in, then returned here automatically.</p>";\
       }\
       wall.classList.add("show");\
     }\
