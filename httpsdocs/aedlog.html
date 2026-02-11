@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.07w">
+  <meta name="build-version" content="01.08w">
   <title>AED Monthly Inspection Log</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -124,6 +124,10 @@
       if (!e.data) return;
       if (e.data.type === 'manual-reload') {
         window.location.reload();
+      }
+      if (e.data.type === 'gas-auth-complete') {
+        window.location.reload();
+        return;
       }
       if (e.data.type === 'gas-reload') {
         var lastGasReload = parseInt(sessionStorage.getItem('gas-reload-time') || '0', 10);
