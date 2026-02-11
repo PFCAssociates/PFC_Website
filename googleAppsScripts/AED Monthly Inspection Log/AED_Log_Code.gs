@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.24g";
+var VERSION = "01.25g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -319,7 +319,7 @@ function buildFormHtml() {
         wall.innerHTML="<h2>Sign-In Required</h2>"\
           +"<p>You must be signed into an authorized Google account to use this inspection log.</p>"\
           +"<p>If you are already signed in, your account may not have access. Try switching to an authorized account.</p>"\
-          +(url?"<a class=\'auth-btn signin\' href=\'#\' onclick=\'openSignIn(_signInUrl);return false;\'>Sign In / Switch Account</a>":"")\
+          +"<a class=\'auth-btn signin\' href=\'#\' onclick=\'openSignIn(_signInUrl);return false;\'>Sign In / Switch Account</a>"\
           +"<p class=auth-hint>A new tab will open. After signing in, this page will refresh automatically.</p>";\
       }\
       wall.classList.add("show");\
