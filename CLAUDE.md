@@ -29,6 +29,15 @@
 - Example: if build-version is `"01.11w"`, change it to `"01.12w"`
 - Each embedding page polls itself every 10 seconds — when the deployed version differs from the loaded version, it auto-reloads
 
+## Commit Message Naming
+- **Every commit message MUST start with the version number(s) being updated**
+- If a `.gs` file was updated: prefix with `v{VERSION}` (e.g. `v01.19g`)
+- If an embedding HTML page was updated: prefix with `w{BUILD_VERSION}` (e.g. `w01.12w`)
+- If both were updated in the same commit: include both (e.g. `v01.19g w01.12w`)
+- If neither was updated: no version prefix needed
+- Example: `v01.19g Fix sign-in popup to auto-close after authentication`
+- Example: `v01.19g w01.12w Add auth wall with build version bump`
+
 ## Execution Style
 - For clear, straightforward requests: **just do it** — make the changes, commit, and push without asking for plan approval
 - Only ask clarifying questions when the request is genuinely ambiguous or has multiple valid interpretations
