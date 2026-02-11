@@ -80,7 +80,7 @@ When a GAS app embedded in a GitHub Pages iframe needs Google sign-in (e.g. to r
 
 ### OAuth Setup (Google Cloud Console)
 - **OAuth Client ID**: `1065458024858-fp9s8h7hiogq114ct4bnc4qhdof2r6j6.apps.googleusercontent.com`
-- **Authorized JavaScript origins** must include: `https://pfcassociates.github.io`
+- **Authorized JavaScript origins** must include: `https://pfcassociates.github.io` and `https://pfcassociates.org`
 - To configure: Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs → edit the client → add the origin
 - If you add new embedding domains (e.g. a custom domain), add those origins too
 
