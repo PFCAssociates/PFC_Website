@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.13g";
+var VERSION = "01.14g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -94,6 +94,11 @@ function getUserInfo() {
  * Checks whether the given email has access to the backend spreadsheet
  * (owner, editor, viewer, or domain/link-level sharing).
  * Uses DriveApp — requires the drive.readonly (or drive) OAuth scope.
+ *
+ * FAIL-OPEN: If DriveApp throws (e.g. scope not yet authorized after
+ * auto-deploy), returns true so signed-in users aren't locked out.
+ * Once the script is manually re-authorized with the Drive scope,
+ * the full sharing-list check will activate automatically.
  */
 function hasSpreadsheetAccess_(email) {
   try {
@@ -134,7 +139,9 @@ function hasSpreadsheetAccess_(email) {
 
     return false;
   } catch(e) {
-    return false;
+    // DriveApp scope likely not authorized yet — fail open so signed-in
+    // users aren't blocked. Full check activates after manual re-auth.
+    return true;
   }
 }
 
