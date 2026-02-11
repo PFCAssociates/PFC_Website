@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.17g";
+var VERSION = "01.18g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -90,7 +90,13 @@ function getUserInfo() {
 // WEB APP ENTRY POINT
 // =============================================
 
-function doGet() {
+function doGet(e) {
+  // If not loaded inside the embedding page, redirect there
+  if (!e || !e.parameter || !e.parameter.embedded) {
+    return HtmlService.createHtmlOutput(
+      '<script>window.top.location.href="' + EMBED_PAGE_URL + '";</script>'
+    );
+  }
   var html = buildFormHtml();
   return HtmlService.createHtmlOutput(html)
     .setTitle(TITLE)
@@ -204,7 +210,6 @@ function buildFormHtml() {
   </style>\
 </head>\
 <body>\
-  <script>if(window.top===window.self){window.location.replace("' + EMBED_PAGE_URL + '");}</script>\
   <div class="auth-wall" id="auth-wall"></div>\
   <div class="ld" id="ld">Loading inspection log...</div>\
   <div class="sv" id="sv">Saving...</div>\
@@ -303,9 +308,10 @@ function buildFormHtml() {
       }else{\
         var loginUrl="https://accounts.google.com/AccountChooser"+(url?"?continue="+encodeURIComponent(url):"");\
         wall.innerHTML="<h2>Sign-In Required</h2>"\
-          +"<p>You must be signed into your Google account to use this inspection log.</p>"\
-          +(url?"<a class=\\"auth-btn signin\\" href=\\""+loginUrl+"\\" target=\\"_blank\\">Sign In with Google</a>":"")\
-          +"<p class=auth-hint>A new tab will open for sign-in. After signing in, come back here and refresh the page.</p>";\
+          +"<p>You must be signed into an authorized Google account to use this inspection log.</p>"\
+          +"<p>If you are already signed in, your account may not have access. Try switching to an authorized account.</p>"\
+          +(url?"<a class=\\"auth-btn signin\\" href=\\""+loginUrl+"\\" target=\\"_blank\\">Sign In / Switch Account</a>":"")\
+          +"<p class=auth-hint>A new tab will open. After signing in, come back here and refresh the page.</p>";\
       }\
       wall.classList.add("show");\
     }\
