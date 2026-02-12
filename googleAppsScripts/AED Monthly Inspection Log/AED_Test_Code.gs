@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.07g";
+var VERSION = "01.08g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -169,10 +169,10 @@ function buildFormHtml(opt_token) {
     .topbar .user-pill.show { display: block; }\
 \
     /* ---- CONFIG BAR ---- */\
-    .config-bar { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--gray-700); flex-shrink: 0; }\
+    .config-bar { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 8px 16px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--gray-700); flex-shrink: 0; }\
     .config-bar .cfg-item { display: flex; align-items: center; gap: 4px; }\
-    .config-bar .cfg-label { font-weight: 600; color: var(--gray-900); }\
-    .config-bar .cfg-input { border: none; border-bottom: 1.5px solid var(--gray-300); background: transparent; font-size: 12px; color: var(--gray-700); padding: 2px 4px; outline: none; min-width: 60px; max-width: 140px; font-family: inherit; }\
+    .config-bar .cfg-label { font-weight: 600; color: var(--gray-900); white-space: nowrap; }\
+    .config-bar .cfg-input { border: none; border-bottom: 1.5px solid var(--gray-300); background: transparent; font-size: 12px; color: var(--gray-700); padding: 2px 4px; outline: none; flex: 1; font-family: inherit; }\
     .config-bar .cfg-input:focus { border-bottom-color: var(--blue); }\
 \
     /* ---- MONTH NAVIGATION ---- */\
@@ -204,7 +204,7 @@ function buildFormHtml(opt_token) {
     .card-content { flex: 1; min-width: 0; }\
     .card-title { font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--gray-900); }\
     .card.completed .card-title { color: var(--green); }\
-    .card-stamp { flex-shrink: 0; text-align: right; font-size: 11px; color: var(--gray-500); }\
+    .card-stamp { text-align: right; font-size: 11px; color: var(--gray-500); }\
     .card-stamp .stamp-name { font-weight: 600; color: var(--blue); }\
     .card.completed .card-stamp .stamp-name { color: var(--green); }\
     .card-stamp .stamp-date { font-size: 10px; color: var(--gray-500); margin-top: 1px; }\
@@ -261,24 +261,6 @@ function buildFormHtml(opt_token) {
     /* ---- VERSION ---- */\
     #gv { text-align: center; font-size: 11px; color: var(--gray-400); padding: 8px; position: fixed; bottom: 0; left: 0; right: 0; background: var(--gray-100); }\
 \
-    /* ---- RESPONSIVE ---- */\
-    @media (max-width: 480px) {\
-      .topbar { padding: 10px 12px; gap: 8px; }\
-      .topbar h1 { font-size: 14px; }\
-      .topbar .user-pill { font-size: 10px; padding: 3px 8px; max-width: 120px; }\
-      .config-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; padding: 6px 12px; }\
-      .config-bar .cfg-input { min-width: 40px; max-width: none; }\
-      .month-nav { padding: 8px 12px; gap: 6px; }\
-      .month-nav .nav-btn { width: 36px; height: 36px; }\
-      .month-nav .month-select { font-size: 16px; }\
-      .card-list { padding: 10px 12px 100px; gap: 8px; }\
-      .card-body { flex-wrap: wrap; padding: 12px; gap: 6px 10px; }\
-      .card-icon { width: 36px; height: 36px; border-radius: 8px; }\
-      .card-icon .icon { width: 18px; height: 18px; }\
-      .card-title { font-size: 12px; }\
-      .card-action { order: 3; width: 30px; height: 30px; font-size: 18px; }\
-      .card-stamp { order: 4; flex-basis: 100%; flex-shrink: 1; text-align: left; padding-left: 46px; }\
-    }\
   </style>\
 </head>\
 <body>\
