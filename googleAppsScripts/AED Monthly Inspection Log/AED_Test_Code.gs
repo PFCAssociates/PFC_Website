@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.10g";
+var VERSION = "01.11g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -159,8 +159,7 @@ function buildFormHtml(opt_token) {
       --shadow-lg: 0 4px 20px rgba(0,0,0,.12);\
     }\
     * { box-sizing: border-box; margin: 0; padding: 0; }\
-    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--gray-100); color: var(--gray-900); -webkit-tap-highlight-color: transparent; }\
-    body { display: flex; flex-direction: column; overflow: hidden; }\
+    html, body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--gray-100); color: var(--gray-900); -webkit-tap-highlight-color: transparent; }\
 \
     /* ---- TOP BAR (title + config) ---- */\
     .topbar { background: #fff; border-bottom: 1px solid var(--gray-300); padding: 8px 16px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 14px; flex-shrink: 0; font-size: 12px; color: var(--gray-700); }\
@@ -188,7 +187,7 @@ function buildFormHtml(opt_token) {
     .month-nav .progress-text { font-size: 10px; color: var(--gray-500); margin-top: 2px; }\
 \
     /* ---- CARD LIST ---- */\
-    .card-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px 16px 100px; display: flex; flex-direction: column; gap: 6px; }\
+    .card-list { padding: 8px 16px 12px; display: flex; flex-direction: column; gap: 6px; }\
 \
     /* ---- INSPECTION CARD ---- */\
     .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); border: 1.5px solid var(--gray-200); overflow: hidden; transition: all .15s; flex-shrink: 0; }\
@@ -257,7 +256,7 @@ function buildFormHtml(opt_token) {
     .toast.on { opacity: 1; }\
 \
     /* ---- VERSION ---- */\
-    #gv { text-align: center; font-size: 11px; color: var(--gray-400); padding: 8px; position: fixed; bottom: 0; left: 0; right: 0; background: var(--gray-100); }\
+    #gv { text-align: center; font-size: 11px; color: var(--gray-400); padding: 8px; }\
 \
   </style>\
 </head>\
