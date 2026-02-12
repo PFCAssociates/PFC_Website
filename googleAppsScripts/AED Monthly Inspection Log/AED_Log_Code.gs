@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.53g";
+var VERSION = "01.54g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -258,6 +258,8 @@ function buildFormHtml(opt_token) {
     .confirm-btns .cb-cancel:hover{background:#bdbdbd}\
     .confirm-btns .cb-ok{background:#d32f2f;color:#fff}\
     .confirm-btns .cb-ok:hover{background:#b71c1c}\
+    .confirm-btns .cb-ok.confirm-green{background:#1565c0}\
+    .confirm-btns .cb-ok.confirm-green:hover{background:#0d47a1}\
     /* Checklist modal */\
     .checklist-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:11000;opacity:0;pointer-events:none;transition:opacity .15s}\
     .checklist-overlay.show{opacity:1;pointer-events:auto}\
@@ -372,7 +374,8 @@ function buildFormHtml(opt_token) {
     var _sav=0;\
     var _user=null;\
     var _gasToken=' + JSON.stringify(opt_token || "") + ';\
-    function showConfirm(msg){return new Promise(function(resolve){var m=document.getElementById("confirm-modal");document.getElementById("confirm-msg").textContent=msg;m.classList.add("show");document.getElementById("confirm-yes").onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById("confirm-no").onclick=function(){m.classList.remove("show");resolve(false)}})}\
+    var _colNames=' + JSON.stringify(COL_HEADERS) + ';\
+    function showConfirm(msg,okLabel){return new Promise(function(resolve){var m=document.getElementById("confirm-modal");document.getElementById("confirm-msg").textContent=msg;var yb=document.getElementById("confirm-yes");yb.textContent=okLabel||"Clear";yb.className=okLabel?"cb-ok confirm-green":"cb-ok";m.classList.add("show");yb.onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById("confirm-no").onclick=function(){m.classList.remove("show");resolve(false)}})}\
     function showChecklistModal(modalId,submitId,cancelId){return new Promise(function(resolve){var m=document.getElementById(modalId);var cbs=m.querySelectorAll("input[type=checkbox]");var sub=document.getElementById(submitId);for(var i=0;i<cbs.length;i++)cbs[i].checked=false;sub.disabled=true;function updBtn(){var all=true;for(var i=0;i<cbs.length;i++){if(!cbs[i].checked){all=false;break}}sub.disabled=!all}for(var i=0;i<cbs.length;i++)cbs[i].onchange=updBtn;m.classList.add("show");sub.onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById(cancelId).onclick=function(){m.classList.remove("show");resolve(false)}})}\
     function showChecklist(){return showChecklistModal("checklist-modal","cl-submit","cl-cancel")}\
     function showPpeChecklist(){return showChecklistModal("ppe-modal","ppe-submit","ppe-cancel")}\
@@ -530,7 +533,7 @@ function buildFormHtml(opt_token) {
         }else if(colIdx===3){\
           showPpeChecklist().then(function(ok){if(ok)doStamp(cell);});\
         }else{\
-          doStamp(cell);\
+          showConfirm(_colNames[colIdx],"Confirm").then(function(ok){if(ok)doStamp(cell);});\
         }\
       });\
     });\
