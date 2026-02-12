@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="build-version" content="01.00w">
+  <title>AED Inspection Log (Touch UI)</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    iframe { width: 100%; height: 100%; border: none; }
+    .splash {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 10000; display: none; align-items: center; justify-content: center;
+      flex-direction: column; transition: opacity 0.3s ease;
+    }
+    .splash .splash-title { color: #fff; font: bold 36px/1 sans-serif; margin-bottom: 20px; }
+    .splash img { max-width: 500px; max-height: 500px; }
+    #splash-green { background: #1b5e20; }
+    #splash-blue  { background: #0d47a1; }
+    #version-indicator {
+      position: fixed; bottom: 8px; right: 8px; z-index: 9999;
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(0,0,0,0.55); color: #ccc; padding: 4px 10px;
+      border-radius: 12px; font: 11px/1 monospace; user-select: none;
+      pointer-events: none; transition: all 0.3s ease;
+    }
+    #version-indicator .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #888; transition: background 0.3s ease;
+    }
+    #version-indicator .dot.checking { background: #ffa726; animation: pulse 0.6s infinite alternate; }
+    #version-indicator .dot.found    { background: #66bb6a; }
+    #version-indicator .dot.error    { background: #ef5350; }
+    @keyframes pulse { from { opacity: 1; } to { opacity: 0.4; } }
+    /* Auth wall */
+    .auth-wall {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #fff;
+      display: none; align-items: center; justify-content: center; z-index: 10000;
+      flex-direction: column; gap: 16px; text-align: center; padding: 20px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .auth-wall.show { display: flex; }
+    .auth-wall h2 { margin: 0; }
+    .auth-wall p { margin: 0; color: #666; max-width: 440px; line-height: 1.6; font-size: 14px; }
+    .auth-wall .auth-email { font-weight: bold; color: #222; }
+    .auth-wall .auth-btn {
+      display: inline-block; margin-top: 4px; padding: 10px 28px; border: none;
+      border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer;
+      color: #fff; text-decoration: none; transition: background 0.2s;
+    }
+    .auth-wall .auth-btn.signin { background: #1a73e8; }
+    .auth-wall .auth-btn.signin:hover { background: #1557b0; }
+    .auth-wall .auth-btn.switch { background: #f4511e; }
+    .auth-wall .auth-btn.switch:hover { background: #d63c0e; }
+    .auth-wall .auth-hint { font-size: 12px; color: #999; margin-top: 0; }
+    .auth-wall .auth-versions { font-size: 11px; color: #aaa; font-family: monospace; margin-top: 8px; }
+    .sign-out-btn {
+      position: fixed; top: 8px; right: 8px; z-index: 9999;
+      background: rgba(0,0,0,0.55); color: #ccc; padding: 4px 10px;
+      border-radius: 12px; font: 11px/1 monospace; cursor: pointer;
+      border: none; transition: all 0.2s; user-select: none;
+    }
+    .sign-out-btn:hover { background: rgba(211,47,47,0.8); color: #fff; }
+  </style>
+</head>
+<body>
+  <div id="auth-wall" class="auth-wall"></div>
+  <button id="sign-out-btn" class="sign-out-btn" style="display:none" onclick="signOut()">Sign Out</button>
+  <div id="splash-green" class="splash"><div class="splash-title">Website Ready</div><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
+  <div id="splash-blue" class="splash"><div class="splash-title">Code Ready</div><img src="https://www.shadowaisolutions.com/SAIS%20Logo.png" alt=""></div>
+  <iframe id="gas-app" allow="*"></iframe>
+  <script>
+    // Auto-refresh: set to false to disable build-version polling
+    var AUTO_REFRESH = true;
+    var SHOW_WEB_VERSION = true;
+
+    // AudioContext for sound playback
+    var _audioCtx = null;
+    function unlockAudio() {
+      if (!_audioCtx) {
+        _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var buf = _audioCtx.createBuffer(1, 1, 22050);
+        var src = _audioCtx.createBufferSource();
+        src.buffer = buf;
+        src.connect(_audioCtx.destination);
+        src.start(0);
+      }
+      if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    }
+    document.addEventListener('click', unlockAudio, { once: false });
+    document.addEventListener('touchstart', unlockAudio, { once: false });
+
+    function playSoundFromDataUrl(dataUrl) {
+      try {
+        var ctx = _audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') ctx.resume();
+        var base64 = dataUrl.split(',')[1];
+        var binary = atob(base64);
+        var bytes = new Uint8Array(binary.length);
+        for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        ctx.decodeAudioData(bytes.buffer, function(audioBuffer) {
+          var source = ctx.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(ctx.destination);
+          source.start(0);
+        });
+      } catch(e) {}
+    }
+
+    function cacheSound(url, key) {
+      if (localStorage.getItem(key)) return;
+      fetch(url).then(function(res) { return res.blob(); }).then(function(blob) {
+        var reader = new FileReader();
+        reader.onloadend = function() { localStorage.setItem(key, reader.result); };
+        reader.readAsDataURL(blob);
+      }).catch(function() {});
+    }
+    cacheSound('sounds/Website_Ready_Voice_1.mp3', 'web-sound-data');
+    cacheSound('sounds/Code_Ready_Voice_1.mp3', 'gas-sound-data');
+
+    // Show splash on update-triggered reloads
+    if (sessionStorage.getItem('gas-pending-sound')) {
+      sessionStorage.removeItem('gas-pending-sound');
+      if (navigator.vibrate) navigator.vibrate(200);
+      var reloadSource = sessionStorage.getItem('reload-source') || '';
+      sessionStorage.removeItem('reload-source');
+      var splash = null;
+      var soundData = null;
+      if (reloadSource === 'build-version') {
+        splash = document.getElementById('splash-green');
+        soundData = localStorage.getItem('web-sound-data');
+      } else if (reloadSource === 'gas') {
+        splash = document.getElementById('splash-blue');
+        soundData = localStorage.getItem('gas-sound-data');
+      }
+      if (soundData) playSoundFromDataUrl(soundData);
+      if (splash) {
+        splash.style.display = 'flex';
+        setTimeout(function() {
+          splash.style.opacity = '0';
+          setTimeout(function() { splash.style.display = 'none'; }, 300);
+        }, 1000);
+      }
+    }
+
+    // GIS sign-in
+    var _gisLoaded = false;
+    var _gasVersion = localStorage.getItem('gas-version-test') || '';
+    var _requireAuth = false;
+    // NOTE: Update this URL once the test GAS project has its own deployment
+    var _gasBaseUrl = '';
+    function loadGis(cb) {
+      if (_gisLoaded) { cb(); return; }
+      var s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = function() { _gisLoaded = true; cb(); };
+      document.head.appendChild(s);
+    }
+    function reloadIframe() {
+      var iframe = document.getElementById('gas-app');
+      var token = localStorage.getItem('gis-token') || '';
+      iframe.src = _gasBaseUrl + (token ? '&token=' + encodeURIComponent(token) : '');
+    }
+    function signOut() {
+      localStorage.removeItem('gis-token');
+      localStorage.removeItem('gis-email');
+      document.getElementById('sign-out-btn').style.display = 'none';
+      _requireAuth = true;
+      showAuthWall('not_signed_in', '');
+    }
+    // Initial load
+    if (_gasBaseUrl) {
+      reloadIframe();
+      if (!localStorage.getItem('gis-token')) {
+        _requireAuth = true;
+        showAuthWall('not_signed_in', '');
+      }
+    } else {
+      // No deployment URL yet — show a placeholder
+      document.getElementById('gas-app').style.display = 'none';
+      var notice = document.createElement('div');
+      notice.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;font-family:sans-serif;color:#666;font-size:16px;text-align:center;padding:20px;';
+      notice.innerHTML = '<div><h2 style="color:#1565c0;margin-bottom:12px">AED Touch UI — Test Page</h2><p>This page is ready. Set the <code>_gasBaseUrl</code> once the test GAS project is deployed.</p></div>';
+      document.body.appendChild(notice);
+    }
+    function triggerGisSignIn() {
+      loadGis(function() {
+        var client = google.accounts.oauth2.initTokenClient({
+          client_id: '1065458024858-fp9s8h7hiogq114ct4bnc4qhdof2r6j6.apps.googleusercontent.com',
+          scope: 'email profile',
+          callback: function(resp) {
+            if (resp && resp.access_token) {
+              localStorage.setItem('gis-token', resp.access_token);
+              fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { 'Authorization': 'Bearer ' + resp.access_token }
+              }).then(function(r) { return r.json(); }).then(function(info) {
+                if (info.email) localStorage.setItem('gis-email', info.email);
+              }).catch(function() {}).finally(function() {
+                document.getElementById('auth-wall').classList.remove('show');
+                document.getElementById('sign-out-btn').style.display = '';
+                reloadIframe();
+              });
+            }
+          }
+        });
+        client.requestAccessToken();
+      });
+    }
+    function showAuthWall(authStatus, email, gasVersion) {
+      var wall = document.getElementById('auth-wall');
+      if (gasVersion) { _gasVersion = gasVersion; localStorage.setItem('gas-version-test', gasVersion); }
+      var webVersion = (document.querySelector('meta[name="build-version"]') || {}).content || '';
+      var versions = '<p class="auth-versions">'
+        + (webVersion ? 'Web: v' + webVersion : '')
+        + (_gasVersion ? (webVersion ? ' &nbsp;|&nbsp; ' : '') + 'Code: ' + _gasVersion : '')
+        + '</p>';
+      var knownEmail = email || localStorage.getItem('gis-email') || '';
+      if (knownEmail) {
+        wall.innerHTML = '<h2 style="color:#d32f2f">Access Denied</h2>'
+          + '<p style="margin-bottom:4px">Currently signed in as:</p>'
+          + '<p><span class="auth-email">' + knownEmail + '</span></p>'
+          + '<p>This account does not have access to the inspection log spreadsheet.</p>'
+          + '<a class="auth-btn switch" href="#" onclick="triggerGisSignIn();return false;">Switch Google Account</a>'
+          + '<p class="auth-hint">Sign in with an account that has access, or ask your administrator to share the spreadsheet with you.</p>'
+          + versions;
+      } else {
+        wall.innerHTML = '<h2 style="color:#d32f2f">Sign-In Required</h2>'
+          + '<p style="margin-bottom:4px">Currently signed in as:</p>'
+          + '<p><span class="auth-email">No Google account detected</span></p>'
+          + '<p>You must sign into an authorized Google account to use this inspection log.</p>'
+          + '<a class="auth-btn signin" href="#" onclick="triggerGisSignIn();return false;">Sign In with Google</a>'
+          + '<p class="auth-hint">A Google sign-in popup will appear. This page will refresh automatically once you sign in.</p>'
+          + versions;
+      }
+      document.getElementById('sign-out-btn').style.display = 'none';
+      wall.classList.add('show');
+    }
+
+    window.addEventListener('message', function(e) {
+      if (!e.data) return;
+      if (e.data.type === 'gas-needs-auth') {
+        showAuthWall(e.data.authStatus, e.data.email, e.data.version);
+        return;
+      }
+      if (e.data.type === 'gas-auth-ok') {
+        if (e.data.version) {
+          _gasVersion = e.data.version; localStorage.setItem('gas-version-test', e.data.version);
+          var av = document.querySelector('.auth-versions');
+          if (av) {
+            var wv = (document.querySelector('meta[name="build-version"]') || {}).content || '';
+            av.innerHTML = (wv ? 'Web: v' + wv : '') + (wv ? ' &nbsp;|&nbsp; ' : '') + 'Code: ' + _gasVersion;
+          }
+        }
+        if (!_requireAuth) document.getElementById('sign-out-btn').style.display = '';
+        return;
+      }
+      if (e.data.type === 'manual-reload') {
+        window.location.reload();
+      }
+      if (e.data.type === 'gas-auth-complete') {
+        _requireAuth = false;
+        document.getElementById('auth-wall').classList.remove('show');
+        reloadIframe();
+        return;
+      }
+      if (e.data.type === 'gas-reload') {
+        var lastGasReload = parseInt(sessionStorage.getItem('gas-reload-time') || '0', 10);
+        if (Date.now() - lastGasReload < 30000) return;
+        sessionStorage.setItem('gas-reload-time', String(Date.now()));
+        sessionStorage.setItem('gas-pending-sound', '1');
+        sessionStorage.setItem('reload-source', 'gas');
+        window.location.reload();
+      }
+    });
+
+    // Auto-refresh: poll own HTML every 10s for build-version changes
+    (function() {
+      var POLL_INTERVAL = 10000;
+      var currentVersion = (document.querySelector('meta[name="build-version"]') || {}).content;
+      if (!currentVersion) return;
+      if (!AUTO_REFRESH) return;
+
+      var indicator = document.createElement('div');
+      indicator.id = 'version-indicator';
+      indicator.innerHTML = '<span class="dot"></span><span class="label">v' + currentVersion + '</span>';
+      if (SHOW_WEB_VERSION) document.body.appendChild(indicator);
+      var dot = indicator.querySelector('.dot');
+
+      function checkForUpdate() {
+        dot.className = 'dot checking';
+        fetch(window.location.href.split('?')[0] + '?_cb=' + Date.now(), { cache: 'no-store' })
+          .then(function(res) { return res.text(); })
+          .then(function(html) {
+            var match = html.match(/<meta\s+name="build-version"\s+content="([^"]+)"/);
+            if (match && match[1] !== currentVersion) {
+              dot.className = 'dot found';
+              indicator.querySelector('.label').textContent = 'Updating...';
+              sessionStorage.setItem('gas-pending-sound', '1');
+              sessionStorage.setItem('reload-source', 'build-version');
+              setTimeout(function() { window.location.reload(); }, 2000);
+            } else {
+              setTimeout(function() { dot.className = 'dot'; }, 800);
+              setTimeout(checkForUpdate, POLL_INTERVAL);
+            }
+          })
+          .catch(function() {
+            dot.className = 'dot error';
+            setTimeout(function() { dot.className = 'dot'; }, 2000);
+            setTimeout(checkForUpdate, POLL_INTERVAL);
+          });
+      }
+      setTimeout(checkForUpdate, POLL_INTERVAL);
+    })();
+
+    // Screen Wake Lock
+    var _wakeLock = null;
+    async function requestWakeLock() {
+      try {
+        if (navigator.wakeLock) {
+          _wakeLock = await navigator.wakeLock.request('screen');
+          _wakeLock.addEventListener('release', function() { _wakeLock = null; });
+        }
+      } catch(e) {}
+    }
+    requestWakeLock();
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible') requestWakeLock();
+    });
+  </script>
+</body>
+</html>
