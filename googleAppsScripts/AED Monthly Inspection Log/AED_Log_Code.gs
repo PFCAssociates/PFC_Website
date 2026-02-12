@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.59g";
+var VERSION = "01.60g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -509,7 +509,7 @@ function buildFormHtml(opt_token) {
         if(!_insCache[v]){\
           google.script.run.withSuccessHandler(function(d){\
             if(d&&d.inspections){ _insCache[v]=d.inspections; if(_yr===v) renderInspections(d.inspections); }\
-          }).getFormData(_gasToken);\
+          }).getFormData(_gasToken,v);\
         }\
       }\
     });\
@@ -592,7 +592,7 @@ function buildFormHtml(opt_token) {
  * Returns all form data: config + inspections for the current year + user info.
  * If the user is not signed in, returns {authorized:false}.
  */
-function getFormData(opt_token) {
+function getFormData(opt_token, opt_yearOverride) {
   var userInfo = getUserInfo(opt_token);
   if (userInfo.status !== "authorized") {
     return { authorized: false, authStatus: userInfo.status, email: userInfo.email || "", version: "v" + VERSION };
@@ -629,7 +629,7 @@ function getFormData(opt_token) {
     insSheet.appendRow(["year","month","secure","expiration","operation","ppe","electrodes","extra"]);
   }
   var inspections = {};
-  var yrSuffix = config.year_suffix || "";
+  var yrSuffix = opt_yearOverride || config.year_suffix || "";
   if (yrSuffix) {
     var insData = insSheet.getDataRange().getValues();
     for (var i = 1; i < insData.length; i++) {
