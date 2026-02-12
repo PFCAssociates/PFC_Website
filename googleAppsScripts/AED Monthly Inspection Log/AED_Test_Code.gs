@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.06g";
+var VERSION = "01.07g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -260,6 +260,25 @@ function buildFormHtml(opt_token) {
 \
     /* ---- VERSION ---- */\
     #gv { text-align: center; font-size: 11px; color: var(--gray-400); padding: 8px; position: fixed; bottom: 0; left: 0; right: 0; background: var(--gray-100); }\
+\
+    /* ---- RESPONSIVE ---- */\
+    @media (max-width: 480px) {\
+      .topbar { padding: 10px 12px; gap: 8px; }\
+      .topbar h1 { font-size: 14px; }\
+      .topbar .user-pill { font-size: 10px; padding: 3px 8px; max-width: 120px; }\
+      .config-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; padding: 6px 12px; }\
+      .config-bar .cfg-input { min-width: 40px; max-width: none; }\
+      .month-nav { padding: 8px 12px; gap: 6px; }\
+      .month-nav .nav-btn { width: 36px; height: 36px; }\
+      .month-nav .month-select { font-size: 16px; }\
+      .card-list { padding: 10px 12px 100px; gap: 8px; }\
+      .card-body { flex-wrap: wrap; padding: 12px; gap: 6px 10px; }\
+      .card-icon { width: 36px; height: 36px; border-radius: 8px; }\
+      .card-icon .icon { width: 18px; height: 18px; }\
+      .card-title { font-size: 12px; }\
+      .card-action { order: 3; width: 30px; height: 30px; font-size: 18px; }\
+      .card-stamp { order: 4; flex-basis: 100%; flex-shrink: 1; text-align: left; padding-left: 46px; }\
+    }\
   </style>\
 </head>\
 <body>\
