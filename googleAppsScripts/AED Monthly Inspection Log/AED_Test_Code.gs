@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.03g";
+var VERSION = "01.04g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -180,8 +180,11 @@ function buildFormHtml(opt_token) {
     .month-nav .nav-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--gray-300); background: #fff; font-size: 20px; color: var(--gray-700); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }\
     .month-nav .nav-btn:active { background: var(--gray-200); transform: scale(.92); }\
     .month-nav .month-info { flex: 1; text-align: center; }\
-    .month-nav .month-name { font-size: 20px; font-weight: 700; }\
-    .month-nav .month-year { font-size: 12px; color: var(--gray-500); margin-top: 2px; }\
+    .month-nav .month-select { font-size: 18px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); text-align: center; text-align-last: center; cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
+    .month-nav .month-select:focus { border-bottom-color: var(--blue); }\
+    .month-nav .year-row { font-size: 13px; color: var(--gray-500); margin-top: 4px; }\
+    .month-nav .year-row input { width: 28px; border: none; border-bottom: 1.5px solid var(--gray-300); font-size: 13px; font-weight: 600; text-align: center; outline: none; background: transparent; color: var(--gray-900); font-family: inherit; }\
+    .month-nav .year-row input:focus { border-bottom-color: var(--blue); }\
     .month-nav .progress-bar { height: 4px; background: var(--gray-200); border-radius: 2px; margin-top: 6px; overflow: hidden; }\
     .month-nav .progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .3s ease; }\
     .month-nav .progress-text { font-size: 10px; color: var(--gray-500); margin-top: 2px; }\
@@ -204,6 +207,7 @@ function buildFormHtml(opt_token) {
     .card-stamp { font-size: 11px; color: var(--gray-500); margin-top: 3px; }\
     .card-stamp .stamp-name { font-weight: 600; color: var(--blue); }\
     .card.completed .card-stamp .stamp-name { color: var(--green); }\
+    .card-stamp .stamp-date { font-size: 10px; color: var(--gray-500); margin-top: 1px; }\
     .card-action { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }\
     .card:not(.completed) .card-action { background: var(--blue); color: #fff; }\
     .card.completed .card-action { background: transparent; color: var(--green); font-size: 22px; }\
@@ -361,8 +365,8 @@ function buildFormHtml(opt_token) {
       <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>\
     </button>\
     <div class="month-info">\
-      <div class="month-name" id="month-name">January</div>\
-      <div class="month-year" id="month-year">2026</div>\
+      <select class="month-select" id="month-select"><option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option></select>\
+      <div class="year-row">Year: 20<input type="text" id="yr" maxlength="2" placeholder="__"></div>\
       <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>\
       <div class="progress-text" id="progress-text">0 / 6 completed</div>\
     </div>\
@@ -408,8 +412,7 @@ function updateProgress() {\
 }\
 \
 function renderCards() {\
-  document.getElementById("month-name").textContent = _months[_curMonth];\
-  document.getElementById("month-year").textContent = _yr ? "20" + _yr : "Year not set";\
+  document.getElementById("month-select").value = _curMonth;\
   var list = document.getElementById("card-list");\
   list.innerHTML = "";\
   for (var c = 0; c < 6; c++) {\
@@ -420,7 +423,7 @@ function renderCards() {\
     var parts = val ? val.split(" | ") : [];\
     var stampHtml = "";\
     if (val) {\
-      stampHtml = \'<div class="card-stamp"><span class="stamp-name">\' + (parts[0] || "") + \'</span>\' + (parts[1] ? " \\u2014 " + parts[1] : "") + \'</div>\';\
+      stampHtml = \'<div class="card-stamp"><div class="stamp-name">\' + (parts[0] || "") + \'</div>\' + (parts[1] ? \'<div class="stamp-date">\' + parts[1] + \'</div>\' : "") + \'</div>\';\
     }\
     var actionHtml = val\
       ? \'<div class="card-action">\\u2713</div>\'\
@@ -565,6 +568,19 @@ document.getElementById("next-btn").addEventListener("click", function() {\
   _curMonth = (_curMonth + 1) % 12;\
   renderCards();\
 });\
+document.getElementById("month-select").addEventListener("change", function() {\
+  _curMonth = parseInt(this.value);\
+  renderCards();\
+});\
+document.getElementById("yr").addEventListener("change", function() {\
+  var v = this.value.replace(/[^0-9]/g, "").substring(0, 2);\
+  this.value = v;\
+  if (v !== _yr) {\
+    _yr = v;\
+    savOn();\
+    google.script.run.withSuccessHandler(function() { savOff(); loadData(); }).withFailureHandler(savOff).saveConfig("year_suffix", v);\
+  }\
+});\
 \
 /* Swipe support */\
 var _touchStartX = 0;\
@@ -613,6 +629,7 @@ function loadData() {\
       try { window.top.postMessage({ type: "gas-auth-ok", version: d.version || "" }, "*"); } catch(e) {}\
       var cfg = d.config || {};\
       _yr = cfg.year_suffix || "";\
+      document.getElementById("yr").value = _yr;\
       document.getElementById("cfg-loc").value = cfg.aed_location || "";\
       document.getElementById("cfg-serial").value = cfg.serial_no || "";\
       document.getElementById("cfg-batt").value = cfg.battery_date || "";\
