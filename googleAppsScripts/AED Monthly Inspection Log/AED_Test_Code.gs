@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.04g";
+var VERSION = "01.05g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -195,7 +195,7 @@ function buildFormHtml(opt_token) {
     /* ---- INSPECTION CARD ---- */\
     .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); border: 1.5px solid var(--gray-200); overflow: hidden; transition: all .15s; }\
     .card.completed { border-color: var(--green-bg); }\
-    .card-body { padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; min-height: 72px; }\
+    .card-body { padding: 14px 16px; display: flex; align-items: flex-start; gap: 14px; cursor: pointer; min-height: 72px; }\
     .card-body:active { background: var(--gray-50); }\
     .card.completed .card-body { background: var(--green-light); }\
     .card.completed .card-body:active { background: var(--green-bg); }\
