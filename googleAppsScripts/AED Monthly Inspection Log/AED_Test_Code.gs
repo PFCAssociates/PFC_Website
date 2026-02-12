@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.30g";
+var VERSION = "01.31g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -627,8 +627,19 @@ _cardList.addEventListener("touchend", function(e) {\
   var dx = e.changedTouches[0].screenX - _touchStartX;\
   var dy = e.changedTouches[0].screenY - _touchStartY;\
   if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {\
-    if (dx < 0) { _curMonth = (_curMonth + 1) % 12; renderCards(); }\
-    else { _curMonth = (_curMonth - 1 + 12) % 12; renderCards(); }\
+    if (dx < 0) {\
+      if (_curMonth === 11) {\
+        if (_yr === _lastYr) return;\
+        _curMonth = 0;\
+        changeYear(String(parseInt(_yr || _firstYr) + 1));\
+      } else { _curMonth++; renderCards(); }\
+    } else {\
+      if (_curMonth === 0) {\
+        if (_yr === _firstYr) return;\
+        _curMonth = 11;\
+        changeYear(String(parseInt(_yr || _firstYr) - 1));\
+      } else { _curMonth--; renderCards(); }\
+    }\
   }\
 }, { passive: true });\
 \
