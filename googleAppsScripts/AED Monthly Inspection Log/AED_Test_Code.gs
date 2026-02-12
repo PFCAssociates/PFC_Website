@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.24g";
+var VERSION = "01.25g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -461,7 +461,6 @@ function showStampSheet(colIdx) {\
   return new Promise(function(resolve) {\
     document.getElementById("stamp-ok").onclick = function() { overlay.classList.remove("show"); doStamp(colIdx); };\
     document.getElementById("stamp-cancel").onclick = function() { overlay.classList.remove("show"); };\
-    overlay.addEventListener("click", function handler(e) { if (e.target === overlay) { overlay.classList.remove("show"); overlay.removeEventListener("click", handler); } });\
   });\
 }\
 \
@@ -473,7 +472,6 @@ function showClearSheet(colIdx) {\
   overlay.classList.add("show");\
   document.getElementById("clear-ok").onclick = function() { overlay.classList.remove("show"); doClear(colIdx); };\
   document.getElementById("clear-cancel").onclick = function() { overlay.classList.remove("show"); };\
-  overlay.addEventListener("click", function handler(e) { if (e.target === overlay) { overlay.classList.remove("show"); overlay.removeEventListener("click", handler); } });\
 }\
 \
 function setupChecklist(sheetId, bodyId, submitId, cancelId, subtitleId, subtitle, count, onSubmit) {\
@@ -509,7 +507,6 @@ function setupChecklist(sheetId, bodyId, submitId, cancelId, subtitleId, subtitl
   overlay.classList.add("show");\
   submit.onclick = function() { overlay.classList.remove("show"); onSubmit(); };\
   document.getElementById(cancelId).onclick = function() { overlay.classList.remove("show"); };\
-  overlay.addEventListener("click", function handler(e) { if (e.target === overlay) { overlay.classList.remove("show"); overlay.removeEventListener("click", handler); } });\
 }\
 \
 function showOpChecklist(colIdx) {\
