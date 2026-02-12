@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.21g";
+var VERSION = "01.22g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -559,13 +559,29 @@ function doClear(colIdx) {\
 }\
 \
 /* ---- Month Navigation ---- */\
+function changeYear(newVal) {\
+  var sel = document.getElementById("yr");\
+  for (var i = 0; i < sel.options.length; i++) {\
+    if (sel.options[i].value === newVal) { sel.value = newVal; sel.dispatchEvent(new Event("change")); return; }\
+  }\
+}\
 document.getElementById("prev-btn").addEventListener("click", function() {\
-  _curMonth = (_curMonth - 1 + 12) % 12;\
-  renderCards();\
+  if (_curMonth === 0) {\
+    _curMonth = 11;\
+    changeYear(String(parseInt(_yr || "26") - 1));\
+  } else {\
+    _curMonth--;\
+    renderCards();\
+  }\
 });\
 document.getElementById("next-btn").addEventListener("click", function() {\
-  _curMonth = (_curMonth + 1) % 12;\
-  renderCards();\
+  if (_curMonth === 11) {\
+    _curMonth = 0;\
+    changeYear(String(parseInt(_yr || "26") + 1));\
+  } else {\
+    _curMonth++;\
+    renderCards();\
+  }\
 });\
 document.getElementById("month-select").addEventListener("change", function() {\
   _curMonth = parseInt(this.value);\
