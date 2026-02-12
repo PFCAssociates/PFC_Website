@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.13g";
+var VERSION = "01.14g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -164,7 +164,8 @@ function buildFormHtml(opt_token) {
     /* ---- TOP BAR (title + config) ---- */\
     .topbar { background: #fff; border-bottom: 1px solid var(--gray-300); padding: 8px 16px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 14px; flex-shrink: 0; font-size: 12px; color: var(--gray-700); }\
     .topbar h1 { font-size: 15px; font-weight: 700; color: var(--gray-900); }\
-    .topbar .user-pill { display: none; }\
+    .topbar .user-pill { display: none; background: var(--blue-light); color: var(--blue); font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; margin-left: auto; margin-right: 70px; }\
+    .topbar .user-pill.show { display: block; }\
     .cfg-item { display: flex; align-items: center; gap: 4px; }\
     .cfg-label { font-weight: 600; color: var(--gray-900); white-space: nowrap; }\
     .cfg-input { border: none; border-bottom: 1.5px solid var(--gray-300); background: transparent; font-size: 12px; color: var(--gray-700); padding: 2px 4px; outline: none; min-width: 50px; max-width: 120px; font-family: inherit; }\
@@ -178,7 +179,7 @@ function buildFormHtml(opt_token) {
     .month-nav .month-year-row { display: flex; align-items: baseline; justify-content: center; gap: 12px; }\
     .month-nav .month-select { font-size: 18px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); text-align: center; text-align-last: center; cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
     .month-nav .month-select:focus { border-bottom-color: var(--blue); }\
-    .month-nav .year-select { font-size: 14px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); text-align: center; text-align-last: center; cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
+    .month-nav .year-select { font-size: 18px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); text-align: center; text-align-last: center; cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
     .month-nav .year-select:focus { border-bottom-color: var(--blue); }\
     .month-nav .progress-bar { height: 4px; background: var(--gray-200); border-radius: 2px; margin-top: 6px; overflow: hidden; }\
     .month-nav .progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .3s ease; }\
