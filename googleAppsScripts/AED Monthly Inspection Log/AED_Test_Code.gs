@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.20g";
+var VERSION = "01.21g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -380,6 +380,7 @@ var _yr = "";\
 var _curMonth = new Date().getMonth();\
 var _user = null;\
 var _inspections = {};\
+var _insCache = {};\
 var _savCount = 0;\
 \
 var _icons = [\
@@ -526,6 +527,7 @@ function doStamp(colIdx) {\
     .withSuccessHandler(function(stampValue) {\
       savOff();\
       _inspections[_curMonth + "_" + colIdx] = stampValue;\
+      if (_yr) _insCache[_yr] = _inspections;\
       renderCards();\
     })\
     .withFailureHandler(function(err) {\
@@ -545,6 +547,7 @@ function doClear(colIdx) {\
     .withSuccessHandler(function() {\
       savOff();\
       _inspections[_curMonth + "_" + colIdx] = "";\
+      if (_yr) _insCache[_yr] = _inspections;\
       renderCards();\
     })\
     .withFailureHandler(function(err) {\
@@ -572,13 +575,14 @@ document.getElementById("yr").addEventListener("change", function() {\
   var v = this.value;\
   if (v !== _yr) {\
     _yr = v;\
-    _inspections = {};\
+    _inspections = _insCache[v] || {};\
     renderCards();\
-    google.script.run.withSuccessHandler(function() {\
+    google.script.run.saveConfig("year_suffix", v);\
+    if (!_insCache[v]) {\
       google.script.run.withSuccessHandler(function(d) {\
-        if (d && d.inspections) { _inspections = d.inspections; renderCards(); }\
+        if (d && d.inspections) { _insCache[v] = d.inspections; if (_yr === v) { _inspections = d.inspections; renderCards(); } }\
       }).getFormData(_token);\
-    }).saveConfig("year_suffix", v);\
+    }\
   }\
 });\
 \
@@ -635,6 +639,7 @@ function loadData() {\
       document.getElementById("cfg-batt").value = cfg.battery_date || "";\
       document.getElementById("cfg-pad").value = cfg.pad_expiration || "";\
       _inspections = d.inspections || {};\
+      if (_yr) _insCache[_yr] = _inspections;\
       renderCards();\
       if (d.version) document.getElementById("gv").textContent = d.version;\
       document.getElementById("loading").classList.add("off");\

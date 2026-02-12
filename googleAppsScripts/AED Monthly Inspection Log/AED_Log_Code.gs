@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.58g";
+var VERSION = "01.59g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -374,6 +374,7 @@ function buildFormHtml(opt_token) {
   </div>\
   <script>\
     var _yr="";\
+    var _insCache={};\
     var _sav=0;\
     var _user=null;\
     var _gasToken=' + JSON.stringify(opt_token || "") + ';\
@@ -423,6 +424,7 @@ function buildFormHtml(opt_token) {
               sOff();\
               cell.classList.remove("stamping");\
               renderCell(cell,"");\
+              if(_yr&&_insCache[_yr]){ var k=cell.getAttribute("data-m")+"_"+cell.getAttribute("data-c"); delete _insCache[_yr][k]; }\
             })\
             .withFailureHandler(function(err){\
               sOff();\
@@ -473,13 +475,18 @@ function buildFormHtml(opt_token) {
       document.getElementById("pad_expiration").value=cfg.pad_expiration||"";\
       _yr=cfg.year_suffix||"";\
       var ins=d.inspections||{};\
+      if(_yr) _insCache[_yr]=ins;\
+      renderInspections(ins);\
+      if(d.version)document.getElementById("gv").textContent=d.version;\
+    }\
+\
+    function renderInspections(ins){\
       var cells=document.querySelectorAll(".init-cell");\
       for(var i=0;i<cells.length;i++){\
         var c=cells[i];\
         var k=c.getAttribute("data-m")+"_"+c.getAttribute("data-c");\
         renderCell(c,ins[k]||"");\
       }\
-      if(d.version)document.getElementById("gv").textContent=d.version;\
     }\
 \
     /* Config field auto-save */\
@@ -497,11 +504,13 @@ function buildFormHtml(opt_token) {
       this.value=v;\
       if(v!==_yr){\
         _yr=v;\
-        var cells=document.querySelectorAll(".init-cell");\
-        for(var i=0;i<cells.length;i++) renderCell(cells[i],"");\
-        google.script.run.withSuccessHandler(function(){\
-          google.script.run.withSuccessHandler(function(d){ if(d&&d.inspections){ var ins=d.inspections; var cells2=document.querySelectorAll(".init-cell"); for(var i=0;i<cells2.length;i++){ var c=cells2[i]; var k=c.getAttribute("data-m")+"_"+c.getAttribute("data-c"); renderCell(c,ins[k]||""); } } }).getFormData(_gasToken);\
-        }).saveConfig("year_suffix",v);\
+        renderInspections(_insCache[v]||{});\
+        google.script.run.saveConfig("year_suffix",v);\
+        if(!_insCache[v]){\
+          google.script.run.withSuccessHandler(function(d){\
+            if(d&&d.inspections){ _insCache[v]=d.inspections; if(_yr===v) renderInspections(d.inspections); }\
+          }).getFormData(_gasToken);\
+        }\
       }\
     });\
 \
@@ -514,6 +523,7 @@ function buildFormHtml(opt_token) {
           sOff();\
           cell.classList.remove("stamping");\
           renderCell(cell,stampValue);\
+          if(_yr&&_insCache[_yr]){ var k=cell.getAttribute("data-m")+"_"+cell.getAttribute("data-c"); _insCache[_yr][k]=stampValue; }\
         })\
         .withFailureHandler(function(err){\
           sOff();\
