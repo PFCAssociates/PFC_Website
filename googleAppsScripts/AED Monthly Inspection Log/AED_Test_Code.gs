@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.01g";
+var VERSION = "01.02g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -210,12 +210,12 @@ function buildFormHtml(opt_token) {
     /* ---- SVG ICONS (inline) ---- */\
     .icon { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }\
 \
-    /* ---- BOTTOM SHEET (confirmation / checklist) ---- */\
-    .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 10000; opacity: 0; pointer-events: none; transition: opacity .2s; }\
+    /* ---- MODAL (confirmation / checklist) ---- */\
+    .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 10000; opacity: 0; pointer-events: none; transition: opacity .2s; display: flex; align-items: center; justify-content: center; }\
     .sheet-overlay.show { opacity: 1; pointer-events: auto; }\
-    .sheet { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 16px 16px 0 0; z-index: 10001; transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); max-height: 85vh; overflow-y: auto; }\
-    .sheet-overlay.show .sheet { transform: translateY(0); }\
-    .sheet-handle { width: 36px; height: 4px; background: var(--gray-300); border-radius: 2px; margin: 10px auto 0; }\
+    .sheet { background: #fff; border-radius: 16px; width: 90%; max-width: 420px; max-height: 85vh; overflow-y: auto; transform: scale(.9); opacity: 0; transition: transform .25s cubic-bezier(.32,.72,0,1), opacity .2s; box-shadow: var(--shadow-lg); }\
+    .sheet-overlay.show .sheet { transform: scale(1); opacity: 1; }\
+    .sheet-handle { display: none; }\
     .sheet-header { padding: 16px 20px 8px; text-align: center; }\
     .sheet-header h3 { font-size: 17px; font-weight: 700; }\
     .sheet-header .sheet-subtitle { font-size: 13px; color: var(--blue); font-weight: 600; margin-top: 4px; }\
