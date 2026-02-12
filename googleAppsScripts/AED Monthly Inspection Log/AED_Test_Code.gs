@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.28g";
+var VERSION = "01.29g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -44,8 +44,8 @@ var MONTHS = ["January","February","March","April","May","June",
 var COL_HEADERS = [
   "AED secure in case, with no cracks, broken parts or damage",
   "Expiration dates checked on pads and batteries",
-  "AED Operation Verified *(see below for list)",
-  "PPE/Ready Kit Stocked and in place **(see below for list)",
+  "AED Operation Verified *(click for list)",
+  "PPE/Ready Kit Stocked and in place **(click for list)",
   "Electrodes in place",
   "Extra sets of electrodes are sealed in their package"
 ];
@@ -206,7 +206,7 @@ function buildFormHtml(opt_token) {
     .card.completed .card-stamp .stamp-name { color: var(--green); }\
     .card-stamp .stamp-date { font-size: 10px; color: var(--gray-500); margin-top: 1px; }\
     .card-action { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }\
-    .card:not(.completed) .card-action { background: #90caf9; color: #fff; }\
+    .card:not(.completed) .card-action { background: #bbdefb; color: #fff; }\
     .card.completed .card-action { background: transparent; color: var(--green); font-size: 22px; }\
     .card.stamping { opacity: .6; pointer-events: none; }\
 \
