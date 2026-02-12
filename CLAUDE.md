@@ -50,6 +50,12 @@
   5. If the returned version differs from the version displayed in `#gv`, it sends a `gas-reload` postMessage to the parent embedding page
   6. The embedding page (e.g. `aedlog.html`) receives the message, sets session storage flags, reloads, and shows the blue "Code Ready" splash
 
+## Race Conditions — Config vs. Data Fetch
+- **Never fire `saveConfig` and a dependent data-fetch (`getFormData`) in parallel** — the data-fetch may read stale config values from the sheet
+- When the client switches a config value (e.g. year) and needs fresh data for that value, **pass the value directly as a parameter** to the server function (e.g. `getFormData(_token, year)`) rather than relying on `saveConfig` completing first
+- Server functions that read config should accept optional override parameters (e.g. `opt_yearOverride`) so the client can bypass the saved config when needed
+- This pattern avoids race conditions without needing to chain callbacks (which adds latency)
+
 ## API Call Optimization (Scaling Goal)
 - **Minimize Google API calls** in every GAS function — the app is designed to scale to many users
 - **Cache `getUserInfo` results** in `CacheService` (keyed by token suffix) for 5 minutes to avoid hitting the OAuth userinfo endpoint on every `google.script.run` call
