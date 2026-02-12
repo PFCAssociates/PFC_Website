@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.00w">
+  <meta name="build-version" content="01.01w">
   <title>AED Inspection Log (Touch UI)</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -148,7 +148,7 @@
     var _gasVersion = localStorage.getItem('gas-version-test') || '';
     var _requireAuth = false;
     // NOTE: Update this URL once the test GAS project has its own deployment
-    var _gasBaseUrl = '';
+    var _gasBaseUrl = 'https://script.google.com/macros/s/AKfycbwaSHfUXawOQnQFFIfyL0imXFwvP09aSchvIYg4FQaQLw7KIA-s_LXa0YTdkbPyrwhk/exec?embedded=1';
     function loadGis(cb) {
       if (_gisLoaded) { cb(); return; }
       var s = document.createElement('script');

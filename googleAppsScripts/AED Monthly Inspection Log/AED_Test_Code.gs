@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.00g";
+var VERSION = "01.01g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -34,7 +34,7 @@ var GITHUB_BRANCH    = "main";
 var FILE_PATH        = "googleAppsScripts/AED Monthly Inspection Log/AED_Test_Code.gs";
 
 // Apps Script Deployment (will need its own deployment ID once deployed)
-var DEPLOYMENT_ID    = "";
+var DEPLOYMENT_ID    = "AKfycbwaSHfUXawOQnQFFIfyL0imXFwvP09aSchvIYg4FQaQLw7KIA-s_LXa0YTdkbPyrwhk";
 
 var EMBED_PAGE_URL   = "https://pfcassociates.github.io/PFC_Website/testaed.html";
 
