@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.15g";
+var VERSION = "01.16g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -215,7 +215,7 @@ function buildFormHtml(opt_token) {
     /* ---- MODAL (confirmation / checklist) ---- */\
     .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 10000; opacity: 0; pointer-events: none; transition: opacity .2s; display: flex; align-items: center; justify-content: center; }\
     .sheet-overlay.show { opacity: 1; pointer-events: auto; }\
-    .sheet { background: #fff; border-radius: 16px; width: 90%; max-width: 420px; max-height: 85vh; overflow-y: auto; transform: scale(.9); opacity: 0; transition: transform .25s cubic-bezier(.32,.72,0,1), opacity .2s; box-shadow: var(--shadow-lg); }\
+    .sheet { background: #fff; border-radius: 16px; width: 90%; max-width: 630px; max-height: 85vh; overflow-y: auto; transform: scale(.9); opacity: 0; transition: transform .25s cubic-bezier(.32,.72,0,1), opacity .2s; box-shadow: var(--shadow-lg); }\
     .sheet-overlay.show .sheet { transform: scale(1); opacity: 1; }\
     .sheet-handle { display: none; }\
     .sheet-header { padding: 16px 20px 8px; text-align: center; }\
