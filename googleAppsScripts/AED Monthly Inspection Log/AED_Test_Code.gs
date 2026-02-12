@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.08g";
+var VERSION = "01.09g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -169,10 +169,10 @@ function buildFormHtml(opt_token) {
     .topbar .user-pill.show { display: block; }\
 \
     /* ---- CONFIG BAR ---- */\
-    .config-bar { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 8px 16px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--gray-700); flex-shrink: 0; }\
+    .config-bar { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--gray-700); flex-shrink: 0; }\
     .config-bar .cfg-item { display: flex; align-items: center; gap: 4px; }\
-    .config-bar .cfg-label { font-weight: 600; color: var(--gray-900); white-space: nowrap; }\
-    .config-bar .cfg-input { border: none; border-bottom: 1.5px solid var(--gray-300); background: transparent; font-size: 12px; color: var(--gray-700); padding: 2px 4px; outline: none; flex: 1; font-family: inherit; }\
+    .config-bar .cfg-label { font-weight: 600; color: var(--gray-900); }\
+    .config-bar .cfg-input { border: none; border-bottom: 1.5px solid var(--gray-300); background: transparent; font-size: 12px; color: var(--gray-700); padding: 2px 4px; outline: none; min-width: 60px; max-width: 140px; font-family: inherit; }\
     .config-bar .cfg-input:focus { border-bottom-color: var(--blue); }\
 \
     /* ---- MONTH NAVIGATION ---- */\
@@ -193,7 +193,7 @@ function buildFormHtml(opt_token) {
     .card-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 16px 100px; display: flex; flex-direction: column; gap: 10px; }\
 \
     /* ---- INSPECTION CARD ---- */\
-    .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); border: 1.5px solid var(--gray-200); overflow: hidden; transition: all .15s; }\
+    .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); border: 1.5px solid var(--gray-200); overflow: hidden; transition: all .15s; flex-shrink: 0; }\
     .card.completed { border-color: var(--green-bg); }\
     .card-body { padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; min-height: 72px; }\
     .card-body:active { background: var(--gray-50); }\
