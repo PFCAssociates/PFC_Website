@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.18g";
+var VERSION = "01.19g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -572,8 +572,9 @@ document.getElementById("yr").addEventListener("change", function() {\
   var v = this.value;\
   if (v !== _yr) {\
     _yr = v;\
+    renderCards();\
     savOn();\
-    google.script.run.withSuccessHandler(function() { savOff(); loadData(); }).withFailureHandler(savOff).saveConfig("year_suffix", v);\
+    google.script.run.withSuccessHandler(savOff).withFailureHandler(savOff).saveConfig("year_suffix", v);\
   }\
 });\
 \
