@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.12g";
+var VERSION = "01.13g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -178,9 +178,8 @@ function buildFormHtml(opt_token) {
     .month-nav .month-year-row { display: flex; align-items: baseline; justify-content: center; gap: 12px; }\
     .month-nav .month-select { font-size: 18px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); text-align: center; text-align-last: center; cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
     .month-nav .month-select:focus { border-bottom-color: var(--blue); }\
-    .month-nav .year-row { font-size: 13px; color: var(--gray-500); }\
-    .month-nav .year-row input { width: 28px; border: none; border-bottom: 1.5px solid var(--gray-300); font-size: 13px; font-weight: 600; text-align: center; outline: none; background: transparent; color: var(--gray-900); font-family: inherit; }\
-    .month-nav .year-row input:focus { border-bottom-color: var(--blue); }\
+    .month-nav .year-select { font-size: 14px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); text-align: center; text-align-last: center; cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
+    .month-nav .year-select:focus { border-bottom-color: var(--blue); }\
     .month-nav .progress-bar { height: 4px; background: var(--gray-200); border-radius: 2px; margin-top: 6px; overflow: hidden; }\
     .month-nav .progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .3s ease; }\
     .month-nav .progress-text { font-size: 10px; color: var(--gray-500); margin-top: 2px; }\
@@ -361,7 +360,7 @@ function buildFormHtml(opt_token) {
     </button>\
     <div class="month-info">\
       <div class="month-year-row"><select class="month-select" id="month-select"><option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option></select>\
-      <span class="year-row">20<input type="text" id="yr" maxlength="2" placeholder="__"></span></div>\
+      <select class="year-select" id="yr"><option value="">Year</option><option value="26">2026</option><option value="27">2027</option><option value="28">2028</option><option value="29">2029</option><option value="30">2030</option><option value="31">2031</option><option value="32">2032</option><option value="33">2033</option><option value="34">2034</option><option value="35">2035</option><option value="36">2036</option></select></div>\
       <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>\
       <div class="progress-text" id="progress-text">0 / 6 completed</div>\
     </div>\
@@ -569,8 +568,7 @@ document.getElementById("month-select").addEventListener("change", function() {\
   renderCards();\
 });\
 document.getElementById("yr").addEventListener("change", function() {\
-  var v = this.value.replace(/[^0-9]/g, "").substring(0, 2);\
-  this.value = v;\
+  var v = this.value;\
   if (v !== _yr) {\
     _yr = v;\
     savOn();\
