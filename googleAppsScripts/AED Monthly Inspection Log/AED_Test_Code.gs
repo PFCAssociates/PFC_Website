@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.09g";
+var VERSION = "01.10g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -162,27 +162,25 @@ function buildFormHtml(opt_token) {
     html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--gray-100); color: var(--gray-900); -webkit-tap-highlight-color: transparent; }\
     body { display: flex; flex-direction: column; overflow: hidden; }\
 \
-    /* ---- TOP BAR ---- */\
-    .topbar { background: #fff; border-bottom: 1px solid var(--gray-300); padding: 12px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }\
-    .topbar h1 { font-size: 16px; font-weight: 700; flex: 1; }\
-    .topbar .user-pill { display: none; background: var(--blue-light); color: var(--blue); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }\
+    /* ---- TOP BAR (title + config) ---- */\
+    .topbar { background: #fff; border-bottom: 1px solid var(--gray-300); padding: 8px 16px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 14px; flex-shrink: 0; font-size: 12px; color: var(--gray-700); }\
+    .topbar h1 { font-size: 15px; font-weight: 700; color: var(--gray-900); }\
+    .topbar .user-pill { display: none; background: var(--blue-light); color: var(--blue); font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; margin-left: auto; }\
     .topbar .user-pill.show { display: block; }\
-\
-    /* ---- CONFIG BAR ---- */\
-    .config-bar { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--gray-700); flex-shrink: 0; }\
-    .config-bar .cfg-item { display: flex; align-items: center; gap: 4px; }\
-    .config-bar .cfg-label { font-weight: 600; color: var(--gray-900); }\
-    .config-bar .cfg-input { border: none; border-bottom: 1.5px solid var(--gray-300); background: transparent; font-size: 12px; color: var(--gray-700); padding: 2px 4px; outline: none; min-width: 60px; max-width: 140px; font-family: inherit; }\
-    .config-bar .cfg-input:focus { border-bottom-color: var(--blue); }\
+    .cfg-item { display: flex; align-items: center; gap: 4px; }\
+    .cfg-label { font-weight: 600; color: var(--gray-900); white-space: nowrap; }\
+    .cfg-input { border: none; border-bottom: 1.5px solid var(--gray-300); background: transparent; font-size: 12px; color: var(--gray-700); padding: 2px 4px; outline: none; min-width: 50px; max-width: 120px; font-family: inherit; }\
+    .cfg-input:focus { border-bottom-color: var(--blue); }\
 \
     /* ---- MONTH NAVIGATION ---- */\
     .month-nav { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 10px 16px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }\
     .month-nav .nav-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--gray-300); background: #fff; font-size: 20px; color: var(--gray-700); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }\
     .month-nav .nav-btn:active { background: var(--gray-200); transform: scale(.92); }\
     .month-nav .month-info { flex: 1; text-align: center; }\
+    .month-nav .month-year-row { display: flex; align-items: baseline; justify-content: center; gap: 12px; }\
     .month-nav .month-select { font-size: 18px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); text-align: center; text-align-last: center; cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
     .month-nav .month-select:focus { border-bottom-color: var(--blue); }\
-    .month-nav .year-row { font-size: 13px; color: var(--gray-500); margin-top: 4px; }\
+    .month-nav .year-row { font-size: 13px; color: var(--gray-500); }\
     .month-nav .year-row input { width: 28px; border: none; border-bottom: 1.5px solid var(--gray-300); font-size: 13px; font-weight: 600; text-align: center; outline: none; background: transparent; color: var(--gray-900); font-family: inherit; }\
     .month-nav .year-row input:focus { border-bottom-color: var(--blue); }\
     .month-nav .progress-bar { height: 4px; background: var(--gray-200); border-radius: 2px; margin-top: 6px; overflow: hidden; }\
@@ -190,16 +188,16 @@ function buildFormHtml(opt_token) {
     .month-nav .progress-text { font-size: 10px; color: var(--gray-500); margin-top: 2px; }\
 \
     /* ---- CARD LIST ---- */\
-    .card-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 16px 100px; display: flex; flex-direction: column; gap: 10px; }\
+    .card-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px 16px 100px; display: flex; flex-direction: column; gap: 6px; }\
 \
     /* ---- INSPECTION CARD ---- */\
     .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); border: 1.5px solid var(--gray-200); overflow: hidden; transition: all .15s; flex-shrink: 0; }\
     .card.completed { border-color: var(--green-bg); }\
-    .card-body { padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; min-height: 72px; }\
+    .card-body { padding: 8px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; min-height: 48px; }\
     .card-body:active { background: var(--gray-50); }\
     .card.completed .card-body { background: var(--green-light); }\
     .card.completed .card-body:active { background: var(--green-bg); }\
-    .card-icon { width: 44px; height: 44px; border-radius: 10px; background: var(--blue-light); color: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }\
+    .card-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--blue-light); color: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }\
     .card.completed .card-icon { background: var(--green-bg); color: var(--green); }\
     .card-content { flex: 1; min-width: 0; }\
     .card-title { font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--gray-900); }\
@@ -208,7 +206,7 @@ function buildFormHtml(opt_token) {
     .card-stamp .stamp-name { font-weight: 600; color: var(--blue); }\
     .card.completed .card-stamp .stamp-name { color: var(--green); }\
     .card-stamp .stamp-date { font-size: 10px; color: var(--gray-500); margin-top: 1px; }\
-    .card-action { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }\
+    .card-action { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }\
     .card:not(.completed) .card-action { background: var(--blue); color: #fff; }\
     .card.completed .card-action { background: transparent; color: var(--green); font-size: 22px; }\
     .card.stamping { opacity: .6; pointer-events: none; }\
@@ -351,23 +349,21 @@ function buildFormHtml(opt_token) {
   </div>\
 \
   <!-- MAIN LAYOUT -->\
-  <div class="topbar">\
+  <div class="topbar" id="config-bar">\
     <h1>AED Inspection</h1>\
-    <div class="user-pill" id="user-pill"></div>\
-  </div>\
-  <div class="config-bar" id="config-bar">\
     <div class="cfg-item"><span class="cfg-label">Location:</span><input class="cfg-input" id="cfg-loc" type="text" placeholder="—"></div>\
     <div class="cfg-item"><span class="cfg-label">Serial:</span><input class="cfg-input" id="cfg-serial" type="text" placeholder="—"></div>\
     <div class="cfg-item"><span class="cfg-label">Battery Exp:</span><input class="cfg-input" id="cfg-batt" type="text" placeholder="—"></div>\
     <div class="cfg-item"><span class="cfg-label">Pad Exp:</span><input class="cfg-input" id="cfg-pad" type="text" placeholder="—"></div>\
+    <div class="user-pill" id="user-pill"></div>\
   </div>\
   <div class="month-nav">\
     <button class="nav-btn" id="prev-btn" aria-label="Previous month">\
       <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>\
     </button>\
     <div class="month-info">\
-      <select class="month-select" id="month-select"><option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option></select>\
-      <div class="year-row">Year: 20<input type="text" id="yr" maxlength="2" placeholder="__"></div>\
+      <div class="month-year-row"><select class="month-select" id="month-select"><option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option></select>\
+      <span class="year-row">20<input type="text" id="yr" maxlength="2" placeholder="__"></span></div>\
       <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>\
       <div class="progress-text" id="progress-text">0 / 6 completed</div>\
     </div>\
