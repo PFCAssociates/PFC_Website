@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.16g";
+var VERSION = "01.17g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -171,19 +171,17 @@ function buildFormHtml(opt_token) {
     .cfg-input { border: none; border-bottom: 1.5px solid var(--gray-300); background: transparent; font-size: 12px; color: var(--gray-700); padding: 2px 4px; outline: none; min-width: 50px; max-width: 120px; font-family: inherit; }\
     .cfg-input:focus { border-bottom-color: var(--blue); }\
 \
-    /* ---- MONTH NAVIGATION ---- */\
-    .month-nav { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 10px 16px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }\
-    .month-nav .nav-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--gray-300); background: #fff; font-size: 20px; color: var(--gray-700); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }\
-    .month-nav .nav-btn:active { background: var(--gray-200); transform: scale(.92); }\
-    .month-nav .month-info { flex: 1; text-align: center; }\
-    .month-nav .month-year-row { display: flex; align-items: baseline; justify-content: center; gap: 12px; }\
-    .month-nav .month-select { font-size: 18px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); text-align: center; text-align-last: center; cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
-    .month-nav .month-select:focus { border-bottom-color: var(--blue); }\
-    .month-nav .year-select { font-size: 18px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); text-align: center; text-align-last: center; cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
-    .month-nav .year-select:focus { border-bottom-color: var(--blue); }\
-    .month-nav .progress-bar { height: 4px; background: var(--gray-200); border-radius: 2px; margin-top: 6px; overflow: hidden; }\
-    .month-nav .progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .3s ease; }\
-    .month-nav .progress-text { font-size: 10px; color: var(--gray-500); margin-top: 2px; }\
+    /* ---- MONTH / YEAR NAV (inside topbar) ---- */\
+    .topbar .nav-btn { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--gray-300); background: #fff; font-size: 16px; color: var(--gray-700); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }\
+    .topbar .nav-btn:active { background: var(--gray-200); transform: scale(.92); }\
+    .topbar .month-select { font-size: 14px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
+    .topbar .month-select:focus { border-bottom-color: var(--blue); }\
+    .topbar .year-select { font-size: 14px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
+    .topbar .year-select:focus { border-bottom-color: var(--blue); }\
+    .progress-row { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 4px 16px 6px; }\
+    .progress-row .progress-bar { height: 4px; background: var(--gray-200); border-radius: 2px; overflow: hidden; }\
+    .progress-row .progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .3s ease; }\
+    .progress-row .progress-text { font-size: 10px; color: var(--gray-500); margin-top: 2px; text-align: center; }\
 \
     /* ---- CARD LIST ---- */\
     .card-list { padding: 8px 16px 12px; display: flex; flex-direction: column; gap: 6px; }\
@@ -215,7 +213,7 @@ function buildFormHtml(opt_token) {
     /* ---- MODAL (confirmation / checklist) ---- */\
     .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 10000; opacity: 0; pointer-events: none; transition: opacity .2s; display: flex; align-items: center; justify-content: center; }\
     .sheet-overlay.show { opacity: 1; pointer-events: auto; }\
-    .sheet { background: #fff; border-radius: 16px; width: 90%; max-width: 630px; max-height: 85vh; overflow-y: auto; transform: scale(.9); opacity: 0; transition: transform .25s cubic-bezier(.32,.72,0,1), opacity .2s; box-shadow: var(--shadow-lg); }\
+    .sheet { background: #fff; border-radius: 16px; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; transform: scale(.9); opacity: 0; transition: transform .25s cubic-bezier(.32,.72,0,1), opacity .2s; box-shadow: var(--shadow-lg); }\
     .sheet-overlay.show .sheet { transform: scale(1); opacity: 1; }\
     .sheet-handle { display: none; }\
     .sheet-header { padding: 16px 20px 8px; text-align: center; }\
@@ -349,25 +347,19 @@ function buildFormHtml(opt_token) {
   <!-- MAIN LAYOUT -->\
   <div class="topbar" id="config-bar">\
     <h1>AED Inspection</h1>\
+    <button class="nav-btn" id="prev-btn" aria-label="Previous month"><svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>\
+    <select class="month-select" id="month-select"><option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option></select>\
+    <select class="year-select" id="yr"><option value="26">2026</option><option value="27">2027</option><option value="28">2028</option><option value="29">2029</option><option value="30">2030</option><option value="31">2031</option><option value="32">2032</option><option value="33">2033</option><option value="34">2034</option><option value="35">2035</option><option value="36">2036</option></select>\
+    <button class="nav-btn" id="next-btn" aria-label="Next month"><svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>\
     <div class="cfg-item"><span class="cfg-label">Location:</span><input class="cfg-input" id="cfg-loc" type="text" placeholder="—"></div>\
     <div class="cfg-item"><span class="cfg-label">Serial:</span><input class="cfg-input" id="cfg-serial" type="text" placeholder="—"></div>\
     <div class="cfg-item"><span class="cfg-label">Battery Exp:</span><input class="cfg-input" id="cfg-batt" type="text" placeholder="—"></div>\
     <div class="cfg-item"><span class="cfg-label">Pad Exp:</span><input class="cfg-input" id="cfg-pad" type="text" placeholder="—"></div>\
     <div class="user-pill" id="user-pill"></div>\
   </div>\
-  <div class="month-nav">\
-    <button class="nav-btn" id="prev-btn" aria-label="Previous month">\
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>\
-    </button>\
-    <div class="month-info">\
-      <div class="month-year-row"><select class="month-select" id="month-select"><option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option></select>\
-      <select class="year-select" id="yr"><option value="26">2026</option><option value="27">2027</option><option value="28">2028</option><option value="29">2029</option><option value="30">2030</option><option value="31">2031</option><option value="32">2032</option><option value="33">2033</option><option value="34">2034</option><option value="35">2035</option><option value="36">2036</option></select></div>\
-      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>\
-      <div class="progress-text" id="progress-text">0 / 6 completed</div>\
-    </div>\
-    <button class="nav-btn" id="next-btn" aria-label="Next month">\
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>\
-    </button>\
+  <div class="progress-row">\
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>\
+    <div class="progress-text" id="progress-text">0 / 6 completed</div>\
   </div>\
   <div class="card-list" id="card-list"></div>\
   <div id="gv"></div>\
