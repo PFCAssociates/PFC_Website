@@ -58,6 +58,11 @@
 - When adding new server-side functions, always consider: can this result be cached? Can I reuse an already-opened spreadsheet object? Avoid redundant `UrlFetchApp` or `SpreadsheetApp` calls
 - Cache TTLs are intentionally short (5–10 min) so permission changes and token revocations take effect quickly
 
+## UI Dialogs — No Browser Defaults
+- **Never use `alert()`, `confirm()`, or `prompt()`** — all confirmation dialogs, alerts, and input prompts must use custom styled HTML/CSS modals
+- This applies to both GAS `.gs` code and parent embedding pages (`.html`)
+- Use overlay + modal patterns consistent with the existing sheet/modal styles in the codebase
+
 ## Execution Style
 - For clear, straightforward requests: **just do it** — make the changes, commit, and push without asking for plan approval
 - Only ask clarifying questions when the request is genuinely ambiguous or has multiple valid interpretations
