@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.54g";
+var VERSION = "01.55g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -264,7 +264,8 @@ function buildFormHtml(opt_token) {
     .checklist-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:11000;opacity:0;pointer-events:none;transition:opacity .15s}\
     .checklist-overlay.show{opacity:1;pointer-events:auto}\
     .checklist-box{background:#fff;border-radius:10px;padding:20px 24px;max-width:500px;width:92%;box-shadow:0 4px 24px rgba(0,0,0,.25)}\
-    .checklist-box h3{margin:0 0 14px;font-size:15px;color:#333;text-align:center}\
+    .checklist-box h3{margin:0 0 4px;font-size:15px;color:#333;text-align:center}\
+    .cl-subtitle{margin:0 0 12px;font-size:13px;color:#1565c0;text-align:center;font-weight:bold}\
     .checklist-item{display:flex;align-items:flex-start;gap:8px;padding:8px 4px;border-bottom:1px solid #eee;font-size:13px;color:#333;line-height:1.4;cursor:pointer}\
     .checklist-item:last-of-type{border-bottom:none}\
     .checklist-item input[type=checkbox]{margin-top:2px;flex-shrink:0;width:16px;height:16px;cursor:pointer;accent-color:#1565c0}\
@@ -307,6 +308,7 @@ function buildFormHtml(opt_token) {
   <div class="checklist-overlay" id="checklist-modal">\
     <div class="checklist-box">\
       <h3>*Operation Checklist</h3>\
+      <p class="cl-subtitle" id="cl-subtitle"></p>\
       <div class="checklist-item"><input type="checkbox" id="cl-1"><label for="cl-1">1. Open the AED lid.</label></div>\
       <div class="checklist-item"><input type="checkbox" id="cl-2"><label for="cl-2">2. Wait for the AED to indicate status: Observe the change of the STATUS INDICATOR to RED. After approximately five seconds, verify that the STATUS INDICATOR returns to GREEN.</label></div>\
       <div class="checklist-item"><input type="checkbox" id="cl-3"><label for="cl-3">3. Check the expiration date on the electrodes.</label></div>\
@@ -322,6 +324,7 @@ function buildFormHtml(opt_token) {
   <div class="checklist-overlay" id="ppe-modal">\
     <div class="checklist-box">\
       <h3>**PPE/Ready Kit Checklist</h3>\
+      <p class="cl-subtitle" id="ppe-subtitle"></p>\
       <div class="checklist-item"><input type="checkbox" id="ppe-1"><label for="ppe-1">1 pocket mask</label></div>\
       <div class="checklist-item"><input type="checkbox" id="ppe-2"><label for="ppe-2">1 trauma scissor</label></div>\
       <div class="checklist-item"><input type="checkbox" id="ppe-3"><label for="ppe-3">2 pair of gloves</label></div>\
@@ -375,10 +378,12 @@ function buildFormHtml(opt_token) {
     var _user=null;\
     var _gasToken=' + JSON.stringify(opt_token || "") + ';\
     var _colNames=' + JSON.stringify(COL_HEADERS) + ';\
-    function showConfirm(msg,okLabel){return new Promise(function(resolve){var m=document.getElementById("confirm-modal");document.getElementById("confirm-msg").textContent=msg;var yb=document.getElementById("confirm-yes");yb.textContent=okLabel||"Clear";yb.className=okLabel?"cb-ok confirm-green":"cb-ok";m.classList.add("show");yb.onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById("confirm-no").onclick=function(){m.classList.remove("show");resolve(false)}})}\
-    function showChecklistModal(modalId,submitId,cancelId){return new Promise(function(resolve){var m=document.getElementById(modalId);var cbs=m.querySelectorAll("input[type=checkbox]");var sub=document.getElementById(submitId);for(var i=0;i<cbs.length;i++)cbs[i].checked=false;sub.disabled=true;function updBtn(){var all=true;for(var i=0;i<cbs.length;i++){if(!cbs[i].checked){all=false;break}}sub.disabled=!all}for(var i=0;i<cbs.length;i++)cbs[i].onchange=updBtn;m.classList.add("show");sub.onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById(cancelId).onclick=function(){m.classList.remove("show");resolve(false)}})}\
-    function showChecklist(){return showChecklistModal("checklist-modal","cl-submit","cl-cancel")}\
-    function showPpeChecklist(){return showChecklistModal("ppe-modal","ppe-submit","ppe-cancel")}\
+    var _months=' + JSON.stringify(MONTHS) + ';\
+    function _monthYr(cell){var mi=parseInt(cell.getAttribute("data-m"));var y=document.getElementById("yr").value;return _months[mi]+(y?" 20"+y:"");}\
+    function showConfirm(msg,okLabel,subtitle){return new Promise(function(resolve){var m=document.getElementById("confirm-modal");var mp=document.getElementById("confirm-msg");mp.textContent=msg;if(subtitle){var br=document.createElement("br");var sp=document.createElement("span");sp.style.cssText="color:#1565c0;font-weight:bold;font-size:13px";sp.textContent=subtitle;mp.appendChild(br);mp.appendChild(sp)}var yb=document.getElementById("confirm-yes");yb.textContent=okLabel||"Clear";yb.className=okLabel?"cb-ok confirm-green":"cb-ok";m.classList.add("show");yb.onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById("confirm-no").onclick=function(){m.classList.remove("show");resolve(false)}})}\
+    function showChecklistModal(modalId,submitId,cancelId,subtitleId,subtitle){return new Promise(function(resolve){var m=document.getElementById(modalId);var cbs=m.querySelectorAll("input[type=checkbox]");var sub=document.getElementById(submitId);if(subtitleId)document.getElementById(subtitleId).textContent=subtitle||"";for(var i=0;i<cbs.length;i++)cbs[i].checked=false;sub.disabled=true;function updBtn(){var all=true;for(var i=0;i<cbs.length;i++){if(!cbs[i].checked){all=false;break}}sub.disabled=!all}for(var i=0;i<cbs.length;i++)cbs[i].onchange=updBtn;m.classList.add("show");sub.onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById(cancelId).onclick=function(){m.classList.remove("show");resolve(false)}})}\
+    function showChecklist(cell){return showChecklistModal("checklist-modal","cl-submit","cl-cancel","cl-subtitle",_monthYr(cell))}\
+    function showPpeChecklist(cell){return showChecklistModal("ppe-modal","ppe-submit","ppe-cancel","ppe-subtitle",_monthYr(cell))}\
     function notifyParentAuth(){\
       var msg={type:"gas-auth-complete"};\
       try{window.top.postMessage(msg,"*")}catch(e){}\
@@ -409,7 +414,7 @@ function buildFormHtml(opt_token) {
       clearBtn.title="Clear this entry";\
       clearBtn.addEventListener("click",function(e){\
         e.stopPropagation();\
-        showConfirm("Clear this inspection entry?").then(function(ok){\
+        showConfirm("Clear this inspection entry?",null,_monthYr(cell)).then(function(ok){\
           if(!ok)return;\
           cell.classList.add("stamping");\
           sOn();\
@@ -529,11 +534,11 @@ function buildFormHtml(opt_token) {
         }\
         var colIdx=parseInt(cell.getAttribute("data-c"));\
         if(colIdx===2){\
-          showChecklist().then(function(ok){if(ok)doStamp(cell);});\
+          showChecklist(cell).then(function(ok){if(ok)doStamp(cell);});\
         }else if(colIdx===3){\
-          showPpeChecklist().then(function(ok){if(ok)doStamp(cell);});\
+          showPpeChecklist(cell).then(function(ok){if(ok)doStamp(cell);});\
         }else{\
-          showConfirm(_colNames[colIdx],"Confirm").then(function(ok){if(ok)doStamp(cell);});\
+          showConfirm(_colNames[colIdx],"Confirm",_monthYr(cell)).then(function(ok){if(ok)doStamp(cell);});\
         }\
       });\
     });\
