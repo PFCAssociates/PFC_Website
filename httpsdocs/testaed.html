@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.03w">
+  <meta name="build-version" content="01.04w">
   <title>AED Inspection Log (Touch UI)</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -54,16 +54,8 @@
     .auth-wall .auth-btn.switch:hover { background: #d63c0e; }
     .auth-wall .auth-hint { font-size: 12px; color: #999; margin-top: 0; }
     .auth-wall .auth-versions { font-size: 11px; color: #aaa; font-family: monospace; margin-top: 8px; }
-    .sign-out-bar {
-      position: fixed; top: 8px; right: 8px; z-index: 9999;
-      display: none; align-items: center; gap: 6px;
-    }
-    .sign-out-bar.show { display: flex; }
-    .sign-out-bar .user-name {
-      background: rgba(0,0,0,0.55); color: #ccc; padding: 4px 10px;
-      border-radius: 12px; font: 11px/1 monospace; user-select: none;
-    }
     .sign-out-btn {
+      position: fixed; top: 8px; right: 8px; z-index: 9999;
       background: rgba(0,0,0,0.55); color: #ccc; padding: 4px 10px;
       border-radius: 12px; font: 11px/1 monospace; cursor: pointer;
       border: none; transition: all 0.2s; user-select: none;
@@ -73,7 +65,7 @@
 </head>
 <body>
   <div id="auth-wall" class="auth-wall"></div>
-  <div id="sign-out-bar" class="sign-out-bar"><span id="user-name" class="user-name"></span><button class="sign-out-btn" onclick="signOut()">Sign Out</button></div>
+  <button id="sign-out-btn" class="sign-out-btn" style="display:none" onclick="signOut()">Sign Out</button>
   <div id="splash-green" class="splash"><div class="splash-title">Website Ready</div><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
   <div id="splash-blue" class="splash"><div class="splash-title">Code Ready</div><img src="https://www.shadowaisolutions.com/SAIS%20Logo.png" alt=""></div>
   <iframe id="gas-app" allow="*"></iframe>
@@ -172,7 +164,7 @@
     function signOut() {
       localStorage.removeItem('gis-token');
       localStorage.removeItem('gis-email');
-      document.getElementById('sign-out-bar').classList.remove('show');
+      document.getElementById('sign-out-btn').style.display = 'none';
       _requireAuth = true;
       showAuthWall('not_signed_in', '');
     }
@@ -182,13 +174,6 @@
       if (!localStorage.getItem('gis-token')) {
         _requireAuth = true;
         showAuthWall('not_signed_in', '');
-      } else {
-        var email = localStorage.getItem('gis-email') || '';
-        if (email) {
-          var name = email.split('@')[0].split(/[._-]/).map(function(p) { return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(); }).join(' ');
-          document.getElementById('user-name').textContent = name;
-        }
-        document.getElementById('sign-out-bar').classList.add('show');
       }
     } else {
       // No deployment URL yet — show a placeholder
@@ -212,12 +197,7 @@
                 if (info.email) localStorage.setItem('gis-email', info.email);
               }).catch(function() {}).finally(function() {
                 document.getElementById('auth-wall').classList.remove('show');
-                var email = localStorage.getItem('gis-email') || '';
-                if (email) {
-                  var name = email.split('@')[0].split(/[._-]/).map(function(p) { return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(); }).join(' ');
-                  document.getElementById('user-name').textContent = name;
-                }
-                document.getElementById('sign-out-bar').classList.add('show');
+                document.getElementById('sign-out-btn').style.display = '';
                 reloadIframe();
               });
             }
@@ -252,7 +232,7 @@
           + '<p class="auth-hint">A Google sign-in popup will appear. This page will refresh automatically once you sign in.</p>'
           + versions;
       }
-      document.getElementById('sign-out-bar').classList.remove('show');
+      document.getElementById('sign-out-btn').style.display = 'none';
       wall.classList.add('show');
     }
 
@@ -271,14 +251,7 @@
             av.innerHTML = (wv ? 'Web: v' + wv : '') + (wv ? ' &nbsp;|&nbsp; ' : '') + 'Code: ' + _gasVersion;
           }
         }
-        if (!_requireAuth) {
-          var email = localStorage.getItem('gis-email') || '';
-          if (email) {
-            var name = email.split('@')[0].split(/[._-]/).map(function(p) { return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(); }).join(' ');
-            document.getElementById('user-name').textContent = name;
-          }
-          document.getElementById('sign-out-bar').classList.add('show');
-        }
+        if (!_requireAuth) document.getElementById('sign-out-btn').style.display = '';
         return;
       }
       if (e.data.type === 'manual-reload') {
