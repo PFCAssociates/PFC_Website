@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.26g";
+var VERSION = "01.27g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -661,17 +661,34 @@ function loadData() {\
       pill.classList.add("show");\
       try { window.top.postMessage({ type: "gas-auth-ok", version: d.version || "" }, "*"); } catch(e) {}\
       var cfg = d.config || {};\
-      _yr = cfg.year_suffix || "";\
+      /* Always open to the current year (override saved config) */\
+      /* To restore last-used year: _yr = cfg.year_suffix || ""; */\
+      _yr = String(new Date().getFullYear()).slice(-2);\
       document.getElementById("yr").value = _yr;\
       document.getElementById("cfg-loc").value = cfg.aed_location || "";\
       document.getElementById("cfg-serial").value = cfg.serial_no || "";\
       document.getElementById("cfg-batt").value = cfg.battery_date || "";\
       document.getElementById("cfg-pad").value = cfg.pad_expiration || "";\
-      _inspections = d.inspections || {};\
-      if (_yr) _insCache[_yr] = _inspections;\
-      renderCards();\
-      if (d.version) document.getElementById("gv").textContent = d.version;\
-      document.getElementById("loading").classList.add("off");\
+      var savedYr = cfg.year_suffix || "";\
+      var returnedInsp = d.inspections || {};\
+      if (savedYr) _insCache[savedYr] = returnedInsp;\
+      if (_yr === savedYr || !savedYr) {\
+        _inspections = returnedInsp;\
+        if (_yr) _insCache[_yr] = _inspections;\
+        renderCards();\
+        if (d.version) document.getElementById("gv").textContent = d.version;\
+        document.getElementById("loading").classList.add("off");\
+      } else {\
+        /* Current year differs from saved — fetch the right data */\
+        _inspections = {};\
+        renderCards();\
+        if (d.version) document.getElementById("gv").textContent = d.version;\
+        document.getElementById("loading").classList.add("off");\
+        var curYr = _yr;\
+        google.script.run.withSuccessHandler(function(d2) {\
+          if (d2 && d2.inspections) { _insCache[curYr] = d2.inspections; if (_yr === curYr) { _inspections = d2.inspections; renderCards(); } }\
+        }).getFormData(_token, curYr);\
+      }\
     })\
     .withFailureHandler(function(e) {\
       document.getElementById("loading").innerHTML = "<div>Error: " + e.message + "</div>";\
