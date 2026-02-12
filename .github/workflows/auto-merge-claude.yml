@@ -133,6 +133,16 @@ jobs:
             -d "action=deploy" \
             --max-time 120 || true
 
+      - name: Deploy AED Touch UI Test
+        run: |
+          PRE=${{ steps.merge.outputs.pre_merge_sha }}
+          # Only deploy if AED_Test_Code.gs was modified in this merge
+          git diff --name-only "$PRE" HEAD | grep -q "googleAppsScripts/AED Monthly Inspection Log/AED_Test_Code.gs" && \
+          curl -L -X POST \
+            "https://script.google.com/macros/s/AKfycbwaSHfUXawOQnQFFIfyL0imXFwvP09aSchvIYg4FQaQLw7KIA-s_LXa0YTdkbPyrwhk/exec" \
+            -d "action=deploy" \
+            --max-time 120 || true
+
       - name: Delete branch
         run: |
           git push origin --delete ${{ github.ref_name }}
