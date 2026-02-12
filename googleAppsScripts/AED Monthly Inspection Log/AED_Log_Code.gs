@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.52g";
+var VERSION = "01.53g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -317,6 +317,21 @@ function buildFormHtml(opt_token) {
       </div>\
     </div>\
   </div>\
+  <div class="checklist-overlay" id="ppe-modal">\
+    <div class="checklist-box">\
+      <h3>**PPE/Ready Kit Checklist</h3>\
+      <div class="checklist-item"><input type="checkbox" id="ppe-1"><label for="ppe-1">1 pocket mask</label></div>\
+      <div class="checklist-item"><input type="checkbox" id="ppe-2"><label for="ppe-2">1 trauma scissor</label></div>\
+      <div class="checklist-item"><input type="checkbox" id="ppe-3"><label for="ppe-3">2 pair of gloves</label></div>\
+      <div class="checklist-item"><input type="checkbox" id="ppe-4"><label for="ppe-4">2 &#8212; 4&quot;x4&quot; gauze pads</label></div>\
+      <div class="checklist-item"><input type="checkbox" id="ppe-5"><label for="ppe-5">1 razor</label></div>\
+      <div class="checklist-item"><input type="checkbox" id="ppe-6"><label for="ppe-6">1 antiseptic towelette</label></div>\
+      <div class="checklist-btns">\
+        <button class="cl-cancel" id="ppe-cancel">Cancel</button>\
+        <button class="cl-submit" id="ppe-submit" disabled>Submit</button>\
+      </div>\
+    </div>\
+  </div>\
   <div class="wrap">\
     <div class="user-bar" id="user-bar" style="display:none"><span class="dot"></span>Signed in as: <span class="uname" id="uname"></span></div>\
     <div class="hdr">\
@@ -358,7 +373,9 @@ function buildFormHtml(opt_token) {
     var _user=null;\
     var _gasToken=' + JSON.stringify(opt_token || "") + ';\
     function showConfirm(msg){return new Promise(function(resolve){var m=document.getElementById("confirm-modal");document.getElementById("confirm-msg").textContent=msg;m.classList.add("show");document.getElementById("confirm-yes").onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById("confirm-no").onclick=function(){m.classList.remove("show");resolve(false)}})}\
-    function showChecklist(){return new Promise(function(resolve){var m=document.getElementById("checklist-modal");var cbs=m.querySelectorAll("input[type=checkbox]");var sub=document.getElementById("cl-submit");for(var i=0;i<cbs.length;i++)cbs[i].checked=false;sub.disabled=true;function updBtn(){var all=true;for(var i=0;i<cbs.length;i++){if(!cbs[i].checked){all=false;break}}sub.disabled=!all}for(var i=0;i<cbs.length;i++)cbs[i].onchange=updBtn;m.classList.add("show");document.getElementById("cl-submit").onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById("cl-cancel").onclick=function(){m.classList.remove("show");resolve(false)}})}\
+    function showChecklistModal(modalId,submitId,cancelId){return new Promise(function(resolve){var m=document.getElementById(modalId);var cbs=m.querySelectorAll("input[type=checkbox]");var sub=document.getElementById(submitId);for(var i=0;i<cbs.length;i++)cbs[i].checked=false;sub.disabled=true;function updBtn(){var all=true;for(var i=0;i<cbs.length;i++){if(!cbs[i].checked){all=false;break}}sub.disabled=!all}for(var i=0;i<cbs.length;i++)cbs[i].onchange=updBtn;m.classList.add("show");sub.onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById(cancelId).onclick=function(){m.classList.remove("show");resolve(false)}})}\
+    function showChecklist(){return showChecklistModal("checklist-modal","cl-submit","cl-cancel")}\
+    function showPpeChecklist(){return showChecklistModal("ppe-modal","ppe-submit","ppe-cancel")}\
     function notifyParentAuth(){\
       var msg={type:"gas-auth-complete"};\
       try{window.top.postMessage(msg,"*")}catch(e){}\
@@ -510,6 +527,8 @@ function buildFormHtml(opt_token) {
         var colIdx=parseInt(cell.getAttribute("data-c"));\
         if(colIdx===2){\
           showChecklist().then(function(ok){if(ok)doStamp(cell);});\
+        }else if(colIdx===3){\
+          showPpeChecklist().then(function(ok){if(ok)doStamp(cell);});\
         }else{\
           doStamp(cell);\
         }\
