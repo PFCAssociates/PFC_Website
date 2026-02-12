@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.55g";
+var VERSION = "01.56g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -414,7 +414,7 @@ function buildFormHtml(opt_token) {
       clearBtn.title="Clear this entry";\
       clearBtn.addEventListener("click",function(e){\
         e.stopPropagation();\
-        showConfirm("Clear this inspection entry?",null,_monthYr(cell)).then(function(ok){\
+        showConfirm("Clear: "+_colNames[parseInt(cell.getAttribute("data-c"))],null,_monthYr(cell)).then(function(ok){\
           if(!ok)return;\
           cell.classList.add("stamping");\
           sOn();\
