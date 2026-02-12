@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.02g";
+var VERSION = "01.03g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -172,6 +172,8 @@ function buildFormHtml(opt_token) {
     .config-bar { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--gray-700); flex-shrink: 0; }\
     .config-bar .cfg-item { display: flex; align-items: center; gap: 4px; }\
     .config-bar .cfg-label { font-weight: 600; color: var(--gray-900); }\
+    .config-bar .cfg-input { border: none; border-bottom: 1.5px solid var(--gray-300); background: transparent; font-size: 12px; color: var(--gray-700); padding: 2px 4px; outline: none; min-width: 60px; max-width: 140px; font-family: inherit; }\
+    .config-bar .cfg-input:focus { border-bottom-color: var(--blue); }\
 \
     /* ---- MONTH NAVIGATION ---- */\
     .month-nav { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 10px 16px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }\
@@ -349,10 +351,10 @@ function buildFormHtml(opt_token) {
     <div class="user-pill" id="user-pill"></div>\
   </div>\
   <div class="config-bar" id="config-bar">\
-    <div class="cfg-item"><span class="cfg-label">Location:</span><span id="cfg-loc">—</span></div>\
-    <div class="cfg-item"><span class="cfg-label">Serial:</span><span id="cfg-serial">—</span></div>\
-    <div class="cfg-item"><span class="cfg-label">Battery Exp:</span><span id="cfg-batt">—</span></div>\
-    <div class="cfg-item"><span class="cfg-label">Pad Exp:</span><span id="cfg-pad">—</span></div>\
+    <div class="cfg-item"><span class="cfg-label">Location:</span><input class="cfg-input" id="cfg-loc" type="text" placeholder="—"></div>\
+    <div class="cfg-item"><span class="cfg-label">Serial:</span><input class="cfg-input" id="cfg-serial" type="text" placeholder="—"></div>\
+    <div class="cfg-item"><span class="cfg-label">Battery Exp:</span><input class="cfg-input" id="cfg-batt" type="text" placeholder="—"></div>\
+    <div class="cfg-item"><span class="cfg-label">Pad Exp:</span><input class="cfg-input" id="cfg-pad" type="text" placeholder="—"></div>\
   </div>\
   <div class="month-nav">\
     <button class="nav-btn" id="prev-btn" aria-label="Previous month">\
@@ -611,10 +613,10 @@ function loadData() {\
       try { window.top.postMessage({ type: "gas-auth-ok", version: d.version || "" }, "*"); } catch(e) {}\
       var cfg = d.config || {};\
       _yr = cfg.year_suffix || "";\
-      document.getElementById("cfg-loc").textContent = cfg.aed_location || "—";\
-      document.getElementById("cfg-serial").textContent = cfg.serial_no || "—";\
-      document.getElementById("cfg-batt").textContent = cfg.battery_date || "—";\
-      document.getElementById("cfg-pad").textContent = cfg.pad_expiration || "—";\
+      document.getElementById("cfg-loc").value = cfg.aed_location || "";\
+      document.getElementById("cfg-serial").value = cfg.serial_no || "";\
+      document.getElementById("cfg-batt").value = cfg.battery_date || "";\
+      document.getElementById("cfg-pad").value = cfg.pad_expiration || "";\
       _inspections = d.inspections || {};\
       renderCards();\
       if (d.version) document.getElementById("gv").textContent = d.version;\
@@ -627,6 +629,15 @@ function loadData() {\
 }\
 \
 loadData();\
+\
+/* ---- Config field auto-save ---- */\
+[["cfg-loc","aed_location"],["cfg-serial","serial_no"],["cfg-batt","battery_date"],["cfg-pad","pad_expiration"]].forEach(function(pair) {\
+  var el = document.getElementById(pair[0]);\
+  el.addEventListener("change", function() {\
+    savOn();\
+    google.script.run.withSuccessHandler(savOff).withFailureHandler(function(err) { savOff(); alert("Error: " + err.message); }).saveConfig(pair[1], el.value);\
+  });\
+});\
 \
 /* ---- Auto-refresh polling ---- */\
 var _ar = ' + AUTO_REFRESH + ';\
