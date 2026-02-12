@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.05g";
+var VERSION = "01.06g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -195,7 +195,7 @@ function buildFormHtml(opt_token) {
     /* ---- INSPECTION CARD ---- */\
     .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); border: 1.5px solid var(--gray-200); overflow: hidden; transition: all .15s; }\
     .card.completed { border-color: var(--green-bg); }\
-    .card-body { padding: 14px 16px; display: flex; align-items: flex-start; gap: 14px; cursor: pointer; min-height: 72px; }\
+    .card-body { padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; min-height: 72px; }\
     .card-body:active { background: var(--gray-50); }\
     .card.completed .card-body { background: var(--green-light); }\
     .card.completed .card-body:active { background: var(--green-bg); }\
@@ -204,7 +204,7 @@ function buildFormHtml(opt_token) {
     .card-content { flex: 1; min-width: 0; }\
     .card-title { font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--gray-900); }\
     .card.completed .card-title { color: var(--green); }\
-    .card-stamp { font-size: 11px; color: var(--gray-500); margin-top: 3px; }\
+    .card-stamp { flex-shrink: 0; text-align: right; font-size: 11px; color: var(--gray-500); }\
     .card-stamp .stamp-name { font-weight: 600; color: var(--blue); }\
     .card.completed .card-stamp .stamp-name { color: var(--green); }\
     .card-stamp .stamp-date { font-size: 10px; color: var(--gray-500); margin-top: 1px; }\
@@ -430,7 +430,8 @@ function renderCards() {\
       : \'<div class="card-action"><svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#fff"><polyline points="20 6 9 17 4 12"/></svg></div>\';\
     card.innerHTML = \'<div class="card-body">\'\
       + \'<div class="card-icon">\' + _icons[c] + \'</div>\'\
-      + \'<div class="card-content"><div class="card-title">\' + _colNames[c] + \'</div>\' + stampHtml + \'</div>\'\
+      + \'<div class="card-content"><div class="card-title">\' + _colNames[c] + \'</div></div>\'\
+      + stampHtml\
       + actionHtml\
       + \'</div>\';\
     (function(colIdx, cardEl) {\
