@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.14g";
+var VERSION = "01.15g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -361,7 +361,7 @@ function buildFormHtml(opt_token) {
     </button>\
     <div class="month-info">\
       <div class="month-year-row"><select class="month-select" id="month-select"><option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option></select>\
-      <select class="year-select" id="yr"><option value="">Year</option><option value="26">2026</option><option value="27">2027</option><option value="28">2028</option><option value="29">2029</option><option value="30">2030</option><option value="31">2031</option><option value="32">2032</option><option value="33">2033</option><option value="34">2034</option><option value="35">2035</option><option value="36">2036</option></select></div>\
+      <select class="year-select" id="yr"><option value="26">2026</option><option value="27">2027</option><option value="28">2028</option><option value="29">2029</option><option value="30">2030</option><option value="31">2031</option><option value="32">2032</option><option value="33">2033</option><option value="34">2034</option><option value="35">2035</option><option value="36">2036</option></select></div>\
       <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>\
       <div class="progress-text" id="progress-text">0 / 6 completed</div>\
     </div>\
