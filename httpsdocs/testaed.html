@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.04w">
+  <meta name="build-version" content="01.05w">
   <title>AED Inspection Log (Touch UI)</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -162,6 +162,7 @@
       iframe.src = _gasBaseUrl + (token ? '&token=' + encodeURIComponent(token) : '');
     }
     function signOut() {
+      if (!confirm('Are you sure you want to sign out?')) return;
       localStorage.removeItem('gis-token');
       localStorage.removeItem('gis-email');
       document.getElementById('sign-out-btn').style.display = 'none';
