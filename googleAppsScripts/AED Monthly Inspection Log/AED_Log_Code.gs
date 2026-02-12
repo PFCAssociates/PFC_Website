@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.51g";
+var VERSION = "01.52g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -258,6 +258,22 @@ function buildFormHtml(opt_token) {
     .confirm-btns .cb-cancel:hover{background:#bdbdbd}\
     .confirm-btns .cb-ok{background:#d32f2f;color:#fff}\
     .confirm-btns .cb-ok:hover{background:#b71c1c}\
+    /* Checklist modal */\
+    .checklist-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:11000;opacity:0;pointer-events:none;transition:opacity .15s}\
+    .checklist-overlay.show{opacity:1;pointer-events:auto}\
+    .checklist-box{background:#fff;border-radius:10px;padding:20px 24px;max-width:500px;width:92%;box-shadow:0 4px 24px rgba(0,0,0,.25)}\
+    .checklist-box h3{margin:0 0 14px;font-size:15px;color:#333;text-align:center}\
+    .checklist-item{display:flex;align-items:flex-start;gap:8px;padding:8px 4px;border-bottom:1px solid #eee;font-size:13px;color:#333;line-height:1.4;cursor:pointer}\
+    .checklist-item:last-of-type{border-bottom:none}\
+    .checklist-item input[type=checkbox]{margin-top:2px;flex-shrink:0;width:16px;height:16px;cursor:pointer;accent-color:#1565c0}\
+    .checklist-item label{cursor:pointer;flex:1;user-select:none}\
+    .checklist-btns{display:flex;gap:10px;justify-content:center;margin-top:16px}\
+    .checklist-btns button{flex:1;padding:9px 0;border:none;border-radius:6px;font-size:14px;font-weight:bold;cursor:pointer;transition:background .15s}\
+    .checklist-btns .cl-cancel{background:#e0e0e0;color:#333}\
+    .checklist-btns .cl-cancel:hover{background:#bdbdbd}\
+    .checklist-btns .cl-submit{background:#1565c0;color:#fff}\
+    .checklist-btns .cl-submit:hover:not(:disabled){background:#0d47a1}\
+    .checklist-btns .cl-submit:disabled{background:#90caf9;cursor:not-allowed}\
     /* Year warning */\
     .yr input.warn{border-bottom-color:#d32f2f;animation:pulse-warn .4s ease 2}\
     @keyframes pulse-warn{0%,100%{border-bottom-color:#d32f2f}50%{border-bottom-color:#ff8a80}}\
@@ -283,6 +299,21 @@ function buildFormHtml(opt_token) {
       <div class="confirm-btns">\
         <button class="cb-cancel" id="confirm-no">Cancel</button>\
         <button class="cb-ok" id="confirm-yes">Clear</button>\
+      </div>\
+    </div>\
+  </div>\
+  <div class="checklist-overlay" id="checklist-modal">\
+    <div class="checklist-box">\
+      <h3>*Operation Checklist</h3>\
+      <div class="checklist-item"><input type="checkbox" id="cl-1"><label for="cl-1">1. Open the AED lid.</label></div>\
+      <div class="checklist-item"><input type="checkbox" id="cl-2"><label for="cl-2">2. Wait for the AED to indicate status: Observe the change of the STATUS INDICATOR to RED. After approximately five seconds, verify that the STATUS INDICATOR returns to GREEN.</label></div>\
+      <div class="checklist-item"><input type="checkbox" id="cl-3"><label for="cl-3">3. Check the expiration date on the electrodes.</label></div>\
+      <div class="checklist-item"><input type="checkbox" id="cl-4"><label for="cl-4">4. Listen for the voice prompts.</label></div>\
+      <div class="checklist-item"><input type="checkbox" id="cl-5"><label for="cl-5">5. Close the lid and observe the change of the STATUS INDICATOR to RED. After approximately five seconds, verify that the STATUS INDICATOR returns to GREEN.</label></div>\
+      <div class="checklist-item"><input type="checkbox" id="cl-6"><label for="cl-6">6. Check the expiration date of the battery.</label></div>\
+      <div class="checklist-btns">\
+        <button class="cl-cancel" id="cl-cancel">Cancel</button>\
+        <button class="cl-submit" id="cl-submit" disabled>Submit</button>\
       </div>\
     </div>\
   </div>\
@@ -327,6 +358,7 @@ function buildFormHtml(opt_token) {
     var _user=null;\
     var _gasToken=' + JSON.stringify(opt_token || "") + ';\
     function showConfirm(msg){return new Promise(function(resolve){var m=document.getElementById("confirm-modal");document.getElementById("confirm-msg").textContent=msg;m.classList.add("show");document.getElementById("confirm-yes").onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById("confirm-no").onclick=function(){m.classList.remove("show");resolve(false)}})}\
+    function showChecklist(){return new Promise(function(resolve){var m=document.getElementById("checklist-modal");var cbs=m.querySelectorAll("input[type=checkbox]");var sub=document.getElementById("cl-submit");for(var i=0;i<cbs.length;i++)cbs[i].checked=false;sub.disabled=true;function updBtn(){var all=true;for(var i=0;i<cbs.length;i++){if(!cbs[i].checked){all=false;break}}sub.disabled=!all}for(var i=0;i<cbs.length;i++)cbs[i].onchange=updBtn;m.classList.add("show");document.getElementById("cl-submit").onclick=function(){m.classList.remove("show");resolve(true)};document.getElementById("cl-cancel").onclick=function(){m.classList.remove("show");resolve(false)}})}\
     function notifyParentAuth(){\
       var msg={type:"gas-auth-complete"};\
       try{window.top.postMessage(msg,"*")}catch(e){}\
@@ -445,6 +477,24 @@ function buildFormHtml(opt_token) {
       }\
     });\
 \
+    /* Stamp a cell (shared by direct click and post-checklist) */\
+    function doStamp(cell){\
+      cell.classList.add("stamping");\
+      sOn();\
+      google.script.run\
+        .withSuccessHandler(function(stampValue){\
+          sOff();\
+          cell.classList.remove("stamping");\
+          renderCell(cell,stampValue);\
+        })\
+        .withFailureHandler(function(err){\
+          sOff();\
+          cell.classList.remove("stamping");\
+          alert("Error: "+err.message);\
+        })\
+        .stampInspection(document.getElementById("yr").value,parseInt(cell.getAttribute("data-m")),parseInt(cell.getAttribute("data-c")),_gasToken);\
+    }\
+\
     /* Inspection cell click — auto-stamp with user name + timestamp */\
     document.querySelectorAll(".init-cell").forEach(function(cell){\
       cell.addEventListener("click",function(){\
@@ -457,20 +507,12 @@ function buildFormHtml(opt_token) {
           setTimeout(function(){yr.classList.remove("warn");},1500);\
           return;\
         }\
-        cell.classList.add("stamping");\
-        sOn();\
-        google.script.run\
-          .withSuccessHandler(function(stampValue){\
-            sOff();\
-            cell.classList.remove("stamping");\
-            renderCell(cell,stampValue);\
-          })\
-          .withFailureHandler(function(err){\
-            sOff();\
-            cell.classList.remove("stamping");\
-            alert("Error: "+err.message);\
-          })\
-          .stampInspection(yr.value,parseInt(cell.getAttribute("data-m")),parseInt(cell.getAttribute("data-c")),_gasToken);\
+        var colIdx=parseInt(cell.getAttribute("data-c"));\
+        if(colIdx===2){\
+          showChecklist().then(function(ok){if(ok)doStamp(cell);});\
+        }else{\
+          doStamp(cell);\
+        }\
       });\
     });\
 \
