@@ -14,7 +14,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.22g";
+var VERSION = "01.23g";
 var TITLE = "AED Inspection Log (Touch UI)";
 
 var AUTO_REFRESH = true;
@@ -175,6 +175,7 @@ function buildFormHtml(opt_token) {
     .month-nav { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 10px 16px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }\
     .month-nav .nav-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--gray-300); background: #fff; font-size: 20px; color: var(--gray-700); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }\
     .month-nav .nav-btn:active { background: var(--gray-200); transform: scale(.92); }\
+    .month-nav .nav-btn.disabled { opacity: .3; pointer-events: none; }\
     .month-nav .month-info { flex: 1; text-align: center; }\
     .month-nav .month-year-row { display: flex; align-items: baseline; justify-content: center; gap: 12px; }\
     .month-nav .month-select { font-size: 18px; font-weight: 700; border: none; background: transparent; color: var(--gray-900); text-align: center; text-align-last: center; cursor: pointer; padding: 2px 4px; outline: none; font-family: inherit; border-bottom: 1.5px dashed var(--gray-300); -webkit-appearance: none; appearance: none; border-radius: 0; }\
@@ -447,6 +448,7 @@ function renderCards() {\
     list.appendChild(card);\
   }\
   updateProgress();\
+  if (typeof updateNavBtns === "function") updateNavBtns();\
 }\
 \
 /* ---- Bottom Sheets ---- */\
@@ -559,16 +561,22 @@ function doClear(colIdx) {\
 }\
 \
 /* ---- Month Navigation ---- */\
+var _yrSel = document.getElementById("yr");\
+var _firstYr = _yrSel.options[0].value;\
+var _lastYr = _yrSel.options[_yrSel.options.length - 1].value;\
+function updateNavBtns() {\
+  document.getElementById("prev-btn").classList.toggle("disabled", _curMonth === 0 && _yr === _firstYr);\
+  document.getElementById("next-btn").classList.toggle("disabled", _curMonth === 11 && _yr === _lastYr);\
+}\
 function changeYear(newVal) {\
-  var sel = document.getElementById("yr");\
-  for (var i = 0; i < sel.options.length; i++) {\
-    if (sel.options[i].value === newVal) { sel.value = newVal; sel.dispatchEvent(new Event("change")); return; }\
+  for (var i = 0; i < _yrSel.options.length; i++) {\
+    if (_yrSel.options[i].value === newVal) { _yrSel.value = newVal; _yrSel.dispatchEvent(new Event("change")); return; }\
   }\
 }\
 document.getElementById("prev-btn").addEventListener("click", function() {\
   if (_curMonth === 0) {\
     _curMonth = 11;\
-    changeYear(String(parseInt(_yr || "26") - 1));\
+    changeYear(String(parseInt(_yr || _firstYr) - 1));\
   } else {\
     _curMonth--;\
     renderCards();\
@@ -577,7 +585,7 @@ document.getElementById("prev-btn").addEventListener("click", function() {\
 document.getElementById("next-btn").addEventListener("click", function() {\
   if (_curMonth === 11) {\
     _curMonth = 0;\
-    changeYear(String(parseInt(_yr || "26") + 1));\
+    changeYear(String(parseInt(_yr || _firstYr) + 1));\
   } else {\
     _curMonth++;\
     renderCards();\
