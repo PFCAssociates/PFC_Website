@@ -574,10 +574,11 @@ document.getElementById("yr").addEventListener("change", function() {\
     _yr = v;\
     _inspections = {};\
     renderCards();\
-    google.script.run.saveConfig("year_suffix", v);\
-    google.script.run.withSuccessHandler(function(d) {\
-      if (d && d.inspections) { _inspections = d.inspections; renderCards(); }\
-    }).getFormData(_token);\
+    google.script.run.withSuccessHandler(function() {\
+      google.script.run.withSuccessHandler(function(d) {\
+        if (d && d.inspections) { _inspections = d.inspections; renderCards(); }\
+      }).getFormData(_token);\
+    }).saveConfig("year_suffix", v);\
   }\
 });\
 \
