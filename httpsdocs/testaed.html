@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.05w">
+  <meta name="build-version" content="01.06w">
   <title>AED Inspection Log (Touch UI)</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -61,11 +61,41 @@
       border: none; transition: all 0.2s; user-select: none;
     }
     .sign-out-btn:hover { background: rgba(211,47,47,0.8); color: #fff; }
+    .confirm-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 20000;
+      display: none; align-items: center; justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .confirm-overlay.show { display: flex; }
+    .confirm-box {
+      background: #fff; border-radius: 16px; padding: 24px 28px; width: 90%; max-width: 340px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-align: center;
+    }
+    .confirm-box h3 { margin: 0 0 8px; font-size: 17px; color: #212121; }
+    .confirm-box p { margin: 0 0 20px; font-size: 14px; color: #666; line-height: 1.5; }
+    .confirm-btns { display: flex; gap: 10px; }
+    .confirm-btns button {
+      flex: 1; padding: 12px 0; border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+    }
+    .confirm-btns button:active { transform: scale(0.97); }
+    .confirm-btns .btn-cancel { background: #eee; color: #616161; }
+    .confirm-btns .btn-confirm { background: #d32f2f; color: #fff; }
   </style>
 </head>
 <body>
   <div id="auth-wall" class="auth-wall"></div>
-  <button id="sign-out-btn" class="sign-out-btn" style="display:none" onclick="signOut()">Sign Out</button>
+  <button id="sign-out-btn" class="sign-out-btn" style="display:none" onclick="showSignOutConfirm()">Sign Out</button>
+  <div id="signout-confirm" class="confirm-overlay">
+    <div class="confirm-box">
+      <h3>Sign Out</h3>
+      <p>Are you sure you want to sign out?</p>
+      <div class="confirm-btns">
+        <button class="btn-cancel" onclick="hideSignOutConfirm()">Cancel</button>
+        <button class="btn-confirm" onclick="hideSignOutConfirm(); signOut();">Sign Out</button>
+      </div>
+    </div>
+  </div>
   <div id="splash-green" class="splash"><div class="splash-title">Website Ready</div><img src="https://pfcassociates.github.io/PFC_Website/PFC_images/PFC_LOGO_4_Transparent.png" alt=""></div>
   <div id="splash-blue" class="splash"><div class="splash-title">Code Ready</div><img src="https://www.shadowaisolutions.com/SAIS%20Logo.png" alt=""></div>
   <iframe id="gas-app" allow="*"></iframe>
@@ -161,8 +191,9 @@
       var token = localStorage.getItem('gis-token') || '';
       iframe.src = _gasBaseUrl + (token ? '&token=' + encodeURIComponent(token) : '');
     }
+    function showSignOutConfirm() { document.getElementById('signout-confirm').classList.add('show'); }
+    function hideSignOutConfirm() { document.getElementById('signout-confirm').classList.remove('show'); }
     function signOut() {
-      if (!confirm('Are you sure you want to sign out?')) return;
       localStorage.removeItem('gis-token');
       localStorage.removeItem('gis-email');
       document.getElementById('sign-out-btn').style.display = 'none';
