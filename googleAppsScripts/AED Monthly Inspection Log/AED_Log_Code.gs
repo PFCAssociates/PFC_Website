@@ -26,7 +26,7 @@
 // =============================================
 // PROJECT CONFIG
 // =============================================
-var VERSION = "01.60g";
+var VERSION = "01.61g";
 var TITLE = "AED Monthly Inspection Log";
 
 var AUTO_REFRESH = true;
@@ -280,6 +280,13 @@ function buildFormHtml(opt_token) {
     /* Year warning */\
     .yr input.warn{border-bottom-color:#d32f2f;animation:pulse-warn .4s ease 2}\
     @keyframes pulse-warn{0%,100%{border-bottom-color:#d32f2f}50%{border-bottom-color:#ff8a80}}\
+    /* Tree */\
+    .tree-wrap{display:flex;justify-content:center;padding:18px 0 8px}\
+    .tree{display:flex;flex-direction:column;align-items:center}\
+    .tree-top{width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-bottom:28px solid #2e7d32;position:relative;z-index:3}\
+    .tree-mid{width:0;height:0;border-left:26px solid transparent;border-right:26px solid transparent;border-bottom:32px solid #388e3c;margin-top:-12px;position:relative;z-index:2}\
+    .tree-bot{width:0;height:0;border-left:34px solid transparent;border-right:34px solid transparent;border-bottom:36px solid #43a047;margin-top:-14px;position:relative;z-index:1}\
+    .tree-trunk{width:14px;height:18px;background:#5d4037;border-radius:0 0 2px 2px;margin-top:-1px}\
     /* Responsive */\
     @media(max-width:700px){\
       .cfg{grid-template-columns:1fr}\
@@ -370,6 +377,7 @@ function buildFormHtml(opt_token) {
       </ol>\
       <p class="ppe"><strong>**PPE/Ready Kit includes:</strong> 1 pocket mask; 1 trauma scissor; 2 pair of gloves; 2 &#8212; 4&quot;x4&quot; gauze pad; 1 razor; 1 antiseptic towelette</p>\
     </div>\
+    <div class="tree-wrap"><div class="tree"><div class="tree-top"></div><div class="tree-mid"></div><div class="tree-bot"></div><div class="tree-trunk"></div></div></div>\
     <div id="gv"></div>\
   </div>\
   <script>\
