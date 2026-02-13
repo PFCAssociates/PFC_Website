@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.02w">
-  <title>HAZCOM</title>
+  <meta name="build-version" content="01.03w">
+  <title>Clark Construction Group — HazCom Training</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0a0a1a; color: #e8e8f0; }
@@ -40,9 +40,9 @@
     /* ── Progress bar ── */
     #progress-bar {
       position: fixed; top: 0; left: 0; height: 3px; z-index: 9000;
-      background: linear-gradient(90deg, #f44336, #ff9800, #ffeb3b);
+      background: linear-gradient(90deg, #1565c0, #42a5f5, #90caf9);
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 12px rgba(255, 152, 0, 0.5);
+      box-shadow: 0 0 12px rgba(33, 150, 243, 0.5);
     }
 
     /* ── Slide counter ── */
@@ -66,22 +66,16 @@
     #nav-next { right: 16px; }
 
     /* ── Slide deck ── */
-    #deck {
-      width: 100%; height: 100%; overflow: hidden; position: relative;
-    }
+    #deck { width: 100%; height: 100%; overflow: hidden; position: relative; }
     .slide {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       display: flex; align-items: center; justify-content: center;
       padding: 60px 80px; opacity: 0; transform: translateX(60px);
       transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      pointer-events: none;
+      pointer-events: none; overflow-y: auto;
     }
-    .slide.active {
-      opacity: 1; transform: translateX(0); pointer-events: auto;
-    }
-    .slide.exit-left {
-      opacity: 0; transform: translateX(-60px);
-    }
+    .slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+    .slide.exit-left { opacity: 0; transform: translateX(-60px); }
 
     /* ── Slide content layouts ── */
     .slide-inner { max-width: 1100px; width: 100%; }
@@ -90,26 +84,32 @@
     .title-slide { text-align: center; flex-direction: column; }
     .title-slide .eyebrow {
       font: 600 14px/1 sans-serif; letter-spacing: 6px; text-transform: uppercase;
-      color: #f44336; margin-bottom: 24px; opacity: 0;
+      color: #42a5f5; margin-bottom: 24px; opacity: 0;
       animation: fadeUp 0.6s 0.2s ease forwards;
     }
     .title-slide h1 {
-      font-size: clamp(48px, 8vw, 96px); font-weight: 800; letter-spacing: -2px;
+      font-size: clamp(42px, 7vw, 84px); font-weight: 800; letter-spacing: -2px;
       line-height: 1.05; margin-bottom: 20px; opacity: 0;
       animation: fadeUp 0.6s 0.4s ease forwards;
     }
-    .title-slide h1 span { color: #f44336; }
+    .title-slide h1 span { color: #42a5f5; }
     .title-slide .subtitle {
-      font: 300 clamp(16px, 2.5vw, 24px)/1.5 sans-serif; color: rgba(255,255,255,0.55);
+      font: 300 clamp(16px, 2.5vw, 22px)/1.5 sans-serif; color: rgba(255,255,255,0.55);
       max-width: 700px; margin: 0 auto 40px; opacity: 0;
       animation: fadeUp 0.6s 0.6s ease forwards;
     }
     .title-slide .tag {
       display: inline-block; padding: 8px 24px; border-radius: 24px;
-      background: rgba(244, 67, 54, 0.12); border: 1px solid rgba(244, 67, 54, 0.3);
-      color: #ef9a9a; font: 600 13px/1 sans-serif; letter-spacing: 2px;
+      background: rgba(33, 150, 243, 0.12); border: 1px solid rgba(33, 150, 243, 0.3);
+      color: #90caf9; font: 600 13px/1 sans-serif; letter-spacing: 2px;
       text-transform: uppercase; opacity: 0;
       animation: fadeUp 0.6s 0.8s ease forwards;
+    }
+    .title-slide .company-badge {
+      display: inline-block; padding: 12px 32px; border-radius: 8px; margin-bottom: 28px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      font: 700 18px/1 sans-serif; letter-spacing: 4px; text-transform: uppercase;
+      color: #e8e8f0; opacity: 0; animation: fadeUp 0.6s 0.1s ease forwards;
     }
 
     @keyframes fadeUp {
@@ -120,130 +120,288 @@
     /* Section headers */
     .section-num {
       font: 800 clamp(60px, 10vw, 120px)/1 sans-serif;
-      color: rgba(244, 67, 54, 0.08); position: absolute; top: 40px; left: 60px;
+      color: rgba(33, 150, 243, 0.06); position: absolute; top: 40px; left: 60px;
       user-select: none; pointer-events: none;
     }
     .slide h2 {
-      font-size: clamp(28px, 4vw, 44px); font-weight: 700; line-height: 1.2;
+      font-size: clamp(26px, 3.8vw, 42px); font-weight: 700; line-height: 1.2;
       margin-bottom: 8px;
     }
-    .slide h2 span { color: #f44336; }
+    .slide h2 span { color: #42a5f5; }
     .accent-line {
-      width: 60px; height: 3px; background: #f44336; border-radius: 2px;
+      width: 60px; height: 3px; background: #42a5f5; border-radius: 2px;
       margin: 16px 0 28px;
     }
     .slide p, .slide li {
-      font-size: clamp(15px, 1.8vw, 19px); line-height: 1.7;
+      font-size: clamp(14px, 1.6vw, 18px); line-height: 1.7;
       color: rgba(255,255,255,0.72);
     }
     .slide ul { list-style: none; padding: 0; }
-    .slide ul li { padding: 8px 0 8px 28px; position: relative; }
+    .slide ul li { padding: 7px 0 7px 28px; position: relative; }
     .slide ul li::before {
-      content: ''; position: absolute; left: 0; top: 17px;
+      content: ''; position: absolute; left: 0; top: 16px;
       width: 10px; height: 10px; border-radius: 50%;
-      background: rgba(244, 67, 54, 0.5); border: 2px solid #f44336;
+      background: rgba(33, 150, 243, 0.5); border: 2px solid #42a5f5;
     }
 
     /* Two-column layout */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
     .two-col-content h2 { margin-top: 0; }
 
-    /* ── GHS Pictogram Grid ── */
+    /* ── GHS Pictogram Grid (flip cards) ── */
     .picto-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 16px;
     }
-    .picto-card {
+    .flip-card {
+      perspective: 800px; cursor: pointer; height: 155px;
+    }
+    .flip-card-inner {
+      position: relative; width: 100%; height: 100%;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+    .flip-card-front, .flip-card-back {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      backface-visibility: hidden; border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 14px 10px; text-align: center;
+    }
+    .flip-card-front {
       background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px; padding: 20px 16px; text-align: center;
-      transition: all 0.3s ease;
     }
-    .picto-card:hover {
-      background: rgba(244, 67, 54, 0.06); border-color: rgba(244, 67, 54, 0.25);
-      transform: translateY(-2px);
+    .flip-card-back {
+      background: rgba(33, 150, 243, 0.1); border: 1px solid rgba(33, 150, 243, 0.3);
+      transform: rotateY(180deg);
     }
-    .picto-diamond {
-      width: 64px; height: 64px; margin: 0 auto 12px;
-      transform: rotate(45deg); border: 3px solid #f44336;
+    .flip-card-front .picto-symbol { font-size: 34px; margin-bottom: 8px; }
+    .flip-card-front .picto-name { font: 600 12px/1.3 sans-serif; color: #e8e8f0; }
+    .flip-card-front .flip-hint {
+      font: 400 10px/1 sans-serif; color: rgba(255,255,255,0.3);
+      margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .flip-card-back .back-title { font: 700 13px/1.2 sans-serif; color: #90caf9; margin-bottom: 6px; }
+    .flip-card-back .back-desc { font: 400 11px/1.4 sans-serif; color: rgba(255,255,255,0.7); }
+    .flip-card-back .back-example { font: 400 10px/1.4 sans-serif; color: rgba(255,255,255,0.4); margin-top: 4px; font-style: italic; }
+
+    /* ── Interactive Role Cards (accordion) ── */
+    .role-cards { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .role-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; overflow: hidden; transition: all 0.3s ease;
+    }
+    .role-card.open { border-color: rgba(33, 150, 243, 0.3); }
+    .role-header {
+      padding: 18px 24px; cursor: pointer; display: flex; align-items: center;
+      gap: 16px; transition: background 0.2s;
+    }
+    .role-header:hover { background: rgba(255,255,255,0.03); }
+    .role-icon { font-size: 28px; flex-shrink: 0; }
+    .role-title { font: 700 17px/1.3 sans-serif; color: #e8e8f0; }
+    .role-subtitle { font: 400 13px/1.4 sans-serif; color: rgba(255,255,255,0.45); }
+    .role-arrow {
+      margin-left: auto; font-size: 18px; color: rgba(255,255,255,0.3);
+      transition: transform 0.3s; flex-shrink: 0;
+    }
+    .role-card.open .role-arrow { transform: rotate(180deg); color: #42a5f5; }
+    .role-body {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .role-card.open .role-body { max-height: 400px; }
+    .role-body-inner { padding: 0 24px 20px 68px; }
+    .role-body-inner ul { margin-top: 4px; }
+    .role-body-inner li { font-size: 14px; padding: 4px 0 4px 24px; }
+    .role-body-inner li::before { top: 13px; width: 8px; height: 8px; }
+
+    /* ── Quiz Styles ── */
+    .quiz-container { margin-top: 20px; }
+    .quiz-question {
+      font: 600 clamp(16px, 2vw, 20px)/1.5 sans-serif; color: #e8e8f0;
+      margin-bottom: 20px; padding: 20px 24px; border-radius: 12px;
+      background: rgba(33, 150, 243, 0.06); border-left: 4px solid #42a5f5;
+    }
+    .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-opt {
+      padding: 16px 20px; border-radius: 10px; cursor: pointer;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      font: 400 15px/1.5 sans-serif; color: rgba(255,255,255,0.8);
+      transition: all 0.3s ease; display: flex; align-items: center; gap: 14px;
+    }
+    .quiz-opt:hover:not(.disabled) {
+      background: rgba(33, 150, 243, 0.08); border-color: rgba(33, 150, 243, 0.3);
+    }
+    .quiz-opt .opt-letter {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(244, 67, 54, 0.06);
+      font: 700 14px/1 sans-serif; background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.5); transition: all 0.3s;
     }
-    .picto-diamond .picto-icon {
-      transform: rotate(-45deg); font-size: 28px; line-height: 1;
+    .quiz-opt.correct {
+      background: rgba(76, 175, 80, 0.12); border-color: rgba(76, 175, 80, 0.5);
+      color: #a5d6a7;
     }
-    .picto-label { font: 600 13px/1.3 sans-serif; color: #e8e8f0; margin-bottom: 4px; }
-    .picto-desc { font: 400 11px/1.4 sans-serif; color: rgba(255,255,255,0.45); }
+    .quiz-opt.correct .opt-letter { background: #4caf50; color: #fff; }
+    .quiz-opt.wrong {
+      background: rgba(244, 67, 54, 0.1); border-color: rgba(244, 67, 54, 0.4);
+      color: #ef9a9a;
+    }
+    .quiz-opt.wrong .opt-letter { background: #f44336; color: #fff; }
+    .quiz-opt.disabled { cursor: default; opacity: 0.6; }
+    .quiz-opt.correct.disabled { opacity: 1; }
+    .quiz-feedback {
+      margin-top: 16px; padding: 16px 20px; border-radius: 10px;
+      font: 400 14px/1.6 sans-serif; display: none;
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.correct-fb {
+      background: rgba(76, 175, 80, 0.08); border: 1px solid rgba(76, 175, 80, 0.2);
+      color: #a5d6a7;
+    }
+    .quiz-feedback.wrong-fb {
+      background: rgba(244, 67, 54, 0.08); border: 1px solid rgba(244, 67, 54, 0.2);
+      color: #ef9a9a;
+    }
 
-    /* ── SDS 16-section list ── */
-    .sds-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 6px 40px; margin-top: 16px;
+    /* ── Scenario cards ── */
+    .scenario-box {
+      background: rgba(255, 152, 0, 0.06); border: 1px solid rgba(255, 152, 0, 0.2);
+      border-radius: 14px; padding: 24px 28px; margin-bottom: 20px;
     }
+    .scenario-label {
+      font: 700 11px/1 sans-serif; letter-spacing: 3px; text-transform: uppercase;
+      color: #ffb74d; margin-bottom: 10px;
+    }
+    .scenario-text { font: 400 16px/1.7 sans-serif; color: rgba(255,255,255,0.8); }
+
+    /* ── Definition cards ── */
+    .def-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .def-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.3s ease;
+    }
+    .def-card:hover, .def-card.expanded {
+      background: rgba(33, 150, 243, 0.06); border-color: rgba(33, 150, 243, 0.25);
+    }
+    .def-card .def-term { font: 700 14px/1.3 sans-serif; color: #90caf9; margin-bottom: 2px; }
+    .def-card .def-short { font: 400 12px/1.4 sans-serif; color: rgba(255,255,255,0.45); }
+    .def-card .def-detail {
+      max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+      font: 400 13px/1.6 sans-serif; color: rgba(255,255,255,0.65);
+    }
+    .def-card.expanded .def-detail { max-height: 100px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); }
+
+    /* ── SDS 16-section (interactive) ── */
+    .sds-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 32px; margin-top: 14px; }
     .sds-item {
-      display: flex; align-items: baseline; gap: 10px; padding: 7px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: baseline; gap: 10px; padding: 8px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.04); border-radius: 6px;
+      cursor: pointer; transition: all 0.2s;
     }
-    .sds-num {
-      font: 700 13px/1 'Segoe UI', monospace; color: #f44336;
-      min-width: 24px; text-align: right;
-    }
+    .sds-item:hover { background: rgba(33, 150, 243, 0.06); }
+    .sds-item.highlight { background: rgba(33, 150, 243, 0.12); border-color: rgba(33, 150, 243, 0.2); }
+    .sds-item.non-mandatory .sds-text { color: rgba(255,255,255,0.4); }
+    .sds-item.non-mandatory .sds-num { color: rgba(33, 150, 243, 0.5); }
+    .sds-num { font: 700 13px/1 monospace; color: #42a5f5; min-width: 24px; text-align: right; }
     .sds-text { font: 400 14px/1.4 sans-serif; color: rgba(255,255,255,0.68); }
+    .sds-badge {
+      font: 600 9px/1 sans-serif; letter-spacing: 1px; text-transform: uppercase;
+      padding: 2px 6px; border-radius: 4px; margin-left: auto; flex-shrink: 0;
+    }
+    .sds-badge.req { background: rgba(33,150,243,0.15); color: #90caf9; }
+    .sds-badge.opt { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.3); }
 
-    /* ── Label diagram ── */
+    /* ── Label diagram (interactive hotspots) ── */
     .label-diagram {
       background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px; padding: 32px; position: relative;
+      border-radius: 16px; padding: 28px; position: relative;
     }
     .label-diagram h3 {
-      font-size: 15px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 3px; color: #f44336; margin-bottom: 24px; text-align: center;
+      font-size: 14px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 3px; color: #42a5f5; margin-bottom: 20px; text-align: center;
     }
-    .label-elements {
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;
-    }
+    .label-elements { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
     .label-el {
-      background: rgba(255,255,255,0.03); border-radius: 10px; padding: 16px;
-      border-left: 3px solid #f44336; transition: background 0.2s;
+      background: rgba(255,255,255,0.03); border-radius: 10px; padding: 14px;
+      border-left: 3px solid #42a5f5; transition: all 0.3s; cursor: pointer;
     }
-    .label-el:hover { background: rgba(255,255,255,0.06); }
-    .label-el-title { font: 700 14px/1 sans-serif; color: #fff; margin-bottom: 6px; }
-    .label-el-desc { font: 400 12px/1.5 sans-serif; color: rgba(255,255,255,0.5); }
+    .label-el:hover, .label-el.active { background: rgba(33, 150, 243, 0.1); transform: translateX(4px); }
+    .label-el-title { font: 700 13px/1 sans-serif; color: #fff; margin-bottom: 4px; }
+    .label-el-desc { font: 400 11px/1.5 sans-serif; color: rgba(255,255,255,0.5); }
 
-    /* ── Key takeaway cards ── */
-    .takeaway-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 24px; }
+    /* ── Takeaway / info cards ── */
+    .takeaway-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
     .takeaway-card {
-      background: linear-gradient(135deg, rgba(244,67,54,0.08), rgba(255,152,0,0.04));
-      border: 1px solid rgba(244,67,54,0.15); border-radius: 16px; padding: 28px 24px;
+      background: linear-gradient(135deg, rgba(33,150,243,0.08), rgba(33,150,243,0.02));
+      border: 1px solid rgba(33,150,243,0.15); border-radius: 16px; padding: 24px 20px;
       text-align: center; transition: all 0.3s ease;
     }
     .takeaway-card:hover {
-      transform: translateY(-4px); border-color: rgba(244,67,54,0.35);
-      box-shadow: 0 12px 40px rgba(244,67,54,0.1);
+      transform: translateY(-4px); border-color: rgba(33,150,243,0.35);
+      box-shadow: 0 12px 40px rgba(33,150,243,0.1);
     }
-    .takeaway-icon { font-size: 36px; margin-bottom: 16px; }
-    .takeaway-card h3 { font: 700 17px/1.3 sans-serif; color: #fff; margin-bottom: 8px; }
+    .takeaway-icon { font-size: 32px; margin-bottom: 14px; }
+    .takeaway-card h3 { font: 700 16px/1.3 sans-serif; color: #fff; margin-bottom: 8px; }
     .takeaway-card p { font: 400 13px/1.6 sans-serif; color: rgba(255,255,255,0.5); }
 
+    /* ── Emergency flow steps ── */
+    .emergency-flow { display: flex; flex-direction: column; gap: 0; margin-top: 16px; }
+    .flow-step { display: flex; align-items: flex-start; gap: 20px; padding: 14px 0; }
+    .flow-num {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font: 800 16px/1 sans-serif; color: #fff;
+      background: linear-gradient(135deg, #1565c0, #42a5f5);
+    }
+    .flow-connector { width: 2px; height: 12px; background: rgba(33,150,243,0.2); margin-left: 19px; }
+    .flow-content { flex: 1; }
+    .flow-title { font: 700 15px/1.3 sans-serif; color: #e8e8f0; margin-bottom: 4px; }
+    .flow-desc { font: 400 13px/1.5 sans-serif; color: rgba(255,255,255,0.5); }
+
     /* ── Stat callout ── */
-    .stat-row { display: flex; gap: 40px; margin: 28px 0 0; }
+    .stat-row { display: flex; gap: 36px; margin: 24px 0 0; }
     .stat-box { text-align: center; }
-    .stat-num { font: 800 clamp(32px, 5vw, 52px)/1 sans-serif; color: #f44336; }
-    .stat-label { font: 400 13px/1.4 sans-serif; color: rgba(255,255,255,0.45); margin-top: 4px; }
+    .stat-num { font: 800 clamp(28px, 4vw, 48px)/1 sans-serif; color: #42a5f5; }
+    .stat-label { font: 400 12px/1.4 sans-serif; color: rgba(255,255,255,0.45); margin-top: 4px; }
+
+    /* ── Score tracker ── */
+    #score-tracker {
+      position: fixed; top: 12px; right: 16px; z-index: 9000;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
+      padding: 8px 16px; border-radius: 20px; display: none;
+      align-items: center; gap: 8px; font: 600 13px/1 sans-serif; color: #90caf9;
+    }
+    #score-tracker.visible { display: flex; }
+    #score-tracker .score-icon { font-size: 16px; }
+
+    /* ── Confetti ── */
+    .confetti-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 9999; overflow: hidden;
+    }
+    .confetti-piece { position: absolute; top: -20px; width: 10px; height: 10px; opacity: 0.8; }
+    @keyframes confetti-fall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
-      .slide { padding: 40px 28px; }
-      .two-col { grid-template-columns: 1fr; gap: 28px; }
-      .picto-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .slide { padding: 40px 24px; }
+      .two-col { grid-template-columns: 1fr; gap: 24px; }
+      .picto-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .flip-card { height: 130px; }
       .sds-grid { grid-template-columns: 1fr; }
       .label-elements { grid-template-columns: 1fr; }
       .takeaway-grid { grid-template-columns: 1fr; }
-      .stat-row { flex-direction: column; gap: 16px; }
+      .def-grid { grid-template-columns: 1fr; }
+      .stat-row { flex-direction: column; gap: 12px; }
       .section-num { display: none; }
       .nav-arrow { width: 36px; height: 36px; font-size: 16px; }
       #nav-prev { left: 6px; }
       #nav-next { right: 6px; }
     }
     @media (max-width: 600px) {
-      .picto-grid { grid-template-columns: repeat(2, 1fr); }
+      .picto-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .quiz-opt { padding: 12px 14px; font-size: 14px; }
     }
   </style>
 </head>
@@ -262,253 +420,662 @@
   <!-- Slide counter -->
   <div id="slide-counter"></div>
 
+  <!-- Score tracker -->
+  <div id="score-tracker"><span class="score-icon">&#9733;</span> <span id="score-display">0 / 0</span></div>
+
   <!-- ════════════════ SLIDES ════════════════ -->
   <div id="deck">
 
     <!-- SLIDE 1 — Title -->
     <div class="slide title-slide active">
       <div class="slide-inner">
-        <div class="eyebrow">OSHA 29 CFR 1910.1200</div>
+        <div class="company-badge">Clark Construction Group</div>
+        <div class="eyebrow">OSHA 29 CFR 1910.1200 &bull; May 2016</div>
         <h1>Hazard<br><span>Communication</span></h1>
-        <div class="subtitle">Understanding chemical hazards in your workplace through the Globally Harmonized System of Classification and Labelling</div>
-        <div class="tag">GHS-Aligned Training</div>
+        <div class="subtitle">Clark Construction Group, LLC and Its Affiliates &mdash; your guide to chemical safety on the job site</div>
+        <div class="tag">Interactive Staff Training</div>
       </div>
     </div>
 
-    <!-- SLIDE 2 — What is HAZCOM -->
+    <!-- SLIDE 2 — Purpose & Scope -->
     <div class="slide">
       <span class="section-num">01</span>
       <div class="slide-inner">
         <div class="two-col">
           <div class="two-col-content">
-            <h2>What is <span>HAZCOM?</span></h2>
+            <h2>Purpose &amp; <span>Scope</span></h2>
             <div class="accent-line"></div>
-            <p>The Hazard Communication Standard (HCS) ensures that information about chemical hazards and protective measures is shared with workers exposed to hazardous chemicals.</p>
+            <p>This program establishes the minimum requirements for <strong>Clark Construction Group, LLC and Its Affiliates (&ldquo;Clark&rdquo;)</strong> for an effective hazard communication program.</p>
             <ul>
-              <li>Also known as the "Right to Know" law</li>
-              <li>Covers all employers with hazardous chemicals in the workplace</li>
-              <li>Aligned with the Globally Harmonized System (GHS) since 2012</li>
-              <li>Requires a written hazard communication program</li>
+              <li>Applies in its entirety to <strong>all Clark operations</strong></li>
+              <li>Variances granted only by the <strong>Vice President of Safety</strong></li>
+              <li>Also known as the <strong>&ldquo;Right to Know&rdquo;</strong> law</li>
+              <li>Requires a <strong>written hazard communication program</strong> at each workplace</li>
+              <li>Covers all employees, subcontractors, and multi-employer sites</li>
             </ul>
           </div>
           <div>
             <div class="stat-row" style="flex-direction:column;">
-              <div class="stat-box"><div class="stat-num">50M+</div><div class="stat-label">Workers protected by HAZCOM</div></div>
-              <div class="stat-box"><div class="stat-num">5M+</div><div class="stat-label">Workplaces covered nationwide</div></div>
               <div class="stat-box"><div class="stat-num">#1</div><div class="stat-label">Most cited OSHA standard year after year</div></div>
+              <div class="stat-box"><div class="stat-num">50M+</div><div class="stat-label">Workers protected by HazCom nationwide</div></div>
+              <div class="stat-box"><div class="stat-num">100%</div><div class="stat-label">Clark&rsquo;s goal: every worker trained and informed</div></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 3 — Three Pillars -->
+    <!-- SLIDE 3 — Key Definitions (Interactive) -->
     <div class="slide">
       <span class="section-num">02</span>
       <div class="slide-inner">
-        <h2>The Three <span>Pillars</span> of HAZCOM</h2>
+        <h2>Key <span>Definitions</span></h2>
         <div class="accent-line"></div>
+        <p style="margin-bottom:8px;">Click any term to see its full definition from the Clark HazCom Program.</p>
+        <div class="def-grid">
+          <div class="def-card" onclick="toggleDef(this)">
+            <div class="def-term">Hazardous Chemical</div>
+            <div class="def-short">Any classified physical or health hazard</div>
+            <div class="def-detail">Any chemical classified as a physical hazard or a health hazard, a simple asphyxiant, combustible dust, pyrophoric gas, or hazard not otherwise classified.</div>
+          </div>
+          <div class="def-card" onclick="toggleDef(this)">
+            <div class="def-term">Container</div>
+            <div class="def-short">Anything that holds a hazardous chemical</div>
+            <div class="def-detail">Any bag, barrel, bottle, box, can, cylinder, drum, reaction vessel, storage tank, or the like that contains a hazardous chemical.</div>
+          </div>
+          <div class="def-card" onclick="toggleDef(this)">
+            <div class="def-term">Safety Data Sheet (SDS)</div>
+            <div class="def-short">Written material about a hazardous chemical</div>
+            <div class="def-detail">Written or printed material concerning a hazardous chemical. Must follow the standardized 16-section format and be available at each workplace.</div>
+          </div>
+          <div class="def-card" onclick="toggleDef(this)">
+            <div class="def-term">Signal Word</div>
+            <div class="def-short">&ldquo;Danger&rdquo; or &ldquo;Warning&rdquo;</div>
+            <div class="def-detail">A word indicating relative severity of hazard. &ldquo;Danger&rdquo; is used for the more severe hazards, while &ldquo;Warning&rdquo; is used for the less severe.</div>
+          </div>
+          <div class="def-card" onclick="toggleDef(this)">
+            <div class="def-term">Pictogram</div>
+            <div class="def-short">Symbol conveying hazard information</div>
+            <div class="def-detail">A composition that may include a symbol plus other graphic elements, such as a border, background pattern, or color, intended to convey specific information about the hazards of a chemical.</div>
+          </div>
+          <div class="def-card" onclick="toggleDef(this)">
+            <div class="def-term">Product Identifier</div>
+            <div class="def-short">Unique name or number for a chemical</div>
+            <div class="def-detail">The name or number used for a hazardous chemical on a label or in the SDS. It permits cross-references among the chemical list, the label, and the SDS.</div>
+          </div>
+          <div class="def-card" onclick="toggleDef(this)">
+            <div class="def-term">Hazard Statement</div>
+            <div class="def-short">Describes the nature of the hazard</div>
+            <div class="def-detail">A statement assigned to a hazard class and category that describes the nature of the hazard(s) of a chemical, including, where appropriate, the degree of hazard.</div>
+          </div>
+          <div class="def-card" onclick="toggleDef(this)">
+            <div class="def-term">Precautionary Statement</div>
+            <div class="def-short">Recommended protective measures</div>
+            <div class="def-detail">A phrase that describes recommended measures to minimize or prevent adverse effects resulting from exposure to a hazardous chemical, or improper storage or handling.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4 — Responsibilities (Accordion) -->
+    <div class="slide">
+      <span class="section-num">03</span>
+      <div class="slide-inner">
+        <h2>Who Is <span>Responsible?</span></h2>
+        <div class="accent-line"></div>
+        <p style="margin-bottom:8px;">Per the Clark HazCom Program &mdash; click each role to see their duties.</p>
+        <div class="role-cards">
+          <div class="role-card" onclick="toggleRole(this)">
+            <div class="role-header">
+              <span class="role-icon">&#128736;</span>
+              <div><div class="role-title">Project Superintendent</div><div class="role-subtitle">Overall responsibility for HazCom compliance</div></div>
+              <span class="role-arrow">&#9660;</span>
+            </div>
+            <div class="role-body"><div class="role-body-inner">
+              <ul>
+                <li>Has <strong>overall responsibility</strong> for establishing and ensuring compliance with the HazCom procedure</li>
+                <li>Ensures a written HazCom program is developed, implemented, and maintained at the workplace</li>
+                <li>Maintains the list of hazardous chemicals known to be present, using product identifiers that reference the appropriate SDS</li>
+                <li>Ensures methods are in place to inform employees of non-routine task hazards and chemicals in unlabeled pipes</li>
+              </ul>
+            </div></div>
+          </div>
+          <div class="role-card" onclick="toggleRole(this)">
+            <div class="role-header">
+              <span class="role-icon">&#128187;</span>
+              <div><div class="role-title">Project Safety Manager</div><div class="role-subtitle">Implementing &amp; monitoring the program</div></div>
+              <span class="role-arrow">&#9660;</span>
+            </div>
+            <div class="role-body"><div class="role-body-inner">
+              <ul>
+                <li>Responsible for <strong>implementing and/or monitoring</strong> activities associated with the HazCom procedure</li>
+                <li>Maintains the SDS binders &mdash; copies of SDS may be obtained upon request</li>
+                <li>Coordinates employee information and training sessions</li>
+                <li>Monitors labeling compliance across the project</li>
+              </ul>
+            </div></div>
+          </div>
+          <div class="role-card" onclick="toggleRole(this)">
+            <div class="role-header">
+              <span class="role-icon">&#128119;</span>
+              <div><div class="role-title">All Managers &amp; Supervisors</div><div class="role-subtitle">Enforce the procedure and ensure compliance</div></div>
+              <span class="role-arrow">&#9660;</span>
+            </div>
+            <div class="role-body"><div class="role-body-inner">
+              <ul>
+                <li><strong>Enforce this procedure</strong> and ensure that each employee follows it</li>
+                <li>Verify every container of hazardous chemicals in the workplace is labeled</li>
+                <li>Ensure SDS are accessible for each hazardous chemical on site</li>
+                <li>Conduct training when new chemical hazards are introduced to the work area</li>
+              </ul>
+            </div></div>
+          </div>
+          <div class="role-card" onclick="toggleRole(this)">
+            <div class="role-header">
+              <span class="role-icon">&#9881;&#65039;</span>
+              <div><div class="role-title">All Employees</div><div class="role-subtitle">Your safety is your right and your responsibility</div></div>
+              <span class="role-arrow">&#9660;</span>
+            </div>
+            <div class="role-body"><div class="role-body-inner">
+              <ul>
+                <li>Follow the HazCom procedure at all times</li>
+                <li>Read labels and SDS <strong>before</strong> using any chemical</li>
+                <li>Wear required PPE &mdash; no shortcuts</li>
+                <li>Never use a chemical from an unlabeled container</li>
+                <li>Report missing labels, SDS gaps, or spills to your supervisor</li>
+                <li>Attend all HazCom training sessions and ask questions</li>
+              </ul>
+            </div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5 — Quick Check #1 -->
+    <div class="slide">
+      <span class="section-num">&#9733;</span>
+      <div class="slide-inner">
+        <h2>Quick <span>Check</span></h2>
+        <div class="accent-line"></div>
+        <div class="quiz-container" data-quiz="q1">
+          <div class="quiz-question">According to the Clark HazCom Program, who has <strong>overall responsibility</strong> for establishing and ensuring compliance with the procedure?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">A</span>
+              <span>The Vice President of Safety</span>
+            </div>
+            <div class="quiz-opt" data-correct="true" onclick="answerQuiz(this)">
+              <span class="opt-letter">B</span>
+              <span>The Project Superintendent</span>
+            </div>
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">C</span>
+              <span>The Project Safety Manager</span>
+            </div>
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">D</span>
+              <span>Each individual employee</span>
+            </div>
+          </div>
+          <div class="quiz-feedback correct-fb">Correct! Per Section 4(a), the Project Superintendent has overall responsibility. The Project Safety Manager implements and monitors, while all managers/supervisors enforce day-to-day compliance.</div>
+          <div class="quiz-feedback wrong-fb">Not quite. Per Section 4(a), the <strong>Project Superintendent</strong> has overall responsibility for establishing and ensuring compliance. The Project Safety Manager implements/monitors, and the VP of Safety can grant variances.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6 — The Three Pillars -->
+    <div class="slide">
+      <span class="section-num">04</span>
+      <div class="slide-inner">
+        <h2>The Three <span>Pillars</span> of HazCom</h2>
+        <div class="accent-line"></div>
+        <p style="margin-bottom: 8px;">Clark&rsquo;s written program must describe how each of these will be met (Section 5):</p>
         <div class="takeaway-grid">
           <div class="takeaway-card">
             <div class="takeaway-icon">&#128278;</div>
-            <h3>Labels</h3>
-            <p>Every container of hazardous chemicals must have a GHS-compliant label with standardized pictograms, signal words, and hazard statements.</p>
+            <h3>Labeling</h3>
+            <p>Every container of hazardous chemicals must be labeled with product identifier, signal word, hazard statements, pictograms, precautionary statements, and supplier info.</p>
           </div>
           <div class="takeaway-card">
             <div class="takeaway-icon">&#128196;</div>
             <h3>Safety Data Sheets</h3>
-            <p>16-section documents providing detailed information about each chemical's properties, hazards, handling, storage, and emergency measures.</p>
+            <p>SDS must be available for each hazardous chemical in the workplace. Maintained by the Project Safety Manager. Copies available upon request.</p>
           </div>
           <div class="takeaway-card">
             <div class="takeaway-icon">&#127891;</div>
-            <h3>Training</h3>
-            <p>Workers must receive effective training on chemical hazards, protective measures, and how to read labels and SDS before working with chemicals.</p>
+            <h3>Employee Training</h3>
+            <p>Effective information and training at initial assignment and whenever a new chemical hazard is introduced into the work area.</p>
+          </div>
+        </div>
+        <div style="margin-top: 24px;">
+          <div class="takeaway-card" style="background: linear-gradient(135deg, rgba(255,152,0,0.08), rgba(255,152,0,0.02)); border-color: rgba(255,152,0,0.2);">
+            <div class="takeaway-icon">&#128101;</div>
+            <h3>Multi-Employer Workplaces</h3>
+            <p>When other employers&rsquo; workers may be exposed, Clark must also share SDS access, precautionary measures, and our labeling system with those employers.</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 4 — GHS Pictograms -->
-    <div class="slide">
-      <span class="section-num">03</span>
-      <div class="slide-inner">
-        <h2>GHS <span>Pictograms</span></h2>
-        <div class="accent-line"></div>
-        <div class="picto-grid">
-          <div class="picto-card">
-            <div class="picto-diamond"><span class="picto-icon">&#128293;</span></div>
-            <div class="picto-label">Flame</div>
-            <div class="picto-desc">Flammable, self-heating, pyrophoric</div>
-          </div>
-          <div class="picto-card">
-            <div class="picto-diamond"><span class="picto-icon">&#9888;&#65039;</span></div>
-            <div class="picto-label">Exclamation Mark</div>
-            <div class="picto-desc">Irritant, skin sensitizer, narcotic</div>
-          </div>
-          <div class="picto-card">
-            <div class="picto-diamond"><span class="picto-icon">&#9760;&#65039;</span></div>
-            <div class="picto-label">Skull &amp; Crossbones</div>
-            <div class="picto-desc">Acute toxicity (fatal or toxic)</div>
-          </div>
-          <div class="picto-card">
-            <div class="picto-diamond"><span class="picto-icon">&#127981;</span></div>
-            <div class="picto-label">Health Hazard</div>
-            <div class="picto-desc">Carcinogen, mutagenicity, organ toxicity</div>
-          </div>
-          <div class="picto-card">
-            <div class="picto-diamond"><span class="picto-icon">&#128167;</span></div>
-            <div class="picto-label">Corrosion</div>
-            <div class="picto-desc">Skin corrosion, eye damage, corrosive to metals</div>
-          </div>
-          <div class="picto-card">
-            <div class="picto-diamond"><span class="picto-icon">&#128165;</span></div>
-            <div class="picto-label">Exploding Bomb</div>
-            <div class="picto-desc">Explosives, self-reactives, organic peroxides</div>
-          </div>
-          <div class="picto-card">
-            <div class="picto-diamond"><span class="picto-icon">&#9901;</span></div>
-            <div class="picto-label">Flame Over Circle</div>
-            <div class="picto-desc">Oxidizers that intensify fire</div>
-          </div>
-          <div class="picto-card">
-            <div class="picto-diamond"><span class="picto-icon">&#127754;</span></div>
-            <div class="picto-label">Environment</div>
-            <div class="picto-desc">Aquatic toxicity hazards</div>
-          </div>
-          <div class="picto-card">
-            <div class="picto-diamond"><span class="picto-icon">&#129707;</span></div>
-            <div class="picto-label">Gas Cylinder</div>
-            <div class="picto-desc">Compressed, liquefied, or dissolved gases</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SLIDE 5 — Safety Data Sheets -->
-    <div class="slide">
-      <span class="section-num">04</span>
-      <div class="slide-inner">
-        <h2>Safety Data Sheets &mdash; <span>16 Sections</span></h2>
-        <div class="accent-line"></div>
-        <p style="margin-bottom:16px;">Every SDS follows a standardized 16-section format. Sections 1&ndash;8 are the most critical for everyday use.</p>
-        <div class="sds-grid">
-          <div class="sds-item"><span class="sds-num">1</span><span class="sds-text">Identification</span></div>
-          <div class="sds-item"><span class="sds-num">9</span><span class="sds-text">Physical &amp; Chemical Properties</span></div>
-          <div class="sds-item"><span class="sds-num">2</span><span class="sds-text">Hazard(s) Identification</span></div>
-          <div class="sds-item"><span class="sds-num">10</span><span class="sds-text">Stability &amp; Reactivity</span></div>
-          <div class="sds-item"><span class="sds-num">3</span><span class="sds-text">Composition / Ingredients</span></div>
-          <div class="sds-item"><span class="sds-num">11</span><span class="sds-text">Toxicological Information</span></div>
-          <div class="sds-item"><span class="sds-num">4</span><span class="sds-text">First-Aid Measures</span></div>
-          <div class="sds-item"><span class="sds-num">12</span><span class="sds-text">Ecological Information</span></div>
-          <div class="sds-item"><span class="sds-num">5</span><span class="sds-text">Fire-Fighting Measures</span></div>
-          <div class="sds-item"><span class="sds-num">13</span><span class="sds-text">Disposal Considerations</span></div>
-          <div class="sds-item"><span class="sds-num">6</span><span class="sds-text">Accidental Release Measures</span></div>
-          <div class="sds-item"><span class="sds-num">14</span><span class="sds-text">Transport Information</span></div>
-          <div class="sds-item"><span class="sds-num">7</span><span class="sds-text">Handling &amp; Storage</span></div>
-          <div class="sds-item"><span class="sds-num">15</span><span class="sds-text">Regulatory Information</span></div>
-          <div class="sds-item"><span class="sds-num">8</span><span class="sds-text">Exposure Controls / PPE</span></div>
-          <div class="sds-item"><span class="sds-num">16</span><span class="sds-text">Other Information</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SLIDE 6 — Container Labels -->
+    <!-- SLIDE 7 — GHS Pictograms (Flip Cards) -->
     <div class="slide">
       <span class="section-num">05</span>
       <div class="slide-inner">
-        <h2>Reading a <span>GHS Label</span></h2>
+        <h2>The 8 GHS <span>Pictograms</span></h2>
         <div class="accent-line"></div>
-        <div class="label-diagram">
-          <h3>Required Label Elements</h3>
-          <div class="label-elements">
-            <div class="label-el">
-              <div class="label-el-title">Product Identifier</div>
-              <div class="label-el-desc">Chemical name or product name matching the SDS</div>
+        <p style="margin-bottom:4px;">Per Attachment 1 of the Clark program &mdash; a red diamond with a black symbol on white. Click to flip.</p>
+        <div class="picto-grid">
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="picto-symbol">&#128293;</div>
+                <div class="picto-name">Flame</div>
+                <div class="flip-hint">Tap to flip</div>
+              </div>
+              <div class="flip-card-back">
+                <div class="back-title">Flammables</div>
+                <div class="back-desc">Self-reactives, pyrophorics, self-heating, emits flammable gas, organic peroxides</div>
+              </div>
             </div>
-            <div class="label-el">
-              <div class="label-el-title">Signal Word</div>
-              <div class="label-el-desc">"Danger" for severe hazards or "Warning" for less severe</div>
+          </div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="picto-symbol">&#9901;</div>
+                <div class="picto-name">Flame Over Circle</div>
+                <div class="flip-hint">Tap to flip</div>
+              </div>
+              <div class="flip-card-back">
+                <div class="back-title">Oxidizers</div>
+                <div class="back-desc">May cause or intensify fire. Keep away from flammable materials.</div>
+              </div>
             </div>
-            <div class="label-el">
-              <div class="label-el-title">Pictogram(s)</div>
-              <div class="label-el-desc">Red diamond-bordered symbols indicating hazard categories</div>
+          </div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="picto-symbol">&#9888;&#65039;</div>
+                <div class="picto-name">Exclamation Mark</div>
+                <div class="flip-hint">Tap to flip</div>
+              </div>
+              <div class="flip-card-back">
+                <div class="back-title">Irritant / Warning</div>
+                <div class="back-desc">Irritant, dermal sensitizer, acute toxicity (harmful), narcotic effects, respiratory tract irritation</div>
+              </div>
             </div>
-            <div class="label-el">
-              <div class="label-el-title">Hazard Statements</div>
-              <div class="label-el-desc">Standardized phrases describing the nature of the hazard</div>
+          </div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="picto-symbol">&#128165;</div>
+                <div class="picto-name">Exploding Bomb</div>
+                <div class="flip-hint">Tap to flip</div>
+              </div>
+              <div class="flip-card-back">
+                <div class="back-title">Explosives</div>
+                <div class="back-desc">Explosives, self-reactives, organic peroxides</div>
+              </div>
             </div>
-            <div class="label-el">
-              <div class="label-el-title">Precautionary Statements</div>
-              <div class="label-el-desc">Prevention, response, storage, and disposal measures</div>
+          </div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="picto-symbol">&#128167;</div>
+                <div class="picto-name">Corrosion</div>
+                <div class="flip-hint">Tap to flip</div>
+              </div>
+              <div class="flip-card-back">
+                <div class="back-title">Corrosives</div>
+                <div class="back-desc">Causes severe skin burns, serious eye damage, or corrodes metals on contact.</div>
+              </div>
             </div>
-            <div class="label-el">
-              <div class="label-el-title">Supplier Info</div>
-              <div class="label-el-desc">Name, address, and phone number of the manufacturer or distributor</div>
+          </div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="picto-symbol">&#129707;</div>
+                <div class="picto-name">Gas Cylinder</div>
+                <div class="flip-hint">Tap to flip</div>
+              </div>
+              <div class="flip-card-back">
+                <div class="back-title">Gases Under Pressure</div>
+                <div class="back-desc">Compressed, liquefied, or dissolved gas. May explode if heated.</div>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="picto-symbol">&#127981;</div>
+                <div class="picto-name">Health Hazard</div>
+                <div class="flip-hint">Tap to flip</div>
+              </div>
+              <div class="flip-card-back">
+                <div class="back-title">Serious Health Hazard</div>
+                <div class="back-desc">Carcinogen, respiratory sensitizer, reproductive toxicity, target organ toxicity, mutagenicity, aspiration toxicity</div>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="picto-symbol">&#9760;&#65039;</div>
+                <div class="picto-name">Skull &amp; Crossbones</div>
+                <div class="flip-hint">Tap to flip</div>
+              </div>
+              <div class="flip-card-back">
+                <div class="back-title">Acute Toxicity (Severe)</div>
+                <div class="back-desc">Fatal or toxic if swallowed, inhaled, or absorbed through skin.</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 7 — Training Requirements -->
+    <!-- SLIDE 8 — Quick Check #2 (Pictogram) -->
+    <div class="slide">
+      <span class="section-num">&#9733;</span>
+      <div class="slide-inner">
+        <h2>Quick <span>Check</span></h2>
+        <div class="accent-line"></div>
+        <div class="quiz-container" data-quiz="q2">
+          <div class="quiz-question">&#127981; &mdash; According to the Clark program, what hazard classes does the &ldquo;Health Hazard&rdquo; pictogram represent?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">A</span>
+              <span>Flammables, self-reactives, and pyrophorics</span>
+            </div>
+            <div class="quiz-opt" data-correct="true" onclick="answerQuiz(this)">
+              <span class="opt-letter">B</span>
+              <span>Carcinogen, respiratory sensitizer, reproductive toxicity, target organ toxicity, mutagenicity, aspiration toxicity</span>
+            </div>
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">C</span>
+              <span>Irritant, dermal sensitizer, narcotic effects</span>
+            </div>
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">D</span>
+              <span>Corrosives and gases under pressure</span>
+            </div>
+          </div>
+          <div class="quiz-feedback correct-fb">Correct! Per Figure C.1 in the Clark program, the Health Hazard pictogram covers carcinogens, respiratory sensitizers, reproductive toxicity, target organ toxicity, mutagenicity, and aspiration toxicity &mdash; serious long-term health effects.</div>
+          <div class="quiz-feedback wrong-fb">Not quite. The Health Hazard pictogram (person with starburst on chest) covers <strong>carcinogen, respiratory sensitizer, reproductive toxicity, target organ toxicity, mutagenicity, and aspiration toxicity</strong>. Option C describes the Exclamation Mark pictogram.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9 — Container Labels (Interactive) -->
     <div class="slide">
       <span class="section-num">06</span>
       <div class="slide-inner">
-        <div class="two-col">
-          <div class="two-col-content">
-            <h2>Training <span>Requirements</span></h2>
-            <div class="accent-line"></div>
-            <p>Employers must provide effective training at the time of initial assignment and whenever a new chemical hazard is introduced.</p>
-            <ul>
-              <li>How to read and interpret GHS labels</li>
-              <li>Where to find and how to use Safety Data Sheets</li>
-              <li>Physical and health hazards of chemicals in the work area</li>
-              <li>Protective measures &mdash; PPE, ventilation, safe work practices</li>
-              <li>Emergency procedures for spills, leaks, and exposures</li>
-              <li>Details of the employer's written HAZCOM program</li>
-            </ul>
-          </div>
-          <div>
-            <div class="takeaway-card" style="margin-bottom:20px;">
-              <div class="takeaway-icon">&#9200;</div>
-              <h3>When to Train</h3>
-              <p>Initial assignment, new chemical introduction, and whenever hazards change. Annual refresher training is recommended best practice.</p>
+        <h2>Reading a <span>GHS Label</span></h2>
+        <div class="accent-line"></div>
+        <p style="margin-bottom:8px;">Per Section 6(a), every container must have these 6 elements. Click each one.</p>
+        <div class="label-diagram">
+          <h3>Required Label Elements</h3>
+          <div class="label-elements">
+            <div class="label-el" onclick="highlightLabel(this)">
+              <div class="label-el-title">&#9312; Product Identifier</div>
+              <div class="label-el-desc">Chemical name or product name &mdash; must permit cross-reference to the chemical list, label, and SDS.</div>
             </div>
-            <div class="takeaway-card">
-              <div class="takeaway-icon">&#128221;</div>
-              <h3>Documentation</h3>
-              <p>Maintain records of training dates, topics, attendees, and trainer qualifications. Records must be accessible to employees.</p>
+            <div class="label-el" onclick="highlightLabel(this)">
+              <div class="label-el-title">&#9313; Signal Word</div>
+              <div class="label-el-desc">&ldquo;DANGER&rdquo; for more severe hazards or &ldquo;WARNING&rdquo; for less severe. Never both.</div>
+            </div>
+            <div class="label-el" onclick="highlightLabel(this)">
+              <div class="label-el-title">&#9314; Hazard Statement(s)</div>
+              <div class="label-el-desc">Standardized phrases describing the nature and degree of each hazard.</div>
+            </div>
+            <div class="label-el" onclick="highlightLabel(this)">
+              <div class="label-el-title">&#9315; Pictogram(s)</div>
+              <div class="label-el-desc">Red diamond-bordered symbols &mdash; one of the 8 standard hazard symbols per Figure C.1.</div>
+            </div>
+            <div class="label-el" onclick="highlightLabel(this)">
+              <div class="label-el-title">&#9316; Precautionary Statement(s)</div>
+              <div class="label-el-desc">Prevention, response, storage, and disposal measures to minimize adverse effects.</div>
+            </div>
+            <div class="label-el" onclick="highlightLabel(this)">
+              <div class="label-el-title">&#9317; Supplier Information</div>
+              <div class="label-el-desc">Name, address, and telephone number of the chemical manufacturer or importer.</div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 8 — Your Rights & Key Takeaways -->
+    <!-- SLIDE 10 — Safety Data Sheets (Interactive) -->
     <div class="slide">
       <span class="section-num">07</span>
       <div class="slide-inner">
-        <h2>Your <span>Rights</span> &amp; Key Takeaways</h2>
+        <h2>Safety Data Sheets &mdash; <span>16 Sections</span></h2>
         <div class="accent-line"></div>
+        <p style="margin-bottom:6px;">Per Section 6(b), SDS are maintained by the Project Safety Manager. Sections <strong>1&ndash;11 &amp; 16 are mandatory</strong>; 12&ndash;15 are non-mandatory. Click any section.</p>
+        <div class="sds-grid">
+          <div class="sds-item" onclick="highlightSDS(this)" title="Product identifier, recommended use, manufacturer info, emergency phone."><span class="sds-num">1</span><span class="sds-text">Identification</span><span class="sds-badge req">Required</span></div>
+          <div class="sds-item" onclick="highlightSDS(this)" title="Appearance, odor, pH, boiling point, flash point, vapor pressure, etc."><span class="sds-num">9</span><span class="sds-text">Physical &amp; Chemical Properties</span><span class="sds-badge req">Required</span></div>
+          <div class="sds-item" onclick="highlightSDS(this)" title="GHS classification, signal word, pictograms, hazard/precautionary statements."><span class="sds-num">2</span><span class="sds-text">Hazard(s) Identification</span><span class="sds-badge req">Required</span></div>
+          <div class="sds-item" onclick="highlightSDS(this)" title="Reactivity, chemical stability, conditions to avoid, incompatible materials."><span class="sds-num">10</span><span class="sds-text">Stability &amp; Reactivity</span><span class="sds-badge req">Required</span></div>
+          <div class="sds-item" onclick="highlightSDS(this)" title="Chemical names, concentrations, CAS numbers. Trade secrets noted."><span class="sds-num">3</span><span class="sds-text">Composition / Ingredients</span><span class="sds-badge req">Required</span></div>
+          <div class="sds-item" onclick="highlightSDS(this)" title="Routes of exposure, symptoms, LD50/LC50, NTP/IARC carcinogen listing."><span class="sds-num">11</span><span class="sds-text">Toxicological Information</span><span class="sds-badge req">Required</span></div>
+          <div class="sds-item" onclick="highlightSDS(this)" title="First aid by route: inhalation, skin, eye contact, ingestion. Immediate/delayed symptoms."><span class="sds-num">4</span><span class="sds-text">First-Aid Measures</span><span class="sds-badge req">Required</span></div>
+          <div class="sds-item non-mandatory" onclick="highlightSDS(this)" title="Ecotoxicity, persistence, bioaccumulative potential, mobility in soil."><span class="sds-num">12</span><span class="sds-text">Ecological Information</span><span class="sds-badge opt">Optional</span></div>
+          <div class="sds-item" onclick="highlightSDS(this)" title="Suitable extinguishing media, combustion products, firefighter PPE."><span class="sds-num">5</span><span class="sds-text">Fire-Fighting Measures</span><span class="sds-badge req">Required</span></div>
+          <div class="sds-item non-mandatory" onclick="highlightSDS(this)" title="Waste residues, safe handling/disposal methods, contaminated packaging."><span class="sds-num">13</span><span class="sds-text">Disposal Considerations</span><span class="sds-badge opt">Optional</span></div>
+          <div class="sds-item" onclick="highlightSDS(this)" title="Personal precautions, protective equipment, containment/cleanup methods."><span class="sds-num">6</span><span class="sds-text">Accidental Release Measures</span><span class="sds-badge req">Required</span></div>
+          <div class="sds-item non-mandatory" onclick="highlightSDS(this)" title="UN number, shipping name, hazard class, packing group, marine pollutant."><span class="sds-num">14</span><span class="sds-text">Transport Information</span><span class="sds-badge opt">Optional</span></div>
+          <div class="sds-item" onclick="highlightSDS(this)" title="Precautions for safe handling, storage conditions, incompatibilities."><span class="sds-num">7</span><span class="sds-text">Handling &amp; Storage</span><span class="sds-badge req">Required</span></div>
+          <div class="sds-item non-mandatory" onclick="highlightSDS(this)" title="Safety, health, environmental regulations specific to this product."><span class="sds-num">15</span><span class="sds-text">Regulatory Information</span><span class="sds-badge opt">Optional</span></div>
+          <div class="sds-item" onclick="highlightSDS(this)" title="OSHA PEL, ACGIH TLV, engineering controls, required PPE specifics."><span class="sds-num">8</span><span class="sds-text">Exposure Controls / PPE</span><span class="sds-badge req">Required</span></div>
+          <div class="sds-item" onclick="highlightSDS(this)" title="Date of preparation or last revision."><span class="sds-num">16</span><span class="sds-text">Other Information</span><span class="sds-badge req">Required</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11 — Scenario: SDS Lookup -->
+    <div class="slide">
+      <span class="section-num">&#9733;</span>
+      <div class="slide-inner">
+        <h2>Scenario: <span>SDS Lookup</span></h2>
+        <div class="accent-line"></div>
+        <div class="scenario-box">
+          <div class="scenario-label">&#128679; Job Site Scenario</div>
+          <div class="scenario-text">A coworker splashes a chemical in their eyes while working on site. They&rsquo;re in pain. You grab the SDS binder. <strong>Which section do you turn to first?</strong></div>
+        </div>
+        <div class="quiz-container" data-quiz="q3">
+          <div class="quiz-options">
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">A</span>
+              <span>Section 1 &mdash; Identification</span>
+            </div>
+            <div class="quiz-opt" data-correct="true" onclick="answerQuiz(this)">
+              <span class="opt-letter">B</span>
+              <span>Section 4 &mdash; First-Aid Measures</span>
+            </div>
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">C</span>
+              <span>Section 8 &mdash; Exposure Controls / PPE</span>
+            </div>
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">D</span>
+              <span>Section 11 &mdash; Toxicological Information</span>
+            </div>
+          </div>
+          <div class="quiz-feedback correct-fb">Correct! Section 4 &mdash; First-Aid Measures gives you immediate treatment instructions by route of exposure (inhalation, skin, eye contact, ingestion), plus most important symptoms and indication of immediate medical attention needed.</div>
+          <div class="quiz-feedback wrong-fb">In an emergency, go straight to <strong>Section 4 &mdash; First-Aid Measures</strong>. It gives you treatment instructions subdivided by route of exposure (inhalation, skin, eye contact, ingestion), plus symptoms and whether immediate medical attention is needed.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12 — Training Requirements -->
+    <div class="slide">
+      <span class="section-num">08</span>
+      <div class="slide-inner">
+        <div class="two-col">
+          <div class="two-col-content">
+            <h2>Employee <span>Training</span></h2>
+            <div class="accent-line"></div>
+            <p>Per Section 6(c) of the Clark HazCom Program, employee training shall include:</p>
+            <ul>
+              <li><strong>Methods to detect</strong> the presence or release of a hazardous chemical (monitoring devices, visual appearance, odor)</li>
+              <li><strong>Physical &amp; health hazards</strong> of chemicals in the work area, including asphyxiation, combustible dust, and pyrophoric gas hazards</li>
+              <li><strong>Protective measures</strong> employees can take &mdash; work practices, emergency procedures, and required PPE</li>
+              <li><strong>Details of the HazCom program</strong> &mdash; how to read labels, the workplace labeling system, SDS order of information, and how to access SDS</li>
+            </ul>
+          </div>
+          <div>
+            <div class="takeaway-card" style="margin-bottom: 16px;">
+              <div class="takeaway-icon">&#9200;</div>
+              <h3>When to Train</h3>
+              <p>At time of <strong>initial assignment</strong> and whenever a <strong>new chemical hazard</strong> the employees have not previously been trained about is introduced into their work area.</p>
+            </div>
+            <div class="takeaway-card" style="margin-bottom: 16px;">
+              <div class="takeaway-icon">&#128218;</div>
+              <h3>Information Required</h3>
+              <p>Employees must be informed of: the requirements of HazCom, operations where hazardous chemicals are present, and location of the written program, chemical lists, and SDS.</p>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-icon">&#128203;</div>
+              <h3>SDS Access</h3>
+              <p>SDS binders are maintained by the Project Safety Manager. Copies may be obtained upon request at any time.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13 — Non-Routine Tasks & Multi-Employer -->
+    <div class="slide">
+      <span class="section-num">09</span>
+      <div class="slide-inner">
+        <div class="two-col">
+          <div class="two-col-content">
+            <h2>Non-Routine Tasks &amp; <span>Multi-Employer</span> Sites</h2>
+            <div class="accent-line"></div>
+            <p>Per Section 5(a), the written HazCom program must address:</p>
+            <ul>
+              <li>Methods to inform employees of <strong>hazards of non-routine tasks</strong></li>
+              <li>Hazards associated with <strong>chemicals in unlabeled pipes</strong> in work areas</li>
+            </ul>
+            <div style="margin-top: 20px;">
+              <p><strong>Multi-employer workplaces</strong> (Section 5(a)(2)) &mdash; when other employers&rsquo; workers may be exposed, Clark must also provide:</p>
+              <ul>
+                <li><strong>SDS access</strong> for each chemical the other employers&rsquo; employees may be exposed to</li>
+                <li><strong>Precautionary measures</strong> needed during normal operations and foreseeable emergencies</li>
+                <li>Information about the <strong>labeling system</strong> used in the workplace</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="takeaway-card" style="margin-bottom: 16px;">
+              <div class="takeaway-icon">&#128227;</div>
+              <h3>Communication Is Key</h3>
+              <p>On multi-employer sites, every contractor must know about chemicals that could affect their workers &mdash; even chemicals they don&rsquo;t directly use.</p>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-icon">&#128203;</div>
+              <h3>Unlabeled Pipes</h3>
+              <p>The program must address how employees are informed about chemicals in unlabeled pipes in their work areas. Always check before cutting or opening any pipe.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 14 — Quick Check #3 (Unlabeled Container) -->
+    <div class="slide">
+      <span class="section-num">&#9733;</span>
+      <div class="slide-inner">
+        <h2>Quick <span>Check</span></h2>
+        <div class="accent-line"></div>
+        <div class="scenario-box">
+          <div class="scenario-label">&#128679; Job Site Scenario</div>
+          <div class="scenario-text">You find a container of solvent on site with no label. What should you do?</div>
+        </div>
+        <div class="quiz-container" data-quiz="q4">
+          <div class="quiz-options">
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">A</span>
+              <span>Use it anyway &mdash; it&rsquo;s probably fine if someone left it out</span>
+            </div>
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">B</span>
+              <span>Smell it to figure out what it is</span>
+            </div>
+            <div class="quiz-opt" data-correct="true" onclick="answerQuiz(this)">
+              <span class="opt-letter">C</span>
+              <span>Stop &mdash; do not use it. Report it to your supervisor immediately</span>
+            </div>
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">D</span>
+              <span>Pour it out and dispose of the container</span>
+            </div>
+          </div>
+          <div class="quiz-feedback correct-fb">Correct! Per Section 6(a)(2), the employer shall ensure that <strong>each container of hazardous chemicals in the workplace is labeled</strong>. Never use an unlabeled chemical. Report it so it can be identified, properly labeled, or disposed of safely.</div>
+          <div class="quiz-feedback wrong-fb">You should <strong>never</strong> use, smell, or dispose of an unlabeled chemical yourself. Per Section 6(a)(2), every container must be labeled. Stop work and report it to your supervisor so it can be identified and properly handled.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 15 — Final Quiz -->
+    <div class="slide">
+      <span class="section-num">&#9733;</span>
+      <div class="slide-inner">
+        <h2>Final <span>Challenge</span></h2>
+        <div class="accent-line"></div>
+        <div class="quiz-container" data-quiz="q5">
+          <div class="quiz-question">Per the Clark HazCom Program, which SDS sections are <strong>non-mandatory</strong> (may be included but are not required)?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">A</span>
+              <span>Sections 1&ndash;4 (Identification through First-Aid)</span>
+            </div>
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">B</span>
+              <span>Sections 8&ndash;11 (Exposure Controls through Toxicological)</span>
+            </div>
+            <div class="quiz-opt" data-correct="true" onclick="answerQuiz(this)">
+              <span class="opt-letter">C</span>
+              <span>Sections 12&ndash;15 (Ecological, Disposal, Transport, Regulatory)</span>
+            </div>
+            <div class="quiz-opt" data-correct="false" onclick="answerQuiz(this)">
+              <span class="opt-letter">D</span>
+              <span>All 16 sections are mandatory</span>
+            </div>
+          </div>
+          <div class="quiz-feedback correct-fb">Correct! Per Attachment 2, sections 1&ndash;11 and 16 are mandatory. <strong>Sections 12&ndash;15</strong> (Ecological Information, Disposal Considerations, Transport Information, Regulatory Information) may be included but are non-mandatory.</div>
+          <div class="quiz-feedback wrong-fb">Per Attachment 2 of the Clark program, <strong>Sections 12&ndash;15</strong> (Ecological Information, Disposal Considerations, Transport Information, Regulatory Information) are non-mandatory. Sections 1&ndash;11 and 16 are required.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 16 — Your Score & Key Takeaways -->
+    <div class="slide">
+      <span class="section-num">10</span>
+      <div class="slide-inner" style="text-align: center;">
+        <h2>Your <span>Results</span> &amp; Key Takeaways</h2>
+        <div class="accent-line" style="margin: 16px auto 28px;"></div>
+        <div id="final-score" style="font: 800 clamp(48px, 8vw, 80px)/1 sans-serif; color: #42a5f5; margin-bottom: 8px;">0 / 5</div>
+        <div id="final-score-label" style="font: 400 16px/1.5 sans-serif; color: rgba(255,255,255,0.5); margin-bottom: 36px;">Complete the quizzes to see your score</div>
         <div class="takeaway-grid">
           <div class="takeaway-card">
             <div class="takeaway-icon">&#128270;</div>
             <h3>Right to Know</h3>
-            <p>You have the right to know about every hazardous chemical in your workplace and how to protect yourself from exposure.</p>
+            <p>You have the right to know about <strong>every</strong> hazardous chemical on your job site and how to protect yourself.</p>
           </div>
           <div class="takeaway-card">
             <div class="takeaway-icon">&#128214;</div>
-            <h3>Right to Access SDS</h3>
-            <p>Safety Data Sheets must be readily available during your work shift. You can request an SDS for any chemical at any time.</p>
+            <h3>Read Before You Use</h3>
+            <p>Check the label and SDS <strong>before</strong> handling any chemical. If there&rsquo;s no label, don&rsquo;t use it.</p>
           </div>
           <div class="takeaway-card">
             <div class="takeaway-icon">&#128170;</div>
-            <h3>Right to Training</h3>
-            <p>Your employer must train you before you work with or near hazardous chemicals. You can request retraining at any time.</p>
+            <h3>Speak Up</h3>
+            <p>Report missing labels, unknown chemicals, and unsafe conditions. Your voice keeps everyone safe.</p>
           </div>
         </div>
-        <div style="text-align:center; margin-top:48px;">
-          <div class="tag" style="display:inline-block;">Stay Safe &mdash; Know Your Chemicals &mdash; Ask Questions</div>
+        <div style="margin-top: 48px;">
+          <div class="tag" style="display:inline-block; font-size: 14px; padding: 12px 32px;">Stay Safe &mdash; Know Your Chemicals &mdash; Ask Questions</div>
         </div>
       </div>
     </div>
@@ -537,17 +1104,13 @@
       var dir = index > current ? 1 : -1;
       var oldSlide = slides[current];
       var newSlide = slides[index];
-      // Hide old slide
       oldSlide.classList.remove('active', 'exit-left');
       oldSlide.style.transform = dir > 0 ? 'translateX(-60px)' : 'translateX(60px)';
-      // After transition, clean up inline style so CSS takes over
       setTimeout(function() { oldSlide.style.transform = ''; }, 550);
-      // Position new slide offscreen on the incoming side
       newSlide.classList.remove('active', 'exit-left');
       newSlide.style.transition = 'none';
       newSlide.style.transform = dir > 0 ? 'translateX(60px)' : 'translateX(-60px)';
       newSlide.style.opacity = '0';
-      // Force reflow then animate in
       void newSlide.offsetWidth;
       newSlide.style.transition = '';
       newSlide.style.transform = '';
@@ -555,6 +1118,7 @@
       newSlide.classList.add('active');
       current = index;
       updateUI();
+      updateScoreTracker();
     }
 
     prevBtn.addEventListener('click', function() { goTo(current - 1); });
@@ -567,7 +1131,6 @@
       if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
     });
 
-    // Touch/swipe support
     var _touchStartX = 0;
     document.addEventListener('touchstart', function(e) { _touchStartX = e.changedTouches[0].clientX; }, { passive: true });
     document.addEventListener('touchend', function(e) {
@@ -576,6 +1139,118 @@
     }, { passive: true });
 
     updateUI();
+
+    /* ══════════════ INTERACTIVE FEATURES ══════════════ */
+
+    /* Role accordion */
+    function toggleRole(card) {
+      var wasOpen = card.classList.contains('open');
+      card.parentElement.querySelectorAll('.role-card').forEach(function(c) { c.classList.remove('open'); });
+      if (!wasOpen) card.classList.add('open');
+    }
+
+    /* Definition cards */
+    function toggleDef(card) {
+      var wasExpanded = card.classList.contains('expanded');
+      card.parentElement.querySelectorAll('.def-card').forEach(function(c) { c.classList.remove('expanded'); });
+      if (!wasExpanded) card.classList.add('expanded');
+    }
+
+    /* Label highlight */
+    function highlightLabel(el) {
+      el.parentElement.querySelectorAll('.label-el').forEach(function(e) { e.classList.remove('active'); });
+      el.classList.add('active');
+    }
+
+    /* SDS highlight */
+    function highlightSDS(item) {
+      item.parentElement.querySelectorAll('.sds-item').forEach(function(i) { i.classList.remove('highlight'); });
+      item.classList.add('highlight');
+    }
+
+    /* ══════════════ QUIZ SYSTEM ══════════════ */
+    var quizScore = { correct: 0, total: 0 };
+    var answeredQuizzes = {};
+
+    function answerQuiz(opt) {
+      var container = opt.closest('.quiz-container');
+      var quizId = container.dataset.quiz;
+      if (answeredQuizzes[quizId]) return;
+      answeredQuizzes[quizId] = true;
+
+      var isCorrect = opt.dataset.correct === 'true';
+      quizScore.total++;
+      if (isCorrect) quizScore.correct++;
+
+      opt.classList.add(isCorrect ? 'correct' : 'wrong');
+
+      var allOpts = container.querySelectorAll('.quiz-opt');
+      allOpts.forEach(function(o) {
+        o.classList.add('disabled');
+        if (o.dataset.correct === 'true' && o !== opt) o.classList.add('correct');
+      });
+
+      var feedbacks = container.querySelectorAll('.quiz-feedback');
+      feedbacks.forEach(function(f) {
+        if ((isCorrect && f.classList.contains('correct-fb')) ||
+            (!isCorrect && f.classList.contains('wrong-fb'))) {
+          f.classList.add('show');
+        }
+      });
+
+      updateScoreTracker();
+      updateFinalScore();
+
+      if (isCorrect && quizScore.correct === 5) launchConfetti();
+    }
+
+    function updateScoreTracker() {
+      var tracker = document.getElementById('score-tracker');
+      var display = document.getElementById('score-display');
+      if (quizScore.total > 0) {
+        tracker.classList.add('visible');
+        display.textContent = quizScore.correct + ' / ' + quizScore.total + ' correct';
+      }
+    }
+
+    function updateFinalScore() {
+      var el = document.getElementById('final-score');
+      var label = document.getElementById('final-score-label');
+      el.textContent = quizScore.correct + ' / 5';
+      if (quizScore.total >= 5) {
+        if (quizScore.correct === 5) {
+          label.textContent = 'Perfect score! You really know your HazCom!';
+          label.style.color = '#66bb6a';
+        } else if (quizScore.correct >= 3) {
+          label.textContent = 'Good job! Review the topics you missed for next time.';
+          label.style.color = '#90caf9';
+        } else {
+          label.textContent = 'Keep studying! Review the training and ask your supervisor if you have questions.';
+          label.style.color = '#ffb74d';
+        }
+      } else {
+        label.textContent = quizScore.total + ' of 5 questions answered so far';
+      }
+    }
+
+    function launchConfetti() {
+      var container = document.createElement('div');
+      container.className = 'confetti-container';
+      document.body.appendChild(container);
+      var colors = ['#42a5f5', '#66bb6a', '#ffeb3b', '#ff7043', '#ab47bc', '#26c6da'];
+      for (var i = 0; i < 80; i++) {
+        var piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.width = (Math.random() * 8 + 4) + 'px';
+        piece.style.height = (Math.random() * 8 + 4) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+        piece.style.animation = 'confetti-fall ' + (Math.random() * 2 + 1.5) + 's linear ' + (Math.random() * 0.5) + 's forwards';
+        container.appendChild(piece);
+      }
+      setTimeout(function() { container.remove(); }, 4000);
+    }
 
     /* ══════════════ AUTO-UPDATE (from template) ══════════════ */
     var AUTO_REFRESH = true;
