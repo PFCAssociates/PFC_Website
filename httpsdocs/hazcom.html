@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="01.01w">
+  <meta name="build-version" content="01.02w">
   <title>HAZCOM</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -535,16 +535,25 @@
     function goTo(index) {
       if (index < 0 || index >= total || index === current) return;
       var dir = index > current ? 1 : -1;
-      slides[current].classList.remove('active');
-      slides[current].classList.add(dir > 0 ? 'exit-left' : '');
-      slides[current].style.transform = dir > 0 ? 'translateX(-60px)' : 'translateX(60px)';
-      current = index;
-      slides[current].classList.remove('exit-left');
-      slides[current].style.transform = dir > 0 ? 'translateX(60px)' : 'translateX(-60px)';
+      var oldSlide = slides[current];
+      var newSlide = slides[index];
+      // Hide old slide
+      oldSlide.classList.remove('active', 'exit-left');
+      oldSlide.style.transform = dir > 0 ? 'translateX(-60px)' : 'translateX(60px)';
+      // After transition, clean up inline style so CSS takes over
+      setTimeout(function() { oldSlide.style.transform = ''; }, 550);
+      // Position new slide offscreen on the incoming side
+      newSlide.classList.remove('active', 'exit-left');
+      newSlide.style.transition = 'none';
+      newSlide.style.transform = dir > 0 ? 'translateX(60px)' : 'translateX(-60px)';
+      newSlide.style.opacity = '0';
       // Force reflow then animate in
-      void slides[current].offsetWidth;
-      slides[current].classList.add('active');
-      slides[current].style.transform = '';
+      void newSlide.offsetWidth;
+      newSlide.style.transition = '';
+      newSlide.style.transform = '';
+      newSlide.style.opacity = '';
+      newSlide.classList.add('active');
+      current = index;
       updateUI();
     }
 
